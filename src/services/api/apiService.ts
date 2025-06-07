@@ -1,22 +1,23 @@
 import axios from 'axios';
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
-import { handleReq, handleReqError } from './interceptors/requestInterceptor';
+import { handleCookie, handleReq, handleReqError } from './interceptors/requestInterceptor';
 import { handleRes, handleResError } from './interceptors/responseInterceptor';
 
 const apiClient: AxiosInstance = axios.create({
-    baseURL: import.meta.env.BASE_URL,
-    withCredentials: false,
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+    withCredentials: true,
+
     // timeout: 10000,
 });
 
 // Request Interceptor
-
 apiClient.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
+        handleCookie();
         return handleReq(config);
     },
     (error: AxiosError) => {
-        handleReqError(error);
+        return handleReqError(error);
     }
 );
 
@@ -27,7 +28,7 @@ apiClient.interceptors.response.use(
         return handleRes(response);
     },
     (error: AxiosError) => {
-        handleResError(error);
+        return handleResError(error);
     }
 );
 

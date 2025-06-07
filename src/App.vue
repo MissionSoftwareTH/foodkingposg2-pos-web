@@ -6,6 +6,7 @@ import AuthLayout from './layouts/AuthLayout.vue';
 import BlankLayout from './layouts/BlankLayout.vue';
 import controllerUI from './services/utils/controllerUI';
 import type { Layouts } from './types';
+import DialogMessage from './components/dialogs/DialogMessage.vue';
 
 // setup layout router
 const layouts: Layouts = {
@@ -28,4 +29,5 @@ controllerUI.setupUI();
     <component :is="currentLayout">
       <RouterView />
     </component>
+    <DialogMessage />
 </template>

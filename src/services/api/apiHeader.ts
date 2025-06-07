@@ -1,16 +1,16 @@
 
 
 export const getApiHeaders = () => {
-  const username = import.meta.env.VITE_API_USERNAME;
-  const password = import.meta.env.VITE_API_PASSWORD;
+  const username = import.meta.env.VITE_API_AUTH_USERNAME;
+  const password = import.meta.env.VITE_API_AUTH_PASSWORD;
   const basicAuth = "Basic " + btoa(`${username}:${password}`);
 
-  const headers = {
+  const headers: { [key: string]: string } = {
     "Content-Type": "application/json",
     "Authorization": basicAuth,
-    "x-platform": 'web',
-    "accept-language": 'EN',
-  };
+    "x-platform": 'WEB',
+    "accept-language": 'TH',
+    };
 
   return headers;
 }

@@ -3,7 +3,7 @@ import { AbilityBuilder, createMongoAbility, type Ability } from "@casl/ability"
 export const ability: Ability = createMongoAbility();
 
 export const updateAbility = (userRoles: string[], userId?: string) => {
-    const { can , cannot , rules } = new AbilityBuilder(createMongoAbility);
+    const { can , rules } = new AbilityBuilder(createMongoAbility);
 
     if (userRoles.includes('admin')) {
         can('manage', 'all');

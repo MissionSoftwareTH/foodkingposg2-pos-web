@@ -2,6 +2,7 @@
   <div>
     <Navbar class="fixed"/>
     <RouterView />
+    
   </div>
 </template>
 

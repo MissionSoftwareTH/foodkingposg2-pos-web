@@ -2,7 +2,7 @@
     <label class="swap swap-rotate">
 
         <!-- this hidden checkbox controls the state -->
-        <input type="checkbox" class="theme-controller" @change="toggleTheme" :checked="isDark" />
+        <input type="checkbox" class="" @change="toggleTheme" :checked="isDark" />
 
         <!-- sun icon -->
         <svg class="swap-on fill-current size-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -17,39 +17,26 @@
     </label>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useAppSetupStore } from '../store/appSetupStore';
+const UIStore = useAppSetupStore();
+const isDark = ref(false);
 
-export default defineComponent({
-    name: 'ThemeBtn',
-    setup() {
-        const isDark = ref(false);
+const applyTheme = (dark: boolean) => {
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    UIStore.setTheme(dark ? 'dark' : 'light')
+};
 
-        const applyTheme = (dark: boolean) => {
-            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-            localStorage.setItem('theme', dark ? 'dark' : 'light');
-        };
+const toggleTheme = () => {
+    isDark.value = !isDark.value;
+    applyTheme(isDark.value);
+};
 
-        const toggleTheme = () => {
-            isDark.value = !isDark.value;
-            applyTheme(isDark.value);
-        };
-
-        onMounted(() => {
-            const storedTheme = localStorage.getItem('theme');
-            if (storedTheme === 'dark') {
-                isDark.value = true;
-                applyTheme(true);
-            } else {
-                isDark.value = false;
-                applyTheme(false);
-            }
-        });
-
-        return {
-            isDark,
-            toggleTheme,
-        };
-    },
+onMounted(() => {
+    if (UIStore.theme === 'dark') {
+        isDark.value = true;
+    }
+    applyTheme(isDark.value);
 });
 </script>

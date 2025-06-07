@@ -1,6 +1,6 @@
 <template>
-    <div class="dropdown dropdown-end ">
-        <label tabindex="0" class="btn m-1">
+    <div class="dropdown dropdown-end">
+        <label tabindex="0" class="btn btn-sm text-sm w-28">
             {{ selectedLanguage }}
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -29,16 +29,29 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import controllerUI from '../services/utils/controllerUI.ts'
-import { languages } from "../constants/language.ts";
+import { languages, type LanguageCode } from "../constants/language.ts";
+import { useAppSetupStore } from "../store/appSetupStore.ts";
 
-const selectedLanguage = ref<string>(languages.en.label);
+const UIStore = useAppSetupStore();
+const getLanguageDetail = (code:LanguageCode) => {
+    if(code === "th") return languages.th;
+    if(code === "en") return languages.en;
+    return undefined;
+}
+
+const selectedLanguage = ref<string>(getLanguageDetail(UIStore.locale as LanguageCode)?.label || '');
 
 const changeLanguage = (lang: { label: string, value: string }) => {
     selectedLanguage.value = lang.label
     // TODO: Implement i18n logic here, e.g., using vue-i18n
     console.log(`Language changed to ${lang.value}`);
-     controllerUI.setLocale(lang.value)
+    controllerUI.setLocale(lang.value)
 };
+
+onMounted(() => {
+    controllerUI.setLocale(UIStore.locale)
+})
+
 </script>
