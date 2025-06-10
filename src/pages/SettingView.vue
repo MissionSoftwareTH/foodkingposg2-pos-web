@@ -1,55 +1,79 @@
 <template>
-    <div class="flex flex-col items-center justify-center bg-gray-100">
-        <h1 class="text-3xl font-bold mb-4">Settings</h1>
-        <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="theme">
-                    Theme
-                </label>
-                <select
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="theme"
-                    v-model="theme"
-                >
-                    <option>Light</option>
-                    <option>Dark</option>
-                    <option>System</option>
-                </select>
+    <div class="breadcrumbs w-full h-full flex flex-col p-2">
+        <ul class="mb-4">
+            <li v-for="item in mypath" :key="item" class="first:text-2xl first:font-bold" >{{ item }}</li>
+        </ul>
+        <div class="card flex-row overflow-hidden h-full">
+            <div class="flex-1 bg-base-200 flex flex-col font-semibold">
+                    <SettingMenu
+                        v-for="item in menuItems"
+                        :key="item.id"
+                        :item="item"
+                    />
             </div>
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="language">
-                    Language
-                </label>
-                <select
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="language"
-                    v-model="language"
-                >
-                    <option>English</option>
-                    <option>Thai</option>
-                </select>
-            </div>
-            <div class="flex items-center justify-between">
-                <button
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    type="button"
-                    @click="saveSettings"
-                >
-                    Save
-                </button>
+            <div class="flex-5">
+              <RouterView></RouterView>
             </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { useRoute } from 'vue-router';
+import SettingMenu from '../components/setting_menu/SettingMenu.vue';
+import type { MenuItem } from '../types';
+import { computed, watch } from 'vue';
 
-const theme = ref('Light');
-const language = ref('English');
+const menuItems: MenuItem[] = [
+  {
+    id: '1',
+    label: 'Account',
+    children: [
+      {
+        id: '1.1',
+        label: 'personal info',
+        path: '/setting/account/info',
+      },
+      {
+        id: '1.2',
+        label: 'change password',
+        path: '/setting/account/change-password',
+      },
+    ],
+  },
+  {
+    id: '2',
+    label: 'Appearance',
+    children: [
+      {
+        id: '2.1',
+        label: 'UI color',
+        path: '#',
+      },
+      {
+        id: '2.2',
+        label: 'language',
+        path: '#',
+      },
+    ],
+  },
+];
 
-const saveSettings = () => {
-    // Save settings here
-    console.log('Saving settings', theme.value, language.value);
-};
+
+
+const route = useRoute();
+const mypath = computed(() => {
+  let path:typeof route.name[] = []
+  route.matched.forEach(r => {
+    path.push(r.name)
+  });
+  console.log(route.matched)
+  return path;
+});
+
+watch(mypath , (newVal) => {
+  console.log(newVal)
+},{immediate: true})
+
+
 </script>

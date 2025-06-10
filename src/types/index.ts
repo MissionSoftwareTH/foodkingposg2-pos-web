@@ -10,11 +10,39 @@ export interface Layouts {
   AuthLayout: typeof AuthLayout;
 }
 
-export interface loginPayload {
+export interface formData {
+    firstname?: string;
+    lastname?: string;
+    email?: string;
+    password?: string;
+    new_password?: string;
+    confirm_password?: string;
+    data?: any;
+    otp?: string;
+}
+
+export interface Payload {
     Email?: string;
     Password?: string;
     TokenRecaptcha?: string;
     otp?: string;
     TempToken?: string;
     RefCode?: string;
+    OldPassword?: string;
+    NewPassword?: string;
+    FirstName?: string;
+    LastName?: string;
+}
+
+export interface MenuItem {
+  id: string;
+  label: string;
+  path?: string; // Optional path for navigation
+  children?: MenuItem[]; // Optional array of sub-menus
+}
+
+export interface HeadersTable {
+    key: string;
+    title: string;
+    type?: 'actions' | 'default';
 }

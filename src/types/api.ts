@@ -1,8 +1,8 @@
 
 export interface baseResponse<T>{
-    res_code: string;
+    res_code: number;
     res_type: 'success' | 'error' | string;
-    re_message: string;
+    res_message: string;
     res_data: T;
     res_time: number;
 }

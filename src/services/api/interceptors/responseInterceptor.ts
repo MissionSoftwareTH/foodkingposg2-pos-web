@@ -1,4 +1,7 @@
 import type { AxiosError, AxiosResponse } from "axios";
+import type { baseResponse } from "../../../types";
+
+
 
 export const handleResError = (error:AxiosError) => {
     if (error.response) {
@@ -22,6 +25,14 @@ export const handleResError = (error:AxiosError) => {
             console.error('Error setting up request:', error.message);
         }
         return Promise.reject(error);
+}
+
+export const handleResDataError = (response: AxiosResponse<baseResponse<void>>) => {
+    switch (response.data.res_code) {
+        case 2300:
+            break;
+        
+    }
 }
 
 export const handleRes = (response: AxiosResponse) => {

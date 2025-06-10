@@ -32,8 +32,8 @@
                         <h1 class="text-center text-xl font-semibold uppercase">Enter OTP </h1>
                         <OTPinput :length="6" @otp-completed="handleOtpCompleted"/>
                         <div class="flex">
-                            <div class="flex-1">
-                                OTP timeleft: <CountdownTimer
+                            <div class="flex-1 flex gap-1">
+                                OTP timeleft: <p class="text-error" v-if="isOTPTimerFinish">OTP expired</p><CountdownTimer v-else
                                                 :startTimeMillis="OTPdata.OtpExpireIn"
                                                 @countdown-finished="isOTPTimerFinish = $event"
                                                 class="text-primary"
@@ -70,18 +70,12 @@ import { useRouter } from 'vue-router';
 import { updateAbility } from '../services/plugin/permissions';
 import { useDialogStore } from '../store/dialogStore';
 import OTPinput from '../components/OTPinput.vue';
-import type { baseResponse, extendTime, loginPayload, OTP_Response } from '../types';
+import type { baseResponse, extendTime, Payload, OTP_Response, formData } from '../types';
 import CountdownTimer from '../components/CountdownTimer.vue';
 import { getApiHeaders } from '../services/api/apiHeader';
 import apiClient from '../services/api/apiService';
 import type { AxiosResponse } from 'axios';
-
-interface formData {
-    email: string;
-    password: string;
-    data?: any;
-    otp?: string;
-}
+import { getInfo } from '../services/utils';
 
 const route = useRouter();
 const dialogStore = useDialogStore();
@@ -90,13 +84,12 @@ const isOTPTimerFinish = ref<boolean>(false);
 const isdelayOTPTimerFinish = ref<boolean>(false);
 const isLoading = ref<boolean>(false);
 
-
 const OTPdata = ref<OTP_Response>({
     TempToken: '',
     RefCode: '',
     RequestTime: '',
     RemainingTime: 10,
-    OtpExpireIn: 20,
+    OtpExpireIn: 10,
 })
 
 
@@ -109,21 +102,6 @@ const form = ref<formData>({
     password: '',
 })
 
-const userinfo = {
-    admin:{
-        userId: 1,
-        username: 'admin.a',
-        email: 'admin.a@smartblocktech.ai',
-        roles: ['admin'],
-    },
-    viewer:{
-        userId: 2,
-        username: 'viewer.v',
-        email: 'viewer.v@smartblocktech.ai',
-        roles: ['viewer'],
-    }
-}
-
 
 const handleSubmit = async () => {
     const {email, password} = form.value;
@@ -131,7 +109,7 @@ const handleSubmit = async () => {
     try {
         isLoading.value = true;
         const headers = getApiHeaders();
-        const payload:loginPayload = {
+        const payload:Payload = {
              Email: email,
              Password: password
             };
@@ -155,7 +133,7 @@ const login = async () => {
         isLoading.value = true;
         const {TempToken , RefCode} = OTPdata.value;
         const headers = getApiHeaders();
-        const payload:loginPayload = {
+        const payload:Payload = {
             otp: form.value.otp,
             TempToken: TempToken,
             RefCode: RefCode,
@@ -183,15 +161,18 @@ const handleOtpCompleted = (otp: string) => {
 const sendEmailOTP = async () => {
     try {
         isLoading.value = true;
-        isdelayOTPTimerFinish.value = false;
+        isOTPTimerFinish.value = true;
         const {email ,password} = form.value;
+
         const headers = getApiHeaders();
-        const payload:loginPayload = {Email: email , Password: password};
+        const payload:Payload = {Email: email , Password: password};
         const apiUrl = '/twofa/login/request/otp/email';
         const res = await apiClient.post(apiUrl , payload , {headers});
         const resData:baseResponse<OTP_Response> = res?.data ;
-        
+            
         OTPdata.value = resData?.res_data;
+        isdelayOTPTimerFinish.value = false;
+        isOTPTimerFinish.value = false;
 
     } catch (error: any) {
         console.error(error);
@@ -201,13 +182,13 @@ const sendEmailOTP = async () => {
     }
 }
 
-const handleLogin = (res:AxiosResponse<baseResponse<extendTime>>) => {
+const handleLogin = async (res:AxiosResponse<baseResponse<extendTime>>) => {
     const resData = res.data?.res_data
-    
+    const info = await getInfo();
     localStorage.setItem('extendTime', JSON.stringify(resData.FormatingTime.extendTime.asiaBangkok.unixTimestamp));
     localStorage.setItem('isLoggedIn' , 'active');
-    updateAbility(userinfo.admin.roles);
-    localStorage.setItem('info' , JSON.stringify(userinfo.admin));
+    updateAbility(info?.Roles || ['unknown']);
+    localStorage.setItem('info' , JSON.stringify(info));
     return route.replace('/dashboard');
 }
 </script>

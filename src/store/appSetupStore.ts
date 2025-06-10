@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import type { User_Data } from '../types';
 
 export const useAppSetupStore = defineStore('appSetup', () => {
     const locale = ref('en');
     const theme = ref('light');
+    const user_data = ref<User_Data>();
 
     const setLocale = (newLocale: string) => {
         locale.value = newLocale;
@@ -30,6 +32,7 @@ export const useAppSetupStore = defineStore('appSetup', () => {
     return {
         locale,
         theme,
+        user_data,
         setLocale,
         setTheme,
         initialize,

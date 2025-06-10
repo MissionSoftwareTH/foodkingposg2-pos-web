@@ -8,7 +8,7 @@ import type { IconName } from '../router/routePath';
 const iconComponents = shallowRef<Record<IconName, any>>({
     'home': IconHome,
     'settings': IconSettings, // Example: Add more icons as defined in IconName
-    'users': IconUsers,     // Example
+    'users': IconUsers, // Example
 });
 
 const router = useRouter();
@@ -32,7 +32,7 @@ const navLinks = router.getRoutes().filter(route => {
         <ul class="flex flex-col gap-2">
             <li v-for="(link) in navLinks" class="" :key="link.name as string"> 
                 <RouterLink 
-                    :to="link.path" 
+                    :to="{name: link.name}" 
                     class="flex items-center px-2 py-2 bg-base-100 rounded-xl hover:bg-primary hover:text-primary-content hover:stroke-primary-content transition-all duration-500 ease-in-out"
                 >
                     <component 

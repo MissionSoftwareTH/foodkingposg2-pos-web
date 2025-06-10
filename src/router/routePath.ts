@@ -3,6 +3,8 @@ import Error404 from '../pages/Error404.vue'
 import DashboardView from '../pages/DashboardView.vue'
 import { type RouteRecordRaw } from 'vue-router'
 import SettingView from '../pages/SettingView.vue';
+import Personal_Info from '../components/setting_menu/components/Personal_Info.vue';
+import ChangePassword from '../components/setting_menu/components/ChangePassword.vue';
 
 // Define a Union Type for the specific icon names you use
 export type IconName = 'home' | 'settings' | 'users'; // Add all valid icon keys here!
@@ -20,8 +22,13 @@ type AppRouteRecordRaw = RouteRecordRaw & {
 };
 
 export const routes: AppRouteRecordRaw[] = [
-    { name: 'login', path: '/', component: LoginView, meta: { requiresAuth: false, layout: 'BlankLayout' ,icon: 'home'} },
-    { name: 'not found', path: '/not-found', component: Error404, meta: { requiresAuth: false, layout: 'BlankLayout' ,icon: 'home' } },
-    { name: 'dashboard', path: '/dashboard', component: DashboardView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'home' } },
-    { name: 'setting', path: '/setting', component: SettingView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'home' } },
+    { name: 'Login', path: '/', component: LoginView, meta: { requiresAuth: false, layout: 'BlankLayout' ,icon: 'home'} },
+    { name: 'Not found', path: '/not-found', component: Error404, meta: { requiresAuth: false, layout: 'BlankLayout' ,icon: 'home' } },
+    { name: 'Dashboard', path: '/dashboard', component: DashboardView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'home' } },
+    { name: 'Settings', path: '/setting', component: SettingView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'home' } , children: [
+        {name: 'Account' ,path: 'account' , redirect: '/setting/account/info', children: [
+            {name: 'Personal info', path: 'info' , component: Personal_Info},
+            {name: 'Change password', path: 'Change-password' , component: ChangePassword},
+        ]},
+    ] },
 ]

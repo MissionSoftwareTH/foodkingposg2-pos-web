@@ -15,9 +15,10 @@
                     <p class="my-6">{{ dialogStore.componentName || '' }}</p>
                     <div class="flex justify-start ">
                         <button
-                            class="bg-base-100 hover:outline-1 text-base-content font-bold py-2 px-4 rounded mr-2"
+                            :disabled="dialogStore.props?.type === 'force'"
+                            class="bg-base-100 hover:outline-1 text-base-content font-bold py-2 px-4 rounded mr-2 disabled:bg-white/50 disabled:text-black/50"
                             :class="setColor"
-                            @click="dialogStore.closeDialog"
+                            @click="handleCloseBtn"
                         >
                             Confirm
                         </button>
@@ -31,10 +32,12 @@
 <script setup lang="ts">
 import { IconAlertTriangle, IconCancel, IconCircleCheck } from '@tabler/icons-vue';
 import { useDialogStore } from '../../store/dialogStore';
-import { computed, shallowRef } from 'vue';
+import { computed, shallowRef, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { logout } from '../../services/utils';
 
 const dialogStore = useDialogStore();
-
+const router = useRouter();
 const iconComponents = shallowRef({
   'error': IconCancel,
   'warning': IconAlertTriangle,
@@ -56,6 +59,34 @@ const textAndStrokeColor = computed(() => {
         default: return 'text-error stroke-error';
     }
 });
+
+const handleCloseBtn = () => {
+    switch (dialogStore.props?.type) {
+        case 'force':
+            console.log('บังคับออก กดอะไรไม่ได้')
+            break;
+        case 'link':
+            if(dialogStore.props.link) {
+                router.replace(dialogStore.props.link)
+                console.log('ย้ายไปหน้า ', dialogStore.props.link)
+            }
+            break;
+        default:
+            console.log('ปิด dialog');
+            break;
+    }
+    dialogStore.closeDialog();
+}
+
+watch(() =>  dialogStore.isOpen , () => {
+    if(dialogStore.props?.type === 'force') {
+        console.log('force')
+        setTimeout(() => {
+            dialogStore.closeDialog();
+            logout();
+        }, 3000);
+    }
+})
 
 </script>
 

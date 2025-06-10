@@ -15,7 +15,7 @@ const rawUserinfo = localStorage.getItem('info');
 if(rawUserinfo) {
     try {
         const userinfo = JSON.parse(rawUserinfo);
-        updateAbility(userinfo.roles);
+        updateAbility(userinfo.Roles);
     } catch (error) {
         console.error('failed to parse user roles from localstorage:', error);
 
