@@ -63,7 +63,7 @@ export interface ProductBrand {
 }
 
 export interface ProductCategory {
-    ProductCategoryId: number;
+    ProductCategoryId: number | undefined;
     ProductCategoryName: string;
 }
 

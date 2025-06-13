@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { RouterLink, useRouter } from 'vue-router';
 import { shallowRef } from 'vue';
-import { IconBuildingStore, IconExclamationCircle, IconLayoutDashboard, IconLogs, IconUsers } from '@tabler/icons-vue'; // Import all icons you use
+import { IconBuildingStore, IconExclamationCircle, IconFileSettings, IconLayoutDashboard, IconLogs, IconShoppingCart, IconUsers } from '@tabler/icons-vue'; // Import all icons you use
 import type { IconName } from '../router/routePath';
 import { useAppSetupStore } from '../store/appSetupStore';
 
 // Explicitly type iconComponents with Record<IconName, any>
 const iconComponents = shallowRef<Record<IconName, any>>({
     'Dashboard': IconLayoutDashboard,
+    'Management': IconFileSettings,
     'Merchant Management': IconBuildingStore,
     'Admin Management': IconUsers,
     'Activity logs': IconLogs,
+    'Product Management': IconShoppingCart,
     'non_icon': IconExclamationCircle,
 });
 
@@ -26,6 +28,8 @@ const navLinks = router.getRoutes().filter(route => {
         meta: route.meta as { layout: string, icon?: IconName, requiresAuth: boolean, title?: string } // Cast meta to a more specific shape here
     };
 });
+
+console.log(navLinks)
 
 </script>
 <template>

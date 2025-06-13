@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue';
 import Table from '../components/Table.vue';
 import type { baseResponse, Data, HeadersTable, MerchantData, Payload } from '../types';
 import MDropdown from '../components/MDropdown.vue';
-import { IconAffiliate, IconPencil, IconPlus, IconTrash, IconX } from '@tabler/icons-vue';
+import { IconFilter2, IconPencil, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
 import { getApiHeaders } from '../services/api/apiHeader';
 import apiClient from '../services/api/apiService';
 import type { AxiosResponse } from 'axios';
@@ -122,21 +122,43 @@ onMounted(() => {
             <button class="btn btn-primary btn-sm " @click="openModal"><IconPlus class="size-5"/>Add Merchant</button>
         </div>
     </div>
-    <div class="flex gap-4 flex-col-reverse">
+    <div class="flex gap-4 flex-col">
+        <div class="flex gap-2 items-center">
+            <div class="flex items-center gap-2">
+                <h1>show</h1>
+                <select v-model="selectedOption" className="select select-sm w-fit rounded-lg">
+                    <option v-for="item in [5,10,25,50]" :value="item" :key="`item-${item}`">{{item}}</option>
+                </select>
+            </div>
+            <div class="dropdown">
+                <button class="btn rounded-lg btn-sm p-2 btn-ghost ">
+                    <IconFilter2/>
+                </button>
+                <ul class="dropdown-content menu bg-base-300 shadow-lg rounded-lg gap-2">
+                    <li v-for="item in ['Product Name','Product Code']" :key="item">
+                        <input type="radio" name="product_filter" id="" :value="item" :aria-label="item" class="btn btn-sm text-nowrap rounded-lg">
+                    </li>
+                </ul>
+            </div>
+            <div class="dropdown">
+                <button class="btn rounded-lg btn-sm p-2 btn-ghost ">
+                    <IconSortAscendingLetters/>
+                </button>
+                <ul class="dropdown-content menu bg-base-300 shadow-lg rounded-lg gap-2">
+                    <li v-for="item in ['ASC','DESC']" :key="item">
+                        <input type="radio" name="product_filter" id="" :value="item" :aria-label="item" class="btn btn-sm text-nowrap rounded-lg">
+                    </li>
+                </ul>
+            </div>
+            <span class="w-full"></span>
+            <button class="btn btn-primary btn-sm rounded-lg" @click="openModal"><IconPlus class="size-5"/>Add Item</button>
+        </div>
         <Table :headers="headers" :items="items" class="rounded-xl shadow-lg w-full h-full">
-            <template #actions="items">
+            <template #actions>
                 <button class="btn btn-circle btn-soft btn-xs bg-info text-info-content mr-2" ><IconPencil class="size-4"/></button>
                 <button class="btn btn-circle btn-soft btn-xs bg-error text-error-content" ><IconTrash class="size-4"/></button>
             </template>
         </Table>
-        <div class="flex gap-2">
-            <MDropdown label="show" :item="selectedOption" @selected="handleOptionSelected" class="">
-                <template #default="slotProps">
-                    <li v-for="list in ['5','10','25','50']" :key="list" @click="slotProps.handleMenuItemClick(list)" class="btn btn-sm rounded-lg w-24">{{ list }}</li>
-                </template>
-            </MDropdown>
-            
-        </div>
     </div>
 
     <!-- add merchant dialog -->

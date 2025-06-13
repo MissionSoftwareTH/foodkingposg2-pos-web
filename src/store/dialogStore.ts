@@ -22,14 +22,7 @@ export const useDialogStore = defineStore('dialog', () => {
         props.value = dialogData || null;
     };
 
-    const resetData = () => {
-        componentName.value = null;
-        props.value = null;
-        return true;
-    }
-
     const closeDialog = () => {
-        // if(resetData()) isOpen.value = false;
         componentName.value = null;
         props.value = null;
         isOpen.value = false;

@@ -8,15 +8,15 @@ import ChangePassword from '../components/setting_menu/components/ChangePassword
 import MerchantView from '../pages/MerchantView.vue';
 import ActivityLogView from '../pages/ActivityLogView.vue';
 import AdminManageView from '../pages/AdminManageView.vue';
-import StockItemView from '../pages/StockItemView.vue';
+import ProductView from '../pages/ProductView.vue';
 
 // Define a Union Type for the specific icon names you use
-export type IconName = 'Dashboard' | 'Merchant Management' | 'Admin Management' | 'Activity logs' | 'non_icon'; // Add all valid icon keys here!
+export type IconName = 'Dashboard' | 'Management' | 'Merchant Management' | 'Admin Management' | 'Activity logs' | 'Product Management' | 'non_icon'; // Add all valid icon keys here!
 // Make sure this matches the keys in your iconComponents object in the sidebar component.
 
 interface RouteMeta {
-    requiresAuth: boolean;
-    layout: string;
+    requiresAuth?: boolean;
+    layout?: string;
     icon?: IconName; // Use the specific IconName type here
     title?: string; // Add any other meta properties you might use
 }
@@ -35,8 +35,13 @@ export const routes: AppRouteRecordRaw[] = [
             {name: 'Change password', path: 'Change-password' , component: ChangePassword},
         ]},
     ]},
-    { name: 'Merchant Management', path: '/merchants', component: MerchantView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Merchant Management' } },
-    { name: 'Admin Management', path: '/admins', component: StockItemView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Admin Management' } },
-    { name: 'Activity logs', path: '/activitylogs', component: ActivityLogView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Activity logs' } },
+    // { name: 'Management', path: '/stores', redirect: '/stores/store-management', meta: {icon: 'Management'}, children: [
+    //     {name: 'Store Management' ,path: 'store-management' , component: MerchantView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Merchant Management' } },
+    //     {name: 'Product Management' ,path: 'product-management' , component: ProductView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Product Management' } },
+    // ] },
+    {name: 'Merchant Management' ,path: '/store-management' , component: MerchantView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Merchant Management' } },
+    {name: 'Product Management' ,path: '/product-management' , component: ProductView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Product Management' } },
+    { name: 'Admin Management', path: '/admins', component: AdminManageView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Admin Management' } },
+    { name: 'Activity Logs', path: '/activitylogs', component: ActivityLogView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Activity logs' } },
 
 ]
