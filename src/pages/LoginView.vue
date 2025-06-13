@@ -76,6 +76,7 @@ import { getApiHeaders } from '../services/api/apiHeader';
 import apiClient from '../services/api/apiService';
 import type { AxiosResponse } from 'axios';
 import { getInfo } from '../services/utils';
+import appController from '../services/utils/appController';
 
 const route = useRouter();
 const dialogStore = useDialogStore();
@@ -140,7 +141,6 @@ const login = async () => {
         }
         const apiUrl = '/token/login/verify/otp';
         const res = await apiClient.post(apiUrl , payload , {headers});
-        console.log(res);
 
         // mock user
         handleLogin(res);
@@ -185,10 +185,10 @@ const sendEmailOTP = async () => {
 const handleLogin = async (res:AxiosResponse<baseResponse<extendTime>>) => {
     const resData = res.data?.res_data
     const info = await getInfo();
+    appController.setup();
     localStorage.setItem('extendTime', JSON.stringify(resData.FormatingTime.extendTime.asiaBangkok.unixTimestamp));
     localStorage.setItem('isLoggedIn' , 'active');
-    updateAbility(info?.Roles || ['unknown']);
-    localStorage.setItem('info' , JSON.stringify(info));
+    updateAbility(info?.Roles || []);
     return route.replace('/dashboard');
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto text-nowrap">
         <table class="min-w-full  relative">
             <thead class="bg-primary">
                 <tr>
@@ -7,7 +7,7 @@
                         v-for="header in headers"
                         :key="header.key"
                         scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-primary-content uppercase tracking-wider"
+                        class="px-6 py-4 text-left text-xs font-semibold text-primary-content uppercase tracking-wider"
                     >
                         {{ header.title }}
                     </th>
@@ -21,16 +21,18 @@
                         class="px-6 py-4 whitespace-nowrap text-sm text-base-content"
                     >
                         <span v-if="header.type !== 'actions'">{{ item[header.key] }}</span>
-                        <span v-else><slot name="actions" :item="item" :index="index"></slot></span>
+                        <span v-else><slot :name="header.key" :item="item" :index="index"></slot></span>
                     </td>
                 </tr>
             </tbody>
         </table>
+        <Pagination/>
     </div>
 </template>
 
 <script lang="ts" setup>
 import type { HeadersTable } from '../types';
+import Pagination from './Pagination.vue';
 
 defineProps({
     headers: {
@@ -38,7 +40,7 @@ defineProps({
         required: true,
     },
     items: {
-        type: Array as () => any[],
+        type: Array as () => any[] | undefined,
         required: true,
     },
 });

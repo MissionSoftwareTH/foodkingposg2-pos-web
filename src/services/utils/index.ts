@@ -6,7 +6,7 @@ import type { AxiosResponse } from 'axios';
 import apiClient from '../api/apiService';
 
 export * from './CookieExtend';
-export * from './controllerUI';
+export * from './appController';
 
 const removelist = ['info','extendTime','isLoggedIn'];
 
@@ -32,9 +32,8 @@ export const getInfo = async () => {
         const headers = getApiHeaders();
         const apiUrl = '/admins/admin/info';
         const res:AxiosResponse<baseResponse<User_Data>> = await apiClient.get(apiUrl , {headers});
-        console.log(res);
-        appSetupStore.user_data = res?.data?.res_data || undefined;
-        localStorage.setItem('info' , JSON.stringify(res?.data?.res_data));
+        console.log('res',res?.data?.res_data);
+        appSetupStore.setUserData(res?.data?.res_data);
         return res?.data?.res_data || undefined;
     } catch (error) {
         console.error(error);

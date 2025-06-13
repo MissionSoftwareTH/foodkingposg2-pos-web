@@ -1,15 +1,21 @@
 import { AbilityBuilder, createMongoAbility, type Ability } from "@casl/ability";
+import type { getAbility } from "../../types";
 
 export const ability: Ability = createMongoAbility();
 
-export const updateAbility = (userRoles: string[], userId?: string) => {
+export const updateAbility = (userRoles: getAbility[], userId?: string) => {
     const { can , rules } = new AbilityBuilder(createMongoAbility);
+    const role:string[] = [];
+    
+    userRoles.forEach((r) => {
+        role.push(r.RoleName);
+    })
 
-    if (userRoles.includes('admin')) {
+    if (role.includes('Super Admin')) {
         can('manage', 'all');
     }
 
-    if (userRoles.includes('editor')) {
+    if (role.includes('editor')) {
         can('read', 'Post');
         can('create', 'Post');
         if (userId) {
@@ -17,7 +23,7 @@ export const updateAbility = (userRoles: string[], userId?: string) => {
         }
     }
 
-    if (userRoles.includes('viewer')) {
+    if (role.includes('viewer')) {
         can('read', 'Post');
         can('read', 'Comment');
     }

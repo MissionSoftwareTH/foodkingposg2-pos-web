@@ -9,12 +9,12 @@
         </div>
         <span class="divider"></span>
         <div class="space-y-5 p-2 w-full overflow-y-auto">
-            <div class="flex gap-4 items-center rounded-full bg-base-300 p-5">
-                <img src="/public/assets/images/profile-mock.png" alt="mock image" class="size-30 rounded-full">
-                <div class="space-y-5">
+            <div class="flex gap-4 rounded-full bg-base-300 p-5">
+                <img src="/public/assets/images/profile-mock.png" alt="mock image" class="size-20 rounded-full">
+                <div class="flex flex-col justify-between">
                     <div class="flex gap-4">
                         <button type="button" class="btn btn-sm btn-info">change your image</button>
-                        <button type="button" class="btn btn-sm btn-error">remove image</button>
+                        <button type="button" class="btn btn-sm btn-base-100">remove image</button>
                     </div>
                     <p class="text-base-content/50 text-xs">We supports PNGs , JPGs and GIFs under 2MB</p>
                 </div>

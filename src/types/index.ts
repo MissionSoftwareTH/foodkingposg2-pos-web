@@ -1,7 +1,8 @@
 import type AuthLayout from '../layouts/AuthLayout.vue';
 import type BlankLayout from '../layouts/BlankLayout.vue';
 export * from './users';
-export * from './api'
+export * from './api';
+export * from './merchant';
 
 
 export interface Layouts {
@@ -19,6 +20,7 @@ export interface formData {
     confirm_password?: string;
     data?: any;
     otp?: string;
+    
 }
 
 export interface Payload {
@@ -32,6 +34,10 @@ export interface Payload {
     NewPassword?: string;
     FirstName?: string;
     LastName?: string;
+    MerchantName?: string;
+    ContactPhone?: string;
+    ContactEmail?: string;
+    
 }
 
 export interface MenuItem {

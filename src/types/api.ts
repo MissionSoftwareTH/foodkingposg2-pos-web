@@ -1,10 +1,14 @@
 
-export interface baseResponse<T>{
+export interface baseResponse<Data>{
     res_code: number;
     res_type: 'success' | 'error' | string;
     res_message: string;
-    res_data: T;
+    res_data: Data;
     res_time: number;
+}
+
+export interface Data<T> {
+  data: T
 }
 
 export interface OTP_Response {

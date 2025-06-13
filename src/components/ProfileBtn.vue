@@ -47,10 +47,6 @@ const isOpen = ref<boolean>(false);
 const isLogin = localStorage.getItem('isLoggedIn');
 
 onMounted(() => {
-    const rawinfo = localStorage.getItem('info');
-    if(rawinfo) {
-        appSetupStore.user_data = JSON.parse(rawinfo) || ''
-    }
     document.addEventListener('click', handleOutsideClick);
 });
 

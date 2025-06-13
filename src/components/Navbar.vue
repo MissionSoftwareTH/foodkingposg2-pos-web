@@ -1,7 +1,7 @@
 <template>
     <nav class="navbar justify-between">
-        <div class="">
-            <img src="/assets/images/logo.svg" alt="logo">
+        <div class="font-extrabold italic flex text-4xl text-shadow-md px-4">
+             <h1 class="text-primary">POSKING</h1><h1 class="text-secondary">-</h1><h1 class="text-accent">SERVER</h1>
         </div>
         <div class="flex items-center gap-2">
             <ThemeBtn/>

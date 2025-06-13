@@ -6,6 +6,7 @@ export const useAppSetupStore = defineStore('appSetup', () => {
     const locale = ref('en');
     const theme = ref('light');
     const user_data = ref<User_Data>();
+    const permission = ref<string[]>([]);
 
     const setLocale = (newLocale: string) => {
         locale.value = newLocale;
@@ -15,6 +16,17 @@ export const useAppSetupStore = defineStore('appSetup', () => {
     const setTheme = (newTheme: string) => {
         theme.value = newTheme;
         localStorage.setItem('theme', newTheme);
+    };
+
+    const setUserData = (userData: User_Data) => {
+        user_data.value = userData;
+        localStorage.setItem('info',JSON.stringify(userData));
+    };
+
+    const setPermissionStore = (data: User_Data) => {
+        data?.Permission?.forEach((p) => {
+            permission?.value?.push(p.PermissionName);
+        });
     };
 
     const initialize = () => {
@@ -27,14 +39,24 @@ export const useAppSetupStore = defineStore('appSetup', () => {
         if (storedTheme) {
             theme.value = storedTheme;
         }
+
+        const get_user_data = localStorage.getItem('info');
+        if(get_user_data) {
+            user_data.value = JSON.parse(get_user_data);
+            setPermissionStore(user_data.value || {});
+        }
+
     };
 
     return {
         locale,
         theme,
         user_data,
+        permission,
         setLocale,
         setTheme,
         initialize,
+        setUserData,
+        setPermissionStore,
     };
 });

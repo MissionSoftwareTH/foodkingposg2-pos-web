@@ -1,22 +1,23 @@
 <script setup lang="ts">
 import { RouterLink, useRouter } from 'vue-router';
 import { shallowRef } from 'vue';
-import { IconHome, IconSettings, IconUsers } from '@tabler/icons-vue'; // Import all icons you use
+import { IconBuildingStore, IconExclamationCircle, IconLayoutDashboard, IconLogs, IconUsers } from '@tabler/icons-vue'; // Import all icons you use
 import type { IconName } from '../router/routePath';
+import { useAppSetupStore } from '../store/appSetupStore';
 
 // Explicitly type iconComponents with Record<IconName, any>
 const iconComponents = shallowRef<Record<IconName, any>>({
-    'home': IconHome,
-    'settings': IconSettings, // Example: Add more icons as defined in IconName
-    'users': IconUsers, // Example
+    'Dashboard': IconLayoutDashboard,
+    'Merchant Management': IconBuildingStore,
+    'Admin Management': IconUsers,
+    'Activity logs': IconLogs,
+    'non_icon': IconExclamationCircle,
 });
 
 const router = useRouter();
-
-// Type the filtered routes to ensure TypeScript knows about `meta` properties
+const appSetupStore = useAppSetupStore();
 const navLinks = router.getRoutes().filter(route => {
-    // Type guard to ensure meta exists and is of our custom type
-    return route.meta && (route.meta as any).layout === 'AuthLayout'; // Temporarily cast to any if needed, then refine
+    return route.name && typeof route.name === 'string' && appSetupStore.permission?.includes(route.name);
 })
 .map(route => {
     // Map to a more specific type if necessary, or directly use
@@ -32,8 +33,9 @@ const navLinks = router.getRoutes().filter(route => {
         <ul class="flex flex-col gap-2">
             <li v-for="(link) in navLinks" class="" :key="link.name as string"> 
                 <RouterLink 
+                    exactActiveClass="bg-primary text-primary-content stroke-primary-content"
                     :to="{name: link.name}" 
-                    class="flex items-center px-2 py-2 bg-base-100 rounded-xl hover:bg-primary hover:text-primary-content hover:stroke-primary-content transition-all duration-500 ease-in-out"
+                    class="flex items-center px-2 py-2 bg-base-100 rounded-xl hover:bg-primary/80 hover:text-primary-content hover:stroke-primary-content transition-all duration-500 ease-in-out"
                 >
                     <component 
                         v-if="link.meta.icon && iconComponents[link.meta.icon]" 

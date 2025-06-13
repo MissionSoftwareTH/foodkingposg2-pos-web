@@ -30,9 +30,10 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
-import controllerUI from '../services/utils/controllerUI.ts'
+
 import { languages, type LanguageCode } from "../constants/language.ts";
 import { useAppSetupStore } from "../store/appSetupStore.ts";
+import appController from "../services/utils/appController.ts";
 
 const UIStore = useAppSetupStore();
 const getLanguageDetail = (code:LanguageCode) => {
@@ -47,11 +48,11 @@ const changeLanguage = (lang: { label: string, value: string }) => {
     selectedLanguage.value = lang.label
     // TODO: Implement i18n logic here, e.g., using vue-i18n
     console.log(`Language changed to ${lang.value}`);
-    controllerUI.setLocale(lang.value)
+    appController.setLocale(lang.value)
 };
 
 onMounted(() => {
-    controllerUI.setLocale(UIStore.locale)
+    appController.setLocale(UIStore.locale)
 })
 
 </script>

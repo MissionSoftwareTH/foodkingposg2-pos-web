@@ -4,5 +4,16 @@ export interface User_Data {
     Email?: string;
     FirstName?: string;
     LastName?: string;
-    Roles?: string[];
+    Permission?: getPermission[];
+    Roles?: getAbility[];
+}
+
+export interface getAbility {
+    RoleName: string;
+    RoleDescription: string;
+}
+
+export interface getPermission {
+    PermissionName: string;
+    PermissionDescription: string;
 }
