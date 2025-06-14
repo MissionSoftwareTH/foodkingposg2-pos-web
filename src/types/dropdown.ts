@@ -12,3 +12,15 @@ export interface ProductStatusList {
     ProductStatusId: number | undefined;
     ProductStatusName: string | null;
 }
+
+export interface TaxTypeList {
+    ProductTaxTypeId: number;
+    ProductTaxTypeName: string;
+    ProductTaxTypeDescription: string;
+}
+
+export interface BranchList {
+    BranchId: number;
+    BranchName: string;
+    BranchKey: string;
+}

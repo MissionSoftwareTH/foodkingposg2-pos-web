@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import Table from '../components/Table.vue';
-import type { baseResponse, BranchPayload, Data, HeadersTable, MerchantData, Payload } from '../types';
+import type { baseResponse, Data, HeadersTable, MerchantData, Payload } from '../types';
 import { IconFilter2, IconPencil, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
 import { getApiHeaders } from '../services/api/apiHeader';
 import apiClient from '../services/api/apiService';
@@ -47,11 +47,10 @@ const headers:HeadersTable[] = [
 const dialogStore = useDialogStore();
 const myModalRef = ref<HTMLDialogElement | null>(null);
 const isLoading = ref<boolean>(false);
-const form = ref<BranchPayload>({
-    MerchantId: 1,
-    BranchName: '',
-    BranchEmail: '',
-    BranchPhone: '',
+const form = ref<Payload>({
+    MerchantName: '',
+    ContactPhone: '',
+    ContactEmail: '',
 });
 const items = ref<MerchantData[]>([]);
 
@@ -62,15 +61,22 @@ const openModal = () => {
 };
 
 const selectedOption = ref<string | number>(5);
+const handleOptionSelected = (value: string | number) => {
+    selectedOption.value = value;
+    console.log('Option selected:', value);
+    // คุณอาจต้องการปิด dropdown ด้วยตัวเอง หากไม่ได้ใช้ form method="dialog" ใน MDropdown
+    // (DaisyUI มักจะปิดอัตโนมัติหากใช้โครงสร้างปุ่ม/ลิงก์ที่ถูกต้อง)
+};
 
-const getBranch = async () => {
+const getMerchant = async () => {
     try {
         const headers = getApiHeaders();
-        const apiUrl = '/branchs/list';
+        const apiUrl = '/merchants/list';
         const res:AxiosResponse<baseResponse<Data<MerchantData[]>>> = await apiClient.get(apiUrl , {headers});
         
         items.value = res?.data?.res_data?.data || [];
         console.log(items.value);
+        
         
     } catch (error:any) {
         console.error(error);
@@ -78,15 +84,15 @@ const getBranch = async () => {
     }
 }
 
-const addBranch = async () => {
+const addMerchant = async () => {
     try {
         isLoading.value = true;
         const headers = getApiHeaders();
         const payload = form.value;
-        const apiUrl = '/branchs/insert';
+        const apiUrl = '/merchants/insert';
         const res:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload , {headers});
         dialogStore.openDialog(res?.data?.res_message || 'unknown message', {status: 'success'});
-        // getBranch();
+        getMerchant();
 
     } catch (error:any) {
         console.error(error);
@@ -98,7 +104,7 @@ const addBranch = async () => {
 }
 
 onMounted(() => {
-    // getBranch();
+    getMerchant();
 })
 
 </script>
@@ -160,24 +166,24 @@ onMounted(() => {
             <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="() => myModalRef?.close()"><IconX class="text-error-content"/></button>
             <h3 className="font-bold text-lg">Add New Merchant</h3>
             <div className="modal-action">
-                <form class="card-body" @submit.prevent="addBranch">
+                <form class="card-body" @submit.prevent="addMerchant">
                     <div class="form-control flex">
                         <label class="label text-base-content flex-1">
-                            <span class="label-text">BranchName</span>
+                            <span class="label-text">MerchantName</span>
                         </label>
-                        <input type="text" placeholder="BranchName" class="input input-bordered flex-2" required v-model="form.BranchName"/>
+                        <input type="text" placeholder="MerchantName" class="input input-bordered flex-2" required v-model="form.MerchantName"/>
                     </div>
                     <div class="form-control flex">
                         <label class="label text-base-content flex-1">
-                            <span class="label-text">BranchPhone</span>
+                            <span class="label-text">ContactPhone</span>
                         </label>
-                        <input type="text" placeholder="BranchPhone" class="input input-bordered flex-2" required v-model="form.BranchPhone"/>
+                        <input type="text" placeholder="ContactPhone" class="input input-bordered flex-2" required v-model="form.ContactPhone"/>
                     </div>
                     <div class="form-control flex">
                         <label class="label text-base-content flex-1">
-                            <span class="label-text">BranchEmail</span>
+                            <span class="label-text">ContactEmail</span>
                         </label>
-                        <input type="text" placeholder="BranchEmail" class="input input-bordered flex-2" required v-model="form.BranchEmail"/>
+                        <input type="text" placeholder="ContactEmail" class="input input-bordered flex-2" required v-model="form.ContactEmail"/>
                     </div>
                     <div class="form-control mt-6">
                         <button type="submit" class="btn btn-primary" :disabled="isLoading">Add<span v-if="isLoading" className="loading loading-spinner loading-xs ml-2"></span></button>

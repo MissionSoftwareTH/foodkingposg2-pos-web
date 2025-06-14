@@ -6,14 +6,12 @@
         <li class="text-sm text-base-content/50 p-4 pb-2 " v-else>
             <span>{{ item.label }}</span>
         </li>
-        <!-- <div v-if="item.children && item.children.length"> -->
             <SettingMenu
             v-if="item.children && item.children.length"
             v-for="child in item.children"
             :key="child.id"
             :item="child"
             />
-        <!-- </div> -->
     </ul>
 </template>
 

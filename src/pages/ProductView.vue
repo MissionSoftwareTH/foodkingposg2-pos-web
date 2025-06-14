@@ -9,7 +9,7 @@ import type { AxiosResponse } from 'axios';
 import { useDialogStore } from '../store/dialogStore';
 import type { ProductPayload, ProductResponse, ProductTable } from '../types/product';
 import CurrencyInput from '../components/CurrencyInput.vue';
-import type { BrandList, CategoryList, ProductStatusList } from '../types/dropdown';
+import type { BrandList, CategoryList, ProductStatusList, TaxTypeList } from '../types/dropdown';
 
 const headers:HeadersTable[] = [
     {
@@ -37,7 +37,7 @@ const headers:HeadersTable[] = [
         type: 'actions',
     },
     {
-        key: 'ProductVatType',
+        key: 'ProductVatTypeId',
         title: 'Vat Type',
     },
     {
@@ -70,7 +70,7 @@ const default_form:ProductPayload = {
     ProductPrice: 0,
     ProductCost: 0,
     ProductBarcode: '',
-    ProductVatType: null,
+    ProductVatTypeId: undefined,
     ProductEnableDiscountPercent: false,
     ProductDiscountPercent: 0,
     ProductEnableDiscountAmount: false,
@@ -87,7 +87,7 @@ const form = ref<ProductPayload>({
     ProductPrice: 0,
     ProductCost: 0,
     ProductBarcode: '',
-    ProductVatType: null,
+    ProductVatTypeId: undefined,
     ProductEnableDiscountPercent: false,
     ProductDiscountPercent: 0,
     ProductEnableDiscountAmount: false,
@@ -98,6 +98,7 @@ const items = ref<ProductTable[]>([]);
 const categoryList = ref<CategoryList[]>();
 const brandList = ref<BrandList[]>();
 const productStatusList = ref<ProductStatusList[]>();
+const productTaxTypeList = ref<TaxTypeList[]>();
 
 const resetForm = () => {
   form.value = {...default_form};
@@ -114,6 +115,7 @@ const openModal = async () => {
     await getCategoryList();
     await getBrandList();
     await getProductStatusList();
+    await getTaxTypeList();
     myModalRef.value.showModal();
     isLoading.value = false;
   }
@@ -127,7 +129,7 @@ const getCategoryList = async () => {
     categoryList.value = res?.data?.res_data?.data || [];
   } catch (error:any) {
     console.error();
-    dialogStore.openDialog(error?.response?.data?.res_message || error , {status: 'error'});
+    // dialogStore.openDialog(error?.response?.data?.res_message || error , {status: 'error'});
   }
 }
 
@@ -139,7 +141,7 @@ const getBrandList = async () => {
     brandList.value = res?.data?.res_data?.data || [];
   } catch (error:any) {
     console.error();
-    dialogStore.openDialog(error?.response?.data?.res_message || error , {status: 'error'});
+    // dialogStore.openDialog(error?.response?.data?.res_message || error , {status: 'error'});
   }
 }
 
@@ -151,7 +153,18 @@ const getProductStatusList = async () => {
     productStatusList.value = res?.data?.res_data?.data || [];
   } catch (error:any) {
     console.error();
-    dialogStore.openDialog(error?.response?.data?.res_message || error , {status: 'error'});
+    // dialogStore.openDialog(error?.response?.data?.res_message || error , {status: 'error'});
+  }
+}
+
+const getTaxTypeList = async () => {
+  try {
+    const headers = getApiHeaders();
+    const apiUrl = '/dropdown/product/taxtypes';
+    const res:AxiosResponse<baseResponse<Data<TaxTypeList[]>>> = await apiClient.get(apiUrl , {headers});
+    productTaxTypeList.value = res?.data?.res_data?.data || [];
+  } catch (error) {
+    console.error(error);
   }
 }
 
@@ -180,7 +193,7 @@ const getProduct = async () => {
           ProductBrand: product.ProductBrand || null,
           ProductPrice: product.ProductPrice || 0,
           ProductCost: product.ProductCost || 0,
-          ProductVatType:product.ProductVatType || 'not availiable',
+          ProductVatTypeId:product.ProductVatTypeId || 'not availiable',
           ProductDiscountPercent: {
             ProductEnableDiscount: product.ProductEnableDiscountPercent || false,
             ProductDiscountValue: product.ProductDiscountPercent || 0,
@@ -384,7 +397,7 @@ onMounted(() => {
                     </div>
                     <select v-model="form.ProductCategoryId" class="select select-bordered w-full rounded-lg">
                       <option value="">Select Category</option>
-                      <option v-for="(cat,index) in categoryList" :key="`brand-${index}`" :value="cat.ProductCategoryId">{{ cat.ProductCategoryName }}</option>
+                      <option v-for="(cat,index) in categoryList" :key="`cat-${index}`" :value="cat.ProductCategoryId">{{ cat.ProductCategoryName }}</option>
                     </select>
                   </label>
 
@@ -394,7 +407,7 @@ onMounted(() => {
                     </div>
                     <select v-model="form.ProductStatusId" class="select select-bordered w-full rounded-lg">
                       <option value="">Select Status</option>
-                      <option v-for="(status,index) in productStatusList" :key="`brand-${index}`" :value="status.ProductStatusId">{{ status.ProductStatusName }}</option>
+                      <option v-for="(status,index) in productStatusList" :key="`status-${index}`" :value="status.ProductStatusId">{{ status.ProductStatusName }}</option>
                     </select>
                   </label>
 
@@ -402,10 +415,9 @@ onMounted(() => {
                     <div class="label">
                       <span class="label-text">VAT Type</span>
                     </div>
-                    <select v-model="form.ProductVatType" class="select select-bordered w-full rounded-lg">
+                    <select v-model="form.ProductVatTypeId" class="select select-bordered w-full rounded-lg">
                       <option value="">Select VAT Type</option>
-                      <option value="VAT">VAT</option>
-                      <option value="VATs">VATs</option>
+                      <option v-for="(vat,index) in productTaxTypeList" :key="`vat-${index}`" :value="vat.ProductTaxTypeId">{{ vat.ProductTaxTypeName }}</option>
                     </select>
                   </label>
                 </div>

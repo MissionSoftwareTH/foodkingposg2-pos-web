@@ -8,8 +8,8 @@ import apiClient from '../services/api/apiService';
 import type { AxiosResponse } from 'axios';
 import { useDialogStore } from '../store/dialogStore';
 import type { ProductPayload, ProductResponse, ProductTable } from '../types/product';
-import CurrencyInput from '../components/CurrencyInput.vue';
 import type { BrandList, CategoryList, ProductStatusList } from '../types/dropdown';
+import CurrencyInput from '../components/CurrencyInput.vue';
 
 const headers:HeadersTable[] = [
     {
@@ -37,7 +37,7 @@ const headers:HeadersTable[] = [
         type: 'actions',
     },
     {
-        key: 'ProductVatType',
+        key: 'ProductVatTypeId',
         title: 'Vat Type',
     },
     {
@@ -70,7 +70,7 @@ const default_form:ProductPayload = {
     ProductPrice: 0,
     ProductCost: 0,
     ProductBarcode: '',
-    ProductVatType: null,
+    ProductVatTypeId: undefined,
     ProductEnableDiscountPercent: false,
     ProductDiscountPercent: 0,
     ProductEnableDiscountAmount: false,
@@ -87,7 +87,7 @@ const form = ref<ProductPayload>({
     ProductPrice: 0,
     ProductCost: 0,
     ProductBarcode: '',
-    ProductVatType: null,
+    ProductVatTypeId: undefined,
     ProductEnableDiscountPercent: false,
     ProductDiscountPercent: 0,
     ProductEnableDiscountAmount: false,
@@ -180,7 +180,7 @@ const getProduct = async () => {
           ProductBrand: product.ProductBrand || null,
           ProductPrice: product.ProductPrice || 0,
           ProductCost: product.ProductCost || 0,
-          ProductVatType:product.ProductVatType || 'not availiable',
+          ProductVatTypeId:product.ProductVatTypeId || 'not availiable',
           ProductDiscountPercent: {
             ProductEnableDiscount: product.ProductEnableDiscountPercent || false,
             ProductDiscountValue: product.ProductDiscountPercent || 0,
@@ -402,7 +402,7 @@ onMounted(() => {
                     <div class="label">
                       <span class="label-text">VAT Type</span>
                     </div>
-                    <select v-model="form.ProductVatType" class="select select-bordered w-full rounded-lg">
+                    <select v-model="form.ProductVatTypeId" class="select select-bordered w-full rounded-lg">
                       <option value="">Select VAT Type</option>
                       <option value="VAT">VAT</option>
                       <option value="VATs">VATs</option>

@@ -1,9 +1,14 @@
+import type { RouteRecordRaw } from 'vue-router';
 import type AuthLayout from '../layouts/AuthLayout.vue';
 import type BlankLayout from '../layouts/BlankLayout.vue';
+import type { IconName } from '../router/routePath';
 export * from './users';
 export * from './api';
 export * from './merchant';
-
+export * from './POS';
+export * from './branch';
+export * from './product';
+export * from './dropdown';
 
 export interface Layouts {
   [key: string]: typeof BlankLayout | typeof AuthLayout;
@@ -52,3 +57,14 @@ export interface HeadersTable {
     title: string;
     type?: 'actions' | 'default';
 }
+
+export interface RouteMeta {
+    requiresAuth?: boolean;
+    layout?: string;
+    icon?: IconName; // Use the specific IconName type here
+    title?: string; // Add any other meta properties you might use
+}
+
+export type AppRouteRecordRaw = RouteRecordRaw & {
+    meta?: RouteMeta;
+};
