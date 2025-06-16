@@ -1,54 +1,39 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import Table from '../components/Table.vue';
-import type { baseResponse, Data, HeadersTable, POSPayload } from '../types';
+import type { baseResponse, Data, HeadersTable, POSPayload , POSResponse , POSTable } from '../types';
 import { IconFilter2, IconPencil, IconPhotoOff, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
 import { getApiHeaders } from '../services/api/apiHeader';
 import apiClient from '../services/api/apiService';
 import type { AxiosResponse } from 'axios';
 import { useDialogStore } from '../store/dialogStore';
-import type { ProductResponse, ProductTable } from '../types/product';
 import type { BranchList } from '../types/dropdown';
-import CurrencyInput from '../components/CurrencyInput.vue';
+import { formatDateTime } from '../services/utils';
 
 const headers:HeadersTable[] = [
     {
-        key: 'ProductInfo',
-        title: 'Product',
-        type: 'actions',
+        key: 'PosSystemId',
+        title: 'Id',
     },
     {
-        key: 'ProductCode',
-        title: 'Product Code',
+        key: 'PosSystemName',
+        title: 'Pos System Name',
     },
     {
-        key: 'ProductStatus',
-        title: 'Status',
-        type: 'actions',
+        key: 'PosSystemKey',
+        title: 'Pos System Key',
     },
     {
-        key: 'ProductPrice',
-        title: 'Price',
-        type: 'actions',
+        key: 'BranchName',
+        title: 'Branch Name',
     },
     {
-        key: 'ProductCost',
-        title: 'Cost',
-        type: 'actions',
+        key: 'PosCreatedAt',
+        title: 'Created At',
     },
     {
-        key: 'ProductVatTypeId',
-        title: 'Vat Type',
-    },
-    {
-        key: 'ProductDiscountPercent',
-        title: 'Percent Discount',
-        type: 'actions',
-    },
-    {
-        key: 'ProductDiscountAmount',
-        title: 'Amount Discount',
-        type: 'actions',
+        key: 'PosUpdatedAt',
+        title: 'Updated At',
     },
     {
         key: 'actions',
@@ -70,7 +55,7 @@ const form = ref<POSPayload>({
   PosName: '',
   PosKey: '',
 });
-const items = ref<ProductTable[]>([]);
+const items = ref<POSTable[]>();
 const branchList = ref<BranchList[]>();
 
 const resetForm = () => {
@@ -108,39 +93,22 @@ const getBranchList = async () => {
 
 const selectedOption = ref<string | number>(5);
 
-const getProduct = async () => {
+const getPOS = async () => {
     try {
         const headers = getApiHeaders();
-        const apiUrl = '/product/list';
-        const res:AxiosResponse<baseResponse<Data<ProductResponse[]>>> = await apiClient.get(apiUrl , {headers});
-        items.value = res?.data?.res_data?.data?.map((product) => ({
-          ProductInfo:{
-              ProductName: product.ProductName || '',
-              ProductImagePath: product.ProductImagePath || null,
-              ProductCategory: {
-                ProductCategoryId: product.ProductCategory?.ProductCategoryId,
-                ProductCategoryName: product.ProductCategory?.ProductCategoryName || 'no category'
-              },
-          } ,
-          ProductCode: product.ProductCode || null,
-          ProductStatus: {
-            ProductStatusId: product.ProductStatus?.ProductStatusId,
-            ProductStatusName: product.ProductStatus?.ProductStatusName || 'not availiable',
-            ProductStatusDescription: product.ProductStatus?.ProductStatusDescription || 'not availiable',
-          },
-          ProductBrand: product.ProductBrand || null,
-          ProductPrice: product.ProductPrice || 0,
-          ProductCost: product.ProductCost || 0,
-          ProductVatTypeId:product.ProductVatTypeId || 'not availiable',
-          ProductDiscountPercent: {
-            ProductEnableDiscount: product.ProductEnableDiscountPercent || false,
-            ProductDiscountValue: product.ProductDiscountPercent || 0,
-          },
-          ProductDiscountAmount: {
-            ProductEnableDiscount: product.ProductEnableDiscountAmount || false,
-            ProductDiscountValue: product.ProductDiscountAmount || 0,
-          },
-        })) || [];
+        const apiUrl = '/branchs/pos/list';
+        const res:AxiosResponse<baseResponse<Data<POSResponse[]>>> = await apiClient.get(apiUrl , {headers});
+        items.value = res?.data?.res_data?.data?.flatMap((data) => 
+          data?.PosSystem?.map((pos) => ({
+            BranchId: data.BranchId,
+            BranchName: data.BranchName,
+            PosSystemId: pos?.PosSystemId,
+            PosSystemName: pos?.PosSystemName || 'not availiable',
+            PosSystemKey: pos?.PosSystemKey || 'not availiable',
+            PosCreatedAt: formatDateTime(pos?.PosCreatedAt) || '',
+            PosUpdatedAt: formatDateTime(pos?.PosUpdatedAt) || '',
+          })) || []
+        )
         console.log(items.value); 
         
     } catch (error:any) {
@@ -158,7 +126,7 @@ const addPOS = async () => {
         const res:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload , {headers});
         dialogStore.openDialog(res?.data?.res_message || 'unknown message', {status: 'success'});
         resetForm();
-        // getProduct();
+        getPOS();
 
     } catch (error:any) {
         console.error(error);
@@ -170,18 +138,18 @@ const addPOS = async () => {
 }
 
 onMounted(() => {
-    // getProduct();
+    getPOS();
 })
 
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
-    <h1 class="text-2xl font-bold">POS Management</h1>
+    <h1 class="text-3xl font-bold">POS Management</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <div class="w-full h-full flex justify-between p-4 items-center">
             <div class="">
-                <div class="rounded-box bg-base-100/50 backdrop-blur-lg p-4">
-                    POS for this merchant
+                <div class="rounded-lg bg-base-100/50 backdrop-blur-lg p-4">
+                    POS of this merchant
                 </div>
             </div>
         </div>
@@ -226,7 +194,7 @@ onMounted(() => {
                     </div>
                     <div class="">
                         <h1>{{ product.item.ProductInfo.ProductName }}</h1>
-                        <h2 class="text-base-content/50 text-xs">{{product.item.ProductInfo.ProductCategory.ProductCategoryName}}</h2>
+                        <h2 class="text-base-content/50 text-sm">{{product.item.ProductInfo.ProductCategory.ProductCategoryName}}</h2>
                     </div>
                </div> 
             </template>
@@ -260,7 +228,7 @@ onMounted(() => {
             <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal"><IconX class="text-error-content"/></button>
             <h3 className="font-bold text-xl">Add New POS</h3>
             <div className="modal-action">
-              <form @submit.prevent="addPOS" class="text-sm mx-auto">
+              <form @submit.prevent="addPOS" class="text-base mx-auto">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <label class="form-control w-full">
                     <div class="label">

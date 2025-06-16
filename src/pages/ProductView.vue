@@ -37,8 +37,9 @@ const headers:HeadersTable[] = [
         type: 'actions',
     },
     {
-        key: 'ProductVatTypeId',
+        key: 'ProductTaxType',
         title: 'Vat Type',
+        type: 'actions',
     },
     {
         key: 'ProductDiscountPercent',
@@ -70,7 +71,7 @@ const default_form:ProductPayload = {
     ProductPrice: 0,
     ProductCost: 0,
     ProductBarcode: '',
-    ProductVatTypeId: undefined,
+    ProductTaxTypeId: undefined,
     ProductEnableDiscountPercent: false,
     ProductDiscountPercent: 0,
     ProductEnableDiscountAmount: false,
@@ -87,7 +88,7 @@ const form = ref<ProductPayload>({
     ProductPrice: 0,
     ProductCost: 0,
     ProductBarcode: '',
-    ProductVatTypeId: undefined,
+    ProductTaxTypeId: undefined,
     ProductEnableDiscountPercent: false,
     ProductDiscountPercent: 0,
     ProductEnableDiscountAmount: false,
@@ -193,7 +194,11 @@ const getProduct = async () => {
           ProductBrand: product.ProductBrand || null,
           ProductPrice: product.ProductPrice || 0,
           ProductCost: product.ProductCost || 0,
-          ProductVatTypeId:product.ProductVatTypeId || 'not availiable',
+          ProductTaxType:{
+            ProductTaxTypeId: product.ProductTaxType?.ProductTaxTypeId,
+            ProductTaxTypeName: product.ProductTaxType?.ProductTaxTypeName || 'not availiable',
+            ProductTaxTypeDescription: product.ProductTaxType?.ProductTaxTypeDescription || 'not availiable'
+          },
           ProductDiscountPercent: {
             ProductEnableDiscount: product.ProductEnableDiscountPercent || false,
             ProductDiscountValue: product.ProductDiscountPercent || 0,
@@ -253,12 +258,12 @@ onMounted(() => {
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
-    <h1 class="text-2xl font-bold">Product Management</h1>
+    <h1 class="text-3xl font-bold">Product Management</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <div class="w-full h-full flex justify-between p-4 items-center">
             <div class="">
-                <div class="rounded-box bg-base-100/50 backdrop-blur-lg p-4">
-                    Product for this merchant
+                <div class="rounded-lg bg-base-100/50 backdrop-blur-lg p-4">
+                    Product of this merchant
                 </div>
             </div>
         </div>
@@ -292,7 +297,7 @@ onMounted(() => {
                 </ul>
             </div>
             <span class="w-full"></span>
-            <button class="btn btn-primary btn-sm rounded-lg" @click="openModal"><IconPlus class="size-5"/>Add Item</button>
+            <button class="btn btn-primary btn-sm rounded-lg" @click="openModal"><IconPlus class="size-5"/>Add Product</button>
         </div>
         <Table :headers="headers" :items="items" class="rounded-xl shadow-lg w-full h-full">
             <template #ProductInfo="product">
@@ -303,7 +308,7 @@ onMounted(() => {
                     </div>
                     <div class="">
                         <h1>{{ product.item.ProductInfo.ProductName }}</h1>
-                        <h2 class="text-base-content/50 text-xs">{{product.item.ProductInfo.ProductCategory.ProductCategoryName}}</h2>
+                        <h2 class="text-base-content/50 text-sm">{{product.item.ProductInfo.ProductCategory.ProductCategoryName}}</h2>
                     </div>
                </div> 
             </template>
@@ -315,6 +320,9 @@ onMounted(() => {
             </template>
             <template #ProductCost="product">
               {{ product.item.ProductCost }} ฿
+            </template>
+            <template #ProductTaxType="product">
+              {{ product.item.ProductTaxType.ProductTaxTypeName }}
             </template>
             <template #ProductDiscountPercent="product">
                 <h1 v-if="product.item.ProductDiscountPercent.ProductEnableDiscount">{{ product.item.ProductDiscountPercent.ProductDiscountValue }}%</h1>
@@ -337,11 +345,12 @@ onMounted(() => {
             <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal"><IconX class="text-error-content"/></button>
             <h3 className="font-bold text-xl">Add New Product</h3>
             <div className="modal-action">
-              <form @submit.prevent="addItem" class="text-sm mx-auto">
+              <form @submit.prevent="addItem" class="text-base mx-auto">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <label class="form-control w-full">
                     <div class="label">
                       <span class="label-text">Product Code</span>
+                      <span class="label-text text-error">*</span>
                     </div>
                     <input
                       type="text"
@@ -354,6 +363,7 @@ onMounted(() => {
                   <label class="form-control w-full">
                     <div class="label">
                       <span class="label-text">Product Name</span>
+                      <span class="label-text text-error">*</span>
                     </div>
                     <input
                       type="text"
@@ -375,7 +385,7 @@ onMounted(() => {
                     class="file-input file-input-bordered w-full"
                     accept="image/*"
                   />
-                  <div v-if="form.ProductImagePath" class="text-sm text-gray-500 mt-2">
+                  <div v-if="form.ProductImagePath" class="text-base text-gray-500 mt-2">
                     Selected: {{ form.ProductImagePath }}
                   </div>
                 </div>
@@ -415,7 +425,7 @@ onMounted(() => {
                     <div class="label">
                       <span class="label-text">VAT Type</span>
                     </div>
-                    <select v-model="form.ProductVatTypeId" class="select select-bordered w-full rounded-lg">
+                    <select v-model="form.ProductTaxTypeId" class="select select-bordered w-full rounded-lg">
                       <option value="">Select VAT Type</option>
                       <option v-for="(vat,index) in productTaxTypeList" :key="`vat-${index}`" :value="vat.ProductTaxTypeId">{{ vat.ProductTaxTypeName }}</option>
                     </select>

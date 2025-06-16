@@ -36,7 +36,7 @@ const test = async () => {
 
 <template>
     <div class="flex flex-col p-2">
-        <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
+        <h1 class="text-3xl font-bold mb-4">Dashboard</h1>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <!-- Example Card -->
             <div v-if="$can('read','Post')" class="card bg-base-300 shadow-xl">

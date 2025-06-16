@@ -8,7 +8,7 @@ export interface ProductPayload {
    ProductPrice?: number;
    ProductCost?: number;
    ProductBarcode?: string;
-   ProductVatTypeId?: number | undefined;
+   ProductTaxTypeId?: number | undefined;
    ProductEnableDiscountPercent?: boolean;
    ProductDiscountPercent?: number | undefined;
    ProductEnableDiscountAmount?: boolean;
@@ -31,7 +31,7 @@ export interface ProductResponse {
     ProductBrand?: ProductBrand;
     ProductCategory?: ProductCategory;
     ProductStatus?: ProductStatus;
-    ProductVatTypeId?: string;
+    ProductTaxType?: ProductTaxType;
 }
 
 export interface ProductTable {
@@ -41,9 +41,14 @@ export interface ProductTable {
    ProductBrand: ProductBrand | null; 
    ProductPrice: number | null; 
    ProductCost: number | null; 
-   ProductVatTypeId: string;
    ProductDiscountPercent: ProductDiscountType;
    ProductDiscountAmount: ProductDiscountType;
+}
+
+export interface ProductTaxType {
+    ProductTaxTypeId: number;
+    ProductTaxTypeName: string;
+    ProductTaxTypeDescription: string;
 }
 
 export interface ProductInfo {

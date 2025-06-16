@@ -12,6 +12,10 @@
     rtl: false;
 }
 
+body {
+  font-family: 'Kanit', sans-serif;
+}
+
 @plugin "daisyui/theme" {
   name: "light";
   default: false;
@@ -37,8 +41,8 @@
   --color-warning-content: oklch(42% 0.095 57.708);
   --color-error: oklch(70% 0.191 22.216);
   --color-error-content: oklch(25% 0.092 26.042);
-  --radius-selector: 2rem;
-  --radius-field: 2rem;
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
   --radius-box: 1rem;
   --size-selector: 0.3125rem;
   --size-field: 0.3125rem;
@@ -72,8 +76,8 @@
   --color-warning-content: oklch(42% 0.095 57.708);
   --color-error: oklch(70% 0.191 22.216);
   --color-error-content: oklch(25% 0.092 26.042);
-  --radius-selector: 2rem;
-  --radius-field: 2rem;
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
   --radius-box: 1rem;
   --size-selector: 0.3125rem;
   --size-field: 0.3125rem;

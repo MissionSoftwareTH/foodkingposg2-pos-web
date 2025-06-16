@@ -1,7 +1,7 @@
 <template>
     <div class="breadcrumbs w-full h-full flex flex-col p-2">
         <ul class="mb-4">
-            <li v-for="item in mypath" :key="item" class="first:text-2xl first:font-bold" >{{ item }}</li>
+            <li v-for="item in mypath" :key="item" class="first:text-3xl first:font-bold" >{{ item }}</li>
         </ul>
         <div class="card flex-row overflow-hidden h-full">
             <div class="flex-1 bg-base-200 flex flex-col font-semibold">

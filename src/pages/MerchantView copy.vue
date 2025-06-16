@@ -61,12 +61,6 @@ const openModal = () => {
 };
 
 const selectedOption = ref<string | number>(5);
-const handleOptionSelected = (value: string | number) => {
-    selectedOption.value = value;
-    console.log('Option selected:', value);
-    // คุณอาจต้องการปิด dropdown ด้วยตัวเอง หากไม่ได้ใช้ form method="dialog" ใน MDropdown
-    // (DaisyUI มักจะปิดอัตโนมัติหากใช้โครงสร้างปุ่ม/ลิงก์ที่ถูกต้อง)
-};
 
 const getMerchant = async () => {
     try {
@@ -110,11 +104,11 @@ onMounted(() => {
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
-    <h1 class="text-2xl font-bold">Merchant Management</h1>
+    <h1 class="text-3xl font-bold">Merchant Management</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <div class="w-full h-full flex justify-between p-4 items-center">
             <div class="">
-                <div class="rounded-box bg-base-100/50 backdrop-blur-lg p-4">
+                <div class="rounded-lg bg-base-100/50 backdrop-blur-lg p-4">
                     Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque, quasi?
                 </div>
             </div>
@@ -164,7 +158,7 @@ onMounted(() => {
     <dialog ref="myModalRef" className="modal">
         <div className="modal-box">
             <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="() => myModalRef?.close()"><IconX class="text-error-content"/></button>
-            <h3 className="font-bold text-lg">Add New Merchant</h3>
+            <h3 className="font-bold text-xl">Add New Merchant</h3>
             <div className="modal-action">
                 <form class="card-body" @submit.prevent="addMerchant">
                     <div class="form-control flex">

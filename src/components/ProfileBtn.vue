@@ -13,7 +13,7 @@
             </div>
             <div class="text-start overflow-hidden font-semibold whitespace-nowrap opacity-0 max-w-0 group-focus:opacity-100 group-focus:px-4 group-focus:max-w-xs transition-all duration-500 ease-in-out">
                 <h1 class="text-base font-semibold space-x-1">{{appSetupStore.user_data?.FirstName || 'unknown'}} {{appSetupStore.user_data?.LastName || 'unknown'}}</h1>
-                <h2 class="text-xs text-base-content/70">{{appSetupStore.user_data?.Email || 'unknown'}}</h2>
+                <h2 class="text-sm text-base-content/70">{{appSetupStore.user_data?.Email || 'unknown'}}</h2>
             </div>
         </button>
         <div
@@ -24,7 +24,7 @@
             aria-labelledby="menu-button"
             tabindex="-1"
         >
-            <div class="py-1 text-sm" role="none">
+            <div class="py-1 text-base" role="none">
                 <RouterLink to="/setting/account/info" class="block px-4 py-2 hover:bg-base-100" role="menuitem" tabindex="-1" id="menu-item-0"><span class="flex gap-2"><IconSettings/>Setting</span></RouterLink>
                 <button @click="logout" type="button" class="block w-full text-left px-4 py-2 hover:bg-error hover:text-error-content" role="menuitem" tabindex="-1" id="menu-item-1">
                     <span class="flex gap-2"><IconLogout/>Logout</span>

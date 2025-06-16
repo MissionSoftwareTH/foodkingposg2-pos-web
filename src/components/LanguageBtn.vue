@@ -1,6 +1,6 @@
 <template>
     <div class="dropdown dropdown-end">
-        <label tabindex="0" class="btn btn-sm text-sm w-28">
+        <label tabindex="0" class="btn btn-sm text-base w-28">
             {{ selectedLanguage }}
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -19,7 +19,7 @@
         </label>
         <ul
             tabindex="0"
-            class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
+            class="dropdown-content menu p-2 shadow bg-base-100 rounded-lg w-52"
         >
             <li v-for="lang in languages" :key="lang.value">
                 <input type="radio" name="theme" :value=lang.value :aria-label=lang.label class="theme-controller btn btn-sm justify-start mb-2" @click="changeLanguage(lang)"></input>

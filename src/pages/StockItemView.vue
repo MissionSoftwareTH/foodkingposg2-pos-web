@@ -7,7 +7,7 @@ import { getApiHeaders } from '../services/api/apiHeader';
 import apiClient from '../services/api/apiService';
 import type { AxiosResponse } from 'axios';
 import { useDialogStore } from '../store/dialogStore';
-import type { ProductPayload, ProductResponse, ProductTable } from '../types/product';
+import type { ProductPayload, ProductTable } from '../types/product';
 import type { BrandList, CategoryList, ProductStatusList } from '../types/dropdown';
 import CurrencyInput from '../components/CurrencyInput.vue';
 
@@ -70,7 +70,7 @@ const default_form:ProductPayload = {
     ProductPrice: 0,
     ProductCost: 0,
     ProductBarcode: '',
-    ProductVatTypeId: undefined,
+    ProductTaxTypeId: undefined,
     ProductEnableDiscountPercent: false,
     ProductDiscountPercent: 0,
     ProductEnableDiscountAmount: false,
@@ -87,7 +87,7 @@ const form = ref<ProductPayload>({
     ProductPrice: 0,
     ProductCost: 0,
     ProductBarcode: '',
-    ProductVatTypeId: undefined,
+    ProductTaxTypeId: undefined,
     ProductEnableDiscountPercent: false,
     ProductDiscountPercent: 0,
     ProductEnableDiscountAmount: false,
@@ -157,46 +157,46 @@ const getProductStatusList = async () => {
 
 const selectedOption = ref<string | number>(5);
 
-const getProduct = async () => {
-    try {
-        const headers = getApiHeaders();
-        const apiUrl = '/product/list';
-        const res:AxiosResponse<baseResponse<Data<ProductResponse[]>>> = await apiClient.get(apiUrl , {headers});
-        items.value = res?.data?.res_data?.data?.map((product) => ({
-          ProductInfo:{
-              ProductName: product.ProductName || '',
-              ProductImagePath: product.ProductImagePath || null,
-              ProductCategory: {
-                ProductCategoryId: product.ProductCategory?.ProductCategoryId,
-                ProductCategoryName: product.ProductCategory?.ProductCategoryName || 'no category'
-              },
-          } ,
-          ProductCode: product.ProductCode || null,
-          ProductStatus: {
-            ProductStatusId: product.ProductStatus?.ProductStatusId,
-            ProductStatusName: product.ProductStatus?.ProductStatusName || 'not availiable',
-            ProductStatusDescription: product.ProductStatus?.ProductStatusDescription || 'not availiable',
-          },
-          ProductBrand: product.ProductBrand || null,
-          ProductPrice: product.ProductPrice || 0,
-          ProductCost: product.ProductCost || 0,
-          ProductVatTypeId:product.ProductVatTypeId || 'not availiable',
-          ProductDiscountPercent: {
-            ProductEnableDiscount: product.ProductEnableDiscountPercent || false,
-            ProductDiscountValue: product.ProductDiscountPercent || 0,
-          },
-          ProductDiscountAmount: {
-            ProductEnableDiscount: product.ProductEnableDiscountAmount || false,
-            ProductDiscountValue: product.ProductDiscountAmount || 0,
-          },
-        })) || [];
-        console.log(items.value); 
+// const getProduct = async () => {
+//     try {
+//         const headers = getApiHeaders();
+//         const apiUrl = '/product/list';
+//         const res:AxiosResponse<baseResponse<Data<ProductResponse[]>>> = await apiClient.get(apiUrl , {headers});
+//         items.value = res?.data?.res_data?.data?.map((product) => ({
+//           ProductInfo:{
+//               ProductName: product.ProductName || '',
+//               ProductImagePath: product.ProductImagePath || null,
+//               ProductCategory: {
+//                 ProductCategoryId: product.ProductCategory?.ProductCategoryId,
+//                 ProductCategoryName: product.ProductCategory?.ProductCategoryName || 'no category'
+//               },
+//           } ,
+//           ProductCode: product.ProductCode || null,
+//           ProductStatus: {
+//             ProductStatusId: product.ProductStatus?.ProductStatusId,
+//             ProductStatusName: product.ProductStatus?.ProductStatusName || 'not availiable',
+//             ProductStatusDescription: product.ProductStatus?.ProductStatusDescription || 'not availiable',
+//           },
+//           ProductBrand: product.ProductBrand || null,
+//           ProductPrice: product.ProductPrice || 0,
+//           ProductCost: product.ProductCost || 0,
+//           ProductTaxTypeId:product.ProductTaxTypeId || 'not availiable',
+//           ProductDiscountPercent: {
+//             ProductEnableDiscount: product.ProductEnableDiscountPercent || false,
+//             ProductDiscountValue: product.ProductDiscountPercent || 0,
+//           },
+//           ProductDiscountAmount: {
+//             ProductEnableDiscount: product.ProductEnableDiscountAmount || false,
+//             ProductDiscountValue: product.ProductDiscountAmount || 0,
+//           },
+//         })) || [];
+//         console.log(items.value); 
         
-    } catch (error:any) {
-        console.error(error);
-        dialogStore.openDialog(error?.res?.data?.res_message || error, {status: 'error'});
-    }
-}
+//     } catch (error:any) {
+//         console.error(error);
+//         dialogStore.openDialog(error?.res?.data?.res_message || error, {status: 'error'});
+//     }
+// }
 
 const addItem = async () => {
     try {
@@ -207,7 +207,7 @@ const addItem = async () => {
         const res:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload , {headers});
         dialogStore.openDialog(res?.data?.res_message || 'unknown message', {status: 'success'});
         resetForm();
-        getProduct();
+        // getProduct();
 
     } catch (error:any) {
         console.error(error);
@@ -234,18 +234,18 @@ const handleImageUpload = (event:any) => {
 };
 
 onMounted(() => {
-    getProduct();
+    // getProduct();
 })
 
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
-    <h1 class="text-2xl font-bold">Stock Management</h1>
+    <h1 class="text-3xl font-bold">Stock Management</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <div class="w-full h-full flex justify-between p-4 items-center">
             <div class="">
-                <div class="rounded-box bg-base-100/50 backdrop-blur-lg p-4">
-                    Product for this merchant
+                <div class="rounded-lg bg-base-100/50 backdrop-blur-lg p-4">
+                    Stock of this merchant
                 </div>
             </div>
         </div>
@@ -290,7 +290,7 @@ onMounted(() => {
                     </div>
                     <div class="">
                         <h1>{{ product.item.ProductInfo.ProductName }}</h1>
-                        <h2 class="text-base-content/50 text-xs">{{product.item.ProductInfo.ProductCategory.ProductCategoryName}}</h2>
+                        <h2 class="text-base-content/50 text-sm">{{product.item.ProductInfo.ProductCategory.ProductCategoryName}}</h2>
                     </div>
                </div> 
             </template>
@@ -324,7 +324,7 @@ onMounted(() => {
             <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal"><IconX class="text-error-content"/></button>
             <h3 className="font-bold text-xl">Add New Product</h3>
             <div className="modal-action">
-              <form @submit.prevent="addItem" class="text-sm mx-auto">
+              <form @submit.prevent="addItem" class="text-base mx-auto">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <label class="form-control w-full">
                     <div class="label">
@@ -362,7 +362,7 @@ onMounted(() => {
                     class="file-input file-input-bordered w-full"
                     accept="image/*"
                   />
-                  <div v-if="form.ProductImagePath" class="text-sm text-gray-500 mt-2">
+                  <div v-if="form.ProductImagePath" class="text-base text-gray-500 mt-2">
                     Selected: {{ form.ProductImagePath }}
                   </div>
                 </div>
@@ -402,7 +402,7 @@ onMounted(() => {
                     <div class="label">
                       <span class="label-text">VAT Type</span>
                     </div>
-                    <select v-model="form.ProductVatTypeId" class="select select-bordered w-full rounded-lg">
+                    <select v-model="form.ProductTaxTypeId" class="select select-bordered w-full rounded-lg">
                       <option value="">Select VAT Type</option>
                       <option value="VAT">VAT</option>
                       <option value="VATs">VATs</option>

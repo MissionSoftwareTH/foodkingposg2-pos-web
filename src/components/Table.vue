@@ -7,7 +7,7 @@
             v-for="header in headers"
             :key="header.key"
             scope="col"
-            class="px-6 py-4 text-left text-xs font-semibold text-primary-content uppercase tracking-wider"
+            class="px-6 py-4 text-left text-sm font-semibold text-primary-content uppercase tracking-wider"
           >
             {{ header.title }}
           </th>
@@ -15,7 +15,7 @@
       </thead>
       <tbody class="bg-base-300 divide-y divide-primary">
         <tr v-if="items && items.length === 0">
-          <td :colspan="headers.length" class="px-6 py-8 text-center text-base-content text-lg">
+          <td :colspan="headers.length" class="px-6 py-8 text-center text-base-content text-xl">
             <div class="flex flex-col justify-center items-center gap-2">
                 <IconShoppingBagX class="size-60 text-base-100"/>
                 <h1>no data availiable</h1>
@@ -26,7 +26,7 @@
           <td
             v-for="header in headers"
             :key="header.key"
-            class="px-6 py-4 whitespace-nowrap text-sm text-base-content"
+            class="px-6 py-4 whitespace-nowrap text-base text-base-content"
           >
             <span v-if="header.type !== 'actions'">{{ item[header.key] }}</span>
             <span v-else><slot :name="header.key" :item="item" :index="index"></slot></span>

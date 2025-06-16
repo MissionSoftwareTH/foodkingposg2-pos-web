@@ -6,3 +6,17 @@ export interface BranchPayload{
     BranchPhone?: string;
 }
 
+export interface BranchResponse {
+   BranchId: number;
+   BranchName: string;
+   ContactPhone: string;
+   NumberOfPos: number; 
+}
+
+export interface BranchTable {
+   BranchId: number;
+   BranchName: string;
+   ContactPhone: string;
+   NumberOfPos: number; 
+
+}

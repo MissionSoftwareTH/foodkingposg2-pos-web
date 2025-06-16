@@ -39,3 +39,30 @@ export const getInfo = async () => {
         console.error(error);
     }
 }
+
+
+// utils/dateFormatter.ts (You can put this in a separate utility file)
+
+export function formatDateTime(
+  dateTimeString: string | Date,
+  locale: string = 'th-TH', // Default to Thai locale
+  options?: Intl.DateTimeFormatOptions
+): string {
+  const date = new Date(dateTimeString);
+
+  // Default options for a common date and time format
+  const defaultOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false, // Use 24-hour format
+    timeZone: 'Asia/Bangkok' // Example: Set to Bangkok time zone
+  };
+
+  const mergedOptions = { ...defaultOptions, ...options };
+
+  return new Intl.DateTimeFormat(locale, mergedOptions).format(date);
+}

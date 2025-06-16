@@ -1,5 +1,5 @@
 <template>
-         <div class="flex flex-col lg:flex-row-reverse min-h-screen bg-base-100">
+         <div class="flex flex-col lg:flex-row-reverse min-h-screen bg-base-100 container mx-auto">
             <div class="flex-1 text-center flex flex-col justify-end lg:justify-center lg:text-left">
                 <h1 class="text-5xl font-bold">Login now!</h1>
                 <p class="py-6">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
@@ -12,19 +12,19 @@
                             <label class="label text-base-content">
                                 <span class="label-text">Email</span>
                             </label>
-                            <input type="text" placeholder="email" class="input input-bordered" required v-model="form.email"/>
+                            <input type="text" placeholder="email" class="input input-bordered w-full" required v-model="form.email"/>
                         </div>
                         <div class="form-control">
                             <label class="label text-base-content">
                                 <span class="label-text">Password</span>
                             </label>
-                            <input type="password" placeholder="password" class="input input-bordered" required v-model="form.password"/>
+                            <input type="password" placeholder="password" class="input input-bordered w-full" required v-model="form.password"/>
                             <label class="label text-base-content">
                                 <a href="#" class="label-text-alt link link-hover">Forgot password?</a>
                             </label>
                         </div>
                         <div class="form-control mt-6">
-                            <button type="submit" class="btn btn-primary" :disabled="isLoading">Login<span v-if="isLoading" className="loading loading-spinner loading-xs ml-2"></span></button>
+                            <button type="submit" class="btn btn-primary w-full" :disabled="isLoading">Login<span v-if="isLoading" className="loading loading-spinner loading-xs ml-2"></span></button>
                         </div>
                     </form>
                     <!-- OTP Form -->

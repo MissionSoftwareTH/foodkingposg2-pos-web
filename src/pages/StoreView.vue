@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import Table from '../components/Table.vue';
-import type { baseResponse, BranchPayload, Data, HeadersTable, MerchantData, Payload } from '../types';
+import type { baseResponse, BranchPayload, Data, HeadersTable, BranchResponse , BranchTable } from '../types';
 import { IconFilter2, IconPencil, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
 import { getApiHeaders } from '../services/api/apiHeader';
 import apiClient from '../services/api/apiService';
@@ -10,12 +10,12 @@ import { useDialogStore } from '../store/dialogStore';
 
 const headers:HeadersTable[] = [
     {
-        key: 'MerchantId',
-        title: 'Merchant Id',
+        key: 'BranchId',
+        title: 'Store Id',
     },
     {
-        key: 'MerchantName',
-        title: 'Merchant Name',
+        key: 'BranchName',
+        title: 'Store Name',
     },
     {
         key: 'ContactPhone',
@@ -24,6 +24,10 @@ const headers:HeadersTable[] = [
     {
         key: 'ContactEmail',
         title: 'Contact Email',
+    },
+    {
+        key: 'NumberOfPos',
+        title: 'number of POS',
     },
     {
         key: 'CreatedAt',
@@ -53,7 +57,7 @@ const form = ref<BranchPayload>({
     BranchEmail: '',
     BranchPhone: '',
 });
-const items = ref<MerchantData[]>([]);
+const items = ref<BranchTable[]>([]);
 
 const openModal = () => {
   if (myModalRef.value) {
@@ -67,7 +71,7 @@ const getBranch = async () => {
     try {
         const headers = getApiHeaders();
         const apiUrl = '/branchs/list';
-        const res:AxiosResponse<baseResponse<Data<MerchantData[]>>> = await apiClient.get(apiUrl , {headers});
+        const res:AxiosResponse<baseResponse<Data<BranchResponse[]>>> = await apiClient.get(apiUrl , {headers});
         
         items.value = res?.data?.res_data?.data || [];
         console.log(items.value);
@@ -86,7 +90,7 @@ const addBranch = async () => {
         const apiUrl = '/branchs/insert';
         const res:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload , {headers});
         dialogStore.openDialog(res?.data?.res_message || 'unknown message', {status: 'success'});
-        // getBranch();
+        getBranch();
 
     } catch (error:any) {
         console.error(error);
@@ -98,21 +102,20 @@ const addBranch = async () => {
 }
 
 onMounted(() => {
-    // getBranch();
+    getBranch();
 })
 
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
-    <h1 class="text-2xl font-bold">Merchant Management</h1>
+    <h1 class="text-3xl font-bold">Store Management</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <div class="w-full h-full flex justify-between p-4 items-center">
             <div class="">
-                <div class="rounded-box bg-base-100/50 backdrop-blur-lg p-4">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque, quasi?
+                <div class="rounded-lg bg-base-100/50 backdrop-blur-lg p-4">
+                    Store of this merchant
                 </div>
             </div>
-            <button class="btn btn-primary btn-sm " @click="openModal"><IconPlus class="size-5"/>Add Merchant</button>
         </div>
     </div>
     <div class="flex gap-4 flex-col">
@@ -144,7 +147,7 @@ onMounted(() => {
                 </ul>
             </div>
             <span class="w-full"></span>
-            <button class="btn btn-primary btn-sm rounded-lg" @click="openModal"><IconPlus class="size-5"/>Add Item</button>
+            <button class="btn btn-primary btn-sm rounded-lg" @click="openModal"><IconPlus class="size-5"/>Add Store</button>
         </div>
         <Table :headers="headers" :items="items" class="rounded-xl shadow-lg w-full h-full">
             <template #actions>
@@ -158,26 +161,26 @@ onMounted(() => {
     <dialog ref="myModalRef" className="modal">
         <div className="modal-box">
             <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="() => myModalRef?.close()"><IconX class="text-error-content"/></button>
-            <h3 className="font-bold text-lg">Add New Merchant</h3>
+            <h3 className="font-bold text-xl">Add New Store</h3>
             <div className="modal-action">
                 <form class="card-body" @submit.prevent="addBranch">
                     <div class="form-control flex">
                         <label class="label text-base-content flex-1">
-                            <span class="label-text">BranchName</span>
+                            <span class="label-text">Store Name</span>
                         </label>
-                        <input type="text" placeholder="BranchName" class="input input-bordered flex-2" required v-model="form.BranchName"/>
+                        <input type="text" placeholder="Store Name" class="input input-bordered flex-2" required v-model="form.BranchName"/>
                     </div>
                     <div class="form-control flex">
                         <label class="label text-base-content flex-1">
-                            <span class="label-text">BranchPhone</span>
+                            <span class="label-text">Store Phone</span>
                         </label>
-                        <input type="text" placeholder="BranchPhone" class="input input-bordered flex-2" required v-model="form.BranchPhone"/>
+                        <input type="text" placeholder="Store Email" class="input input-bordered flex-2" required v-model="form.BranchPhone"/>
                     </div>
                     <div class="form-control flex">
                         <label class="label text-base-content flex-1">
-                            <span class="label-text">BranchEmail</span>
+                            <span class="label-text">Store Email</span>
                         </label>
-                        <input type="text" placeholder="BranchEmail" class="input input-bordered flex-2" required v-model="form.BranchEmail"/>
+                        <input type="text" placeholder="Store Email" class="input input-bordered flex-2" required v-model="form.BranchEmail"/>
                     </div>
                     <div class="form-control mt-6">
                         <button type="submit" class="btn btn-primary" :disabled="isLoading">Add<span v-if="isLoading" className="loading loading-spinner loading-xs ml-2"></span></button>

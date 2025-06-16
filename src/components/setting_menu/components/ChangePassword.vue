@@ -2,8 +2,8 @@
     <form class="flex flex-col p-4 font-semibold " @submit.prevent="changePassword()">
         <div class="flex justify-between">
             <div class="">
-                <h1 class="text-lg">Change Password</h1>
-                <p class="text-sm font-medium text-base-content/50">Update your password</p>
+                <h1 class="text-xl">Change Password</h1>
+                <p class="text-base font-medium text-base-content/50">Update your password</p>
             </div>
             <button type="submit" class="btn btn-primary btn-sm">Submit<span v-if="isLoading" className="loading loading-spinner loading-xs ml-2"></span></button>
         </div>
