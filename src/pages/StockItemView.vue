@@ -10,6 +10,7 @@ import { useDialogStore } from '../store/dialogStore';
 import type { ProductPayload, ProductTable } from '../types/product';
 import type { BrandList, CategoryList, ProductStatusList } from '../types/dropdown';
 import CurrencyInput from '../components/CurrencyInput.vue';
+import ConfirmDialog from '../components/dialogs/ConfirmDialog.vue';
 
 const headers:HeadersTable[] = [
     {
@@ -240,7 +241,7 @@ onMounted(() => {
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
-    <h1 class="text-3xl font-bold">Stock Management</h1>
+    <h1 class="text-3xl font-semibold">Stock Management</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <div class="w-full h-full flex justify-between p-4 items-center">
             <div class="">
@@ -318,11 +319,13 @@ onMounted(() => {
         </Table>
     </div>
 
+    <ConfirmDialog />
+
     <!-- add product dialog -->
     <dialog ref="myModalRef" className="modal">
         <div className="modal-box min-w-1/2">
             <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal"><IconX class="text-error-content"/></button>
-            <h3 className="font-bold text-xl">Add New Product</h3>
+            <h3 className="font-semibold text-xl">Add New Product</h3>
             <div className="modal-action">
               <form @submit.prevent="addItem" class="text-base mx-auto">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">

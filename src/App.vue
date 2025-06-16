@@ -7,6 +7,7 @@ import BlankLayout from './layouts/BlankLayout.vue';
 import type { Layouts } from './types';
 import DialogMessage from './components/dialogs/DialogMessage.vue';
 import appController from './services/utils/appController';
+import ConfirmDialog from './components/dialogs/ConfirmDialog.vue';
 
 // setup layout router
 const layouts: Layouts = {
@@ -32,6 +33,7 @@ appController.setup();
       </Transition>
     </component>
     <DialogMessage />
+    <ConfirmDialog />
 </template>
 
 <style>

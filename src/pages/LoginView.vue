@@ -1,7 +1,7 @@
 <template>
          <div class="flex flex-col lg:flex-row-reverse min-h-screen bg-base-100 container mx-auto">
             <div class="flex-1 text-center flex flex-col justify-end lg:justify-center lg:text-left">
-                <h1 class="text-5xl font-bold">Login now!</h1>
+                <h1 class="text-5xl font-semibold">Login now!</h1>
                 <p class="py-6">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
             </div>
             <div class="flex-1 flex flex-col justify-center items-center">

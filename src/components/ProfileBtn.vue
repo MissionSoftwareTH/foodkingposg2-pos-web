@@ -8,7 +8,7 @@
             aria-expanded="false"
             aria-haspopup="true"
         >
-            <div class="size-10 rounded-full overflow-hidden relative bg-primary text-primary-content flex justify-center items-center">
+            <div class="size-12 rounded-full overflow-hidden relative bg-primary text-primary-content flex justify-center items-center">
                 <img src="/assets/images/profile-mock.png" alt="myimage">
             </div>
             <div class="text-start overflow-hidden font-semibold whitespace-nowrap opacity-0 max-w-0 group-focus:opacity-100 group-focus:px-4 group-focus:max-w-xs transition-all duration-500 ease-in-out">

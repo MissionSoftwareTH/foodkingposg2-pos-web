@@ -86,13 +86,11 @@ const getBranchList = async () => {
     const res:AxiosResponse<baseResponse<Data<BranchList[]>>> = await apiClient.get(apiUrl , {headers,params});
     branchList.value = res?.data?.res_data?.data || [];
   } catch (error:any) {
-    console.error();
+    console.error(error);
     dialogStore.openDialog(error?.response?.data?.res_message || error , {status: 'error'});
   }
 }
-
 const selectedOption = ref<string | number>(5);
-
 const getPOS = async () => {
     try {
         const headers = getApiHeaders();
@@ -116,7 +114,6 @@ const getPOS = async () => {
         dialogStore.openDialog(error?.res?.data?.res_message || error, {status: 'error'});
     }
 }
-
 const addPOS = async () => {
     try {
         isLoading.value = true;
@@ -136,15 +133,13 @@ const addPOS = async () => {
         myModalRef.value?.close();
     }
 }
-
 onMounted(() => {
     getPOS();
 })
-
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
-    <h1 class="text-3xl font-bold">POS Management</h1>
+    <h1 class="text-3xl font-semibold">POS Management</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <div class="w-full h-full flex justify-between p-4 items-center">
             <div class="">
@@ -168,7 +163,7 @@ onMounted(() => {
                 </button>
                 <ul class="dropdown-content menu bg-base-300 shadow-lg rounded-lg gap-2">
                     <li v-for="item in ['Product Name','Product Code']" :key="item">
-                        <input type="radio" name="product_filter" id="" :value="item" :aria-label="item" class="btn btn-sm text-nowrap rounded-lg">
+                        <input type="radio" name="product_filter" :value="item" :aria-label="item" class="btn btn-sm text-nowrap rounded-lg">
                     </li>
                 </ul>
             </div>
@@ -221,12 +216,11 @@ onMounted(() => {
             </template>
         </Table>
     </div>
-
     <!-- add product dialog -->
     <dialog ref="myModalRef" className="modal">
         <div className="modal-box min-w-1/2">
             <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal"><IconX class="text-error-content"/></button>
-            <h3 className="font-bold text-xl">Add New POS</h3>
+            <h3 className="font-semibold text-xl">Add New POS</h3>
             <div className="modal-action">
               <form @submit.prevent="addPOS" class="text-base mx-auto">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -235,7 +229,7 @@ onMounted(() => {
                       <span class="label-text">Brand</span>
                     </div>
                     <select v-model="form.BranchId" class="select select-bordered w-full rounded-lg">
-                      <option value="" disabled>Select Brand</option>
+                      <option :value="undefined" disabled>Select Brand</option>
                       <option v-for="(branch,index) in branchList" :key="`branch-${index}`" :value="branch.BranchId">{{ branch.BranchName }}</option>
                     </select>
                   </label>
@@ -264,14 +258,12 @@ onMounted(() => {
                     />
                   </label>
                 </div>
-
                 <div class="flex justify-center">
                   <button type="submit" class="btn btn-primary px-8" :disabled="isLoading">Add POS<span v-if="isLoading" className="loading loading-spinner loading-xs ml-2"></span></button>
                 </div>
               </form>
             </div>
         </div>
-    
     </dialog>
 </div>
 </template>

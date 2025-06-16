@@ -2,11 +2,12 @@
 import { onMounted, ref } from 'vue';
 import Table from '../components/Table.vue';
 import type { baseResponse, BranchPayload, Data, HeadersTable, BranchResponse , BranchTable } from '../types';
-import { IconFilter2, IconPencil, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
+import { IconAffiliate, IconFilter2, IconPencil, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
 import { getApiHeaders } from '../services/api/apiHeader';
 import apiClient from '../services/api/apiService';
 import type { AxiosResponse } from 'axios';
 import { useDialogStore } from '../store/dialogStore';
+import { useConfirmDialogStore } from '../store/confirmDialogStore';
 
 const headers:HeadersTable[] = [
     {
@@ -105,10 +106,11 @@ onMounted(() => {
     getBranch();
 })
 
+const store = useConfirmDialogStore();
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
-    <h1 class="text-3xl font-bold">Store Management</h1>
+    <h1 class="text-3xl font-semibold">Store Management</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <div class="w-full h-full flex justify-between p-4 items-center">
             <div class="">
@@ -152,7 +154,7 @@ onMounted(() => {
         <Table :headers="headers" :items="items" class="rounded-xl shadow-lg w-full h-full">
             <template #actions>
                 <button class="btn btn-circle btn-soft btn-xs bg-info text-info-content mr-2" ><IconPencil class="size-4"/></button>
-                <button class="btn btn-circle btn-soft btn-xs bg-error text-error-content" ><IconTrash class="size-4"/></button>
+                <button class="btn btn-circle btn-soft btn-xs bg-error text-error-content" @click="() => store.isOpen = true"><IconTrash class="size-4"/></button>
             </template>
         </Table>
     </div>
@@ -161,7 +163,7 @@ onMounted(() => {
     <dialog ref="myModalRef" className="modal">
         <div className="modal-box">
             <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="() => myModalRef?.close()"><IconX class="text-error-content"/></button>
-            <h3 className="font-bold text-xl">Add New Store</h3>
+            <h3 className="font-semibold text-xl">Add New Store</h3>
             <div className="modal-action">
                 <form class="card-body" @submit.prevent="addBranch">
                     <div class="form-control flex">
