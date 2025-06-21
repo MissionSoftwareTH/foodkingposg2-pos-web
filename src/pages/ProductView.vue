@@ -1,16 +1,19 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import Table from '../components/Table.vue';
 import type { baseResponse, Data, HeadersTable } from '../types';
 import { IconFilter2, IconPencil, IconPhotoOff, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
-import { getApiHeaders } from '../services/api/apiHeader';
 import apiClient from '../services/api/apiService';
-import type { AxiosResponse } from 'axios';
+import type { AxiosError, AxiosResponse } from 'axios';
 import { useDialogStore } from '../store/dialogStore';
 import type { ProductPayload, ProductResponse, ProductTable } from '../types/product';
 import CurrencyInput from '../components/CurrencyInput.vue';
 import type { BrandList, CategoryList, ProductStatusList, TaxTypeList } from '../types/dropdown';
 import { useConfirmDialogStore } from '../store/confirmDialogStore';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { useToastStore } from '../store/toastStore';
+import { useProgressBarStore } from '../store/progressBarStore';
+import { debounce } from '../services/utils/debounce';
 
 const headers:HeadersTable[] = [
     {
@@ -62,6 +65,7 @@ const headers:HeadersTable[] = [
 const dialogStore = useDialogStore();
 const myModalRef = ref<HTMLDialogElement | null>(null);
 const isLoading = ref<boolean>(false);
+const mode = ref<number>(1);
 const default_form:ProductPayload = {
     ProductName: '',
     ProductCode: '',
@@ -80,6 +84,7 @@ const default_form:ProductPayload = {
     ProductDescription: '',
 };
 const form = ref<ProductPayload>({
+    ProductInfoId: undefined,
     ProductName: '',
     ProductCode: '',
     ProductImagePath: null,
@@ -95,100 +100,34 @@ const form = ref<ProductPayload>({
     ProductEnableDiscountAmount: false,
     ProductDiscountAmount: 0,
     ProductDescription: '',
-});
-const items = ref<ProductTable[]>([]);
-const categoryList = ref<CategoryList[]>();
-const brandList = ref<BrandList[]>();
-const productStatusList = ref<ProductStatusList[]>();
-const productTaxTypeList = ref<TaxTypeList[]>();
-
-const resetForm = () => {
-  form.value = {...default_form};
-}
-
-const closeModal = () => {
-  resetForm();
-  myModalRef?.value?.close();
-}
-
-const openModal = async () => {
-  if (myModalRef.value) {
-    isLoading.value = true;
-    await getCategoryList();
-    await getBrandList();
-    await getProductStatusList();
-    await getTaxTypeList();
-    myModalRef.value.showModal();
-    isLoading.value = false;
-  }
-};
-
-const getCategoryList = async () => {
-  try {
-    const headers = getApiHeaders();
-    const apiUrl = '/dropdown/product/category';
-    const res:AxiosResponse<baseResponse<Data<CategoryList[]>>> = await apiClient.get(apiUrl , {headers});
-    categoryList.value = res?.data?.res_data?.data || [];
-  } catch (error:any) {
-    console.error();
-    // dialogStore.openDialog(error?.response?.data?.res_message || error , {status: 'error'});
-  }
-}
-
-const getBrandList = async () => {
-  try {
-    const headers = getApiHeaders();
-    const apiUrl = '/dropdown/product/brand';
-    const res:AxiosResponse<baseResponse<Data<BrandList[]>>> = await apiClient.get(apiUrl , {headers});
-    brandList.value = res?.data?.res_data?.data || [];
-  } catch (error:any) {
-    console.error();
-    // dialogStore.openDialog(error?.response?.data?.res_message || error , {status: 'error'});
-  }
-}
-
-const getProductStatusList = async () => {
-  try {
-    const headers = getApiHeaders();
-    const apiUrl = '/dropdown/product/status';
-    const res:AxiosResponse<baseResponse<Data<ProductStatusList[]>>> = await apiClient.get(apiUrl , {headers});
-    productStatusList.value = res?.data?.res_data?.data || [];
-  } catch (error:any) {
-    console.error();
-    // dialogStore.openDialog(error?.response?.data?.res_message || error , {status: 'error'});
-  }
-}
-
-const getTaxTypeList = async () => {
-  try {
-    const headers = getApiHeaders();
-    const apiUrl = '/dropdown/product/taxtypes';
-    const res:AxiosResponse<baseResponse<Data<TaxTypeList[]>>> = await apiClient.get(apiUrl , {headers});
-    productTaxTypeList.value = res?.data?.res_data?.data || [];
-  } catch (error) {
-    console.error(error);
-  }
-}
+  });
 
 const selectedOption = ref<string | number>(5);
-
-const getProduct = async () => {
-    try {
-        const headers = getApiHeaders();
+const store = useConfirmDialogStore();
+const queryClient = useQueryClient();
+const toastStore = useToastStore();
+const progressBarStore = useProgressBarStore();
+  
+//fetch product
+const fetchProduct = async ():Promise<ProductTable[]> => {
+          
         const apiUrl = '/product/list';
-        const res:AxiosResponse<baseResponse<Data<ProductResponse[]>>> = await apiClient.get(apiUrl , {headers});
-        items.value = res?.data?.res_data?.data?.map((product) => ({
+        const res:AxiosResponse<baseResponse<Data<ProductResponse[]>>> = await apiClient.get(apiUrl );
+        const productList:ProductTable[] = res?.data?.res_data?.data?.map((product) => ({
+          ProductInfoId: product.ProductInfoId || null,
+          ProductBarcode: product.ProductBarcode || '',
+          ProductDescription: product.ProductDescription || '',
           ProductInfo:{
               ProductName: product.ProductName || '',
               ProductImagePath: product.ProductImagePath || null,
               ProductCategory: {
-                ProductCategoryId: product.ProductCategory?.ProductCategoryId,
+                ProductCategoryId: product.ProductCategory?.ProductCategoryId || null,
                 ProductCategoryName: product.ProductCategory?.ProductCategoryName || 'no category'
               },
           } ,
           ProductCode: product.ProductCode || null,
           ProductStatus: {
-            ProductStatusId: product.ProductStatus?.ProductStatusId,
+            ProductStatusId: product.ProductStatus?.ProductStatusId || null,
             ProductStatusName: product.ProductStatus?.ProductStatusName || 'not availiable',
             ProductStatusDescription: product.ProductStatus?.ProductStatusDescription || 'not availiable',
           },
@@ -196,47 +135,207 @@ const getProduct = async () => {
           ProductPrice: product.ProductPrice || 0,
           ProductCost: product.ProductCost || 0,
           ProductTaxType:{
-            ProductTaxTypeId: product.ProductTaxType?.ProductTaxTypeId,
+            ProductTaxTypeId: product.ProductTaxType?.ProductTaxTypeId || null,
             ProductTaxTypeName: product.ProductTaxType?.ProductTaxTypeName || 'not availiable',
             ProductTaxTypeDescription: product.ProductTaxType?.ProductTaxTypeDescription || 'not availiable'
-          },
+          }, 
           ProductDiscountPercent: {
-            ProductEnableDiscount: product.ProductEnableDiscountPercent || false,
+            ProductEnableDiscount: !!product.ProductEnableDiscountPercent,
             ProductDiscountValue: product.ProductDiscountPercent || 0,
           },
           ProductDiscountAmount: {
-            ProductEnableDiscount: product.ProductEnableDiscountAmount || false,
+            ProductEnableDiscount: !!product.ProductEnableDiscountAmount,
             ProductDiscountValue: product.ProductDiscountAmount || 0,
           },
         })) || [];
-        console.log(items.value); 
-        
-    } catch (error:any) {
-        console.error(error);
-        dialogStore.openDialog(error?.res?.data?.res_message || error, {status: 'error'});
-    }
+        return productList;
 }
 
-const addItem = async () => {
-    try {
-        isLoading.value = true;
-        const headers = getApiHeaders();
-        const payload = form.value;
-        const apiUrl = '/product/insert';
-        const res:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload , {headers});
-        dialogStore.openDialog(res?.data?.res_message || 'unknown message', {status: 'success'});
-        resetForm();
-        getProduct();
+const {data: product , isPending: isTablePending , isError: isTableError , error: tableError , isFetching: isTableFetching } = useQuery<ProductTable[] , AxiosError>({
+    queryKey: ['productListAxios'] ,
+    queryFn: fetchProduct ,
+})
 
-    } catch (error:any) {
-        console.error(error);
-        dialogStore.openDialog(error?.res?.data?.res_message || 'unknown message', {status: 'error'});
-    } finally {
-        isLoading.value = false;
-        myModalRef.value?.close();
-    }
+
+//fetch dropdown list
+const fetchCategoryList = async ():Promise<CategoryList[]> => {
+  
+  const apiUrl = '/dropdown/product/category';
+  const res:AxiosResponse<baseResponse<Data<CategoryList[]>>> = await apiClient.get(apiUrl );
+  const catDropdown:CategoryList[] = res.data.res_data.data;
+    return catDropdown;
+  }
+
+const { data: categoryList , isPending: isCatPending , isError: isCatError , error: catError , isFetching: isCatFetching } = useQuery<CategoryList[] , AxiosError>({
+  queryKey: ['catListAxios'],
+  queryFn: fetchCategoryList,
+})
+
+const fetchBrandList = async ():Promise<BrandList[]> => {
+  
+  const apiUrl = '/dropdown/product/brand';
+  const res:AxiosResponse<baseResponse<Data<BrandList[]>>> = await apiClient.get(apiUrl );
+  const brandDropdown:BrandList[] = res.data.res_data.data;
+  return brandDropdown;
 }
 
+const { data: brandList , isPending: isBrandPending , isError: isBrandError , error: brandError , isFetching: isBrandFetching } = useQuery<BrandList[] , AxiosError>({
+  queryKey: ['brandListAxios'],
+  queryFn: fetchBrandList,
+})
+
+const fetchProductStatusList = async ():Promise<ProductStatusList[]> => {
+  
+  const apiUrl = '/dropdown/product/status';
+  const res:AxiosResponse<baseResponse<Data<ProductStatusList[]>>> = await apiClient.get(apiUrl );
+  const productStatusList:ProductStatusList[] = res.data.res_data.data;
+  return productStatusList;
+}
+
+const { data: productStatusList , isPending: isProductStatusPending , isError: isProductStatusError , error: productStatusError , isFetching: isProductStatusFetching } = useQuery<ProductStatusList[] , AxiosError>({
+  queryKey: ['productStatusListAxios'],
+  queryFn: fetchProductStatusList,
+})
+
+const fetchTaxTypeList = async ():Promise<TaxTypeList[]> => {
+  
+  const apiUrl = '/dropdown/product/taxtypes';
+  const res:AxiosResponse<baseResponse<Data<TaxTypeList[]>>> = await apiClient.get(apiUrl );
+  const taxTypeList:TaxTypeList[] = res.data.res_data.data;
+  return taxTypeList;
+}
+
+const { data: productTaxTypeList , isPending: isTaxTypePending , isError: isTaxTypeError , error: taxtypeError , isFetching: isTaxTypeFetching } = useQuery<TaxTypeList[] , AxiosError>({
+  queryKey: ['taxTypeListAxios'],
+  queryFn: fetchTaxTypeList,
+})
+
+//post product
+const createProduct = async (payload:ProductPayload) => {
+  
+  const apiUrl = '/product/insert';
+  const res:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload );
+  return res.data;
+}
+
+const createProductMutation = useMutation<baseResponse<void>,AxiosError,ProductPayload>({
+  mutationFn: createProduct,
+  onSuccess: (data) => {
+    closeModal();
+    dialogStore.openDialog(data.res_message , {status: 'success'});
+    queryClient.invalidateQueries({queryKey: ['productListAxios']});
+  },
+  onError: (error) => {
+    dialogStore.openDialog(error.message , {status: 'error'});
+  }
+});
+
+const handleSubmit = () => {
+  console.log(mode.value)
+  const {ProductCode , ProductName} = form.value;
+  if(!ProductCode || !ProductName) {
+    return toastStore.showToast('กรอกข้อมูลให้ครบถ้วน','warning');
+  }
+  switch(mode.value) {
+    //create
+    case 1: {
+      createProductMutation.mutate(form.value);
+      return;
+    }
+    //update
+    case 2: {
+      updateProductMutation.mutate(form.value);
+      return; 
+    }
+    default: return;
+  }
+}
+
+//update product
+const updateProduct = async (payload:ProductPayload) => {
+  
+  const apiUrl = '/product/update';
+  const res:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload );
+  return res.data;
+}
+
+const updateProductMutation = useMutation<baseResponse<void>,AxiosError,ProductPayload>({
+  mutationFn: updateProduct,
+  onSuccess: (data) => {
+    toastStore.showToast(data.res_message , 'success');
+    queryClient.invalidateQueries({queryKey: ['productListAxios']});
+    closeModal();
+  },
+  onError: (error) => {
+    toastStore.showToast(error.message , 'error');
+  },
+  onMutate: () => {
+    progressBarStore.loadingStart();
+  },
+  onSettled: () => {
+    setTimeout(() => {
+      progressBarStore.loadingStop();
+    }, 1000);
+  }
+})
+
+const handleUpdateSubmit = () => {
+  const ProductInfoId = form.value;
+  if(!ProductInfoId) {
+    return toastStore.showToast('ไม่สามารถ update ได้');
+  }
+  updateProductMutation.mutate(form.value);
+}
+
+// const debounceUpdateForm = debounce(handleUpdateSubmit , 500);
+
+const closeModal = () => {
+  myModalRef.value?.close();
+  resetForm();
+}
+
+const resetForm = () => {
+  form.value = {...default_form};
+}
+
+const handleSelecterUpdate = <T extends keyof ProductPayload>(key: T, newValue: ProductPayload[T] ,productId:any) => {
+  if (form.value) {
+    form.value = {};
+    form.value.ProductInfoId = productId;
+    form.value[key] = newValue;
+  }
+  handleUpdateSubmit();
+};
+
+const openModal = (data?:ProductTable) => {
+  if(data) {
+    console.log(data)
+    const payloadData:ProductPayload = {
+      ProductInfoId: data.ProductInfoId || null,
+      ProductName: data.ProductInfo.ProductName,
+      ProductCode: data.ProductCode || null,
+      ProductImagePath: data.ProductInfo?.ProductImagePath || null,
+      ProductBrandId: data.ProductBrand?.ProductBrandId ,
+      ProductStatusId: data.ProductStatus?.ProductStatusId,
+      ProductCategoryId: data.ProductInfo.ProductCategory?.ProductCategoryId,
+      ProductPrice: data.ProductPrice,
+      ProductCost: data.ProductCost,
+      ProductBarcode: data.ProductBarcode,
+      ProductTaxTypeId: data.ProductTaxType.ProductTaxTypeId,
+      ProductEnableDiscountPercent: data.ProductDiscountPercent.ProductEnableDiscount,
+      ProductDiscountPercent: data.ProductDiscountPercent.ProductDiscountValue,
+      ProductEnableDiscountAmount: data.ProductDiscountAmount.ProductEnableDiscount,
+      ProductDiscountAmount: data.ProductDiscountAmount.ProductDiscountValue,
+      ProductDescription: data.ProductDescription,
+    }
+    console.log(payloadData)
+    form.value = payloadData;
+    mode.value = 2;
+    return myModalRef?.value?.showModal();
+  }
+  mode.value = 1;
+  myModalRef?.value?.showModal();
+};
 
 const handleImageUpload = (event:any) => {
   const file = event.target.files[0];
@@ -252,11 +351,6 @@ const handleImageUpload = (event:any) => {
   }
 };
 
-onMounted(() => {
-    getProduct();
-})
-
-const store = useConfirmDialogStore();
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
@@ -282,7 +376,7 @@ const store = useConfirmDialogStore();
                 <button class="btn rounded-lg btn-sm p-2 btn-ghost ">
                     <IconFilter2/>
                 </button>
-                <ul class="dropdown-content menu bg-base-300 shadow-lg rounded-lg gap-2">
+                <ul class="dropdown-content menu bg-base-100 shadow-lg rounded-lg gap-2">
                     <li v-for="item in ['Product Name','Product Code']" :key="item">
                         <input type="radio" name="product_filter" :value="item" :aria-label="item" class="btn btn-sm text-nowrap rounded-lg">
                     </li>
@@ -292,16 +386,22 @@ const store = useConfirmDialogStore();
                 <button class="btn rounded-lg btn-sm p-2 btn-ghost ">
                     <IconSortAscendingLetters/>
                 </button>
-                <ul class="dropdown-content menu bg-base-300 shadow-lg rounded-lg gap-2">
+                <ul class="dropdown-content menu bg-base-100 shadow-lg rounded-lg gap-2">
                     <li v-for="item in ['ASC','DESC']" :key="item">
                         <input type="radio" name="product_filter" :value="item" :aria-label="item" class="btn btn-sm text-nowrap rounded-lg">
                     </li>
                 </ul>
             </div>
             <span class="w-full"></span>
-            <button class="btn btn-primary btn-sm rounded-lg" @click="openModal"><IconPlus class="size-5"/>Add Product</button>
+            <button class="btn btn-primary btn-sm rounded-lg" @click="openModal()"><IconPlus class="size-5"/>Add Product</button>
         </div>
-        <Table :headers="headers" :items="items" class="rounded-xl shadow-lg w-full h-full">
+        <Table 
+          class="rounded-xl shadow-lg w-full h-full" 
+          :headers="headers" 
+          :items="product" 
+          :isLoading="isTablePending" 
+          :isError="isTableError"
+        >
             <template #ProductInfo="product">
                <div class="flex items-center gap-4">
                     <div class="size-20 bg-base-100 rounded-lg overflow-hidden">
@@ -315,7 +415,9 @@ const store = useConfirmDialogStore();
                </div>
             </template>
             <template #ProductStatus="product">
-              {{ product.item.ProductStatus.ProductStatusName }}
+              <select :value="product.item.ProductStatus.ProductStatusId" @change="e => handleSelecterUpdate('ProductStatusId', Number((e.target as HTMLSelectElement).value), product.item.ProductInfoId)" class="select select-bordered w-full rounded-lg bg-transparent border-0 outline-0 p-1 focus:bg-base-100">
+                <option v-for="(status,index) in productStatusList" :key="`status-${index}`" :value="status.ProductStatusId">{{ status.ProductStatusName }}</option>
+              </select>
             </template>
             <template #ProductPrice="product">
               {{ product.item.ProductPrice }} ฿
@@ -324,7 +426,10 @@ const store = useConfirmDialogStore();
               {{ product.item.ProductCost }} ฿
             </template>
             <template #ProductTaxType="product">
-              {{ product.item.ProductTaxType.ProductTaxTypeName }}
+              <select :value="product.item.ProductTaxType.ProductTaxTypeId" @change="e => handleSelecterUpdate('ProductStatusId', Number((e.target as HTMLSelectElement).value), product.item.ProductInfoId)" class="select select-bordered w-full rounded-lg bg-transparent border-0 outline-0 p-1 focus:bg-base-100">
+                <option v-for="(status,index) in productTaxTypeList" :key="`status-${index}`" :value="status.ProductTaxTypeId">{{ status.ProductTaxTypeName }}</option>
+              </select>
+              <!-- {{ product.item.ProductTaxType.ProductTaxTypeName }} -->
             </template>
             <template #ProductDiscountPercent="product">
                 <h1 v-if="product.item.ProductDiscountPercent.ProductEnableDiscount">{{ product.item.ProductDiscountPercent.ProductDiscountValue }}%</h1>
@@ -334,8 +439,8 @@ const store = useConfirmDialogStore();
                 <h1 v-if="product.item.ProductDiscountAmount.ProductEnableDiscount">{{ product.item.ProductDiscountAmount.ProductDiscountValue }}฿</h1>
                 <h1 v-else class="text-error">disabled</h1>
             </template>
-            <template #actions>
-                <button class="btn btn-circle btn-soft btn-xs bg-info text-info-content mr-2" ><IconPencil class="size-4"/></button>
+            <template #actions="product">
+                <button class="btn btn-circle btn-soft btn-xs bg-info text-info-content mr-2" @click="openModal(product.item)"><IconPencil class="size-4"/></button>
                 <button class="btn btn-circle btn-soft btn-xs bg-error text-error-content" @click="() => store.isOpen = true"><IconTrash class="size-4"/></button>
             </template>
         </Table>
@@ -345,9 +450,10 @@ const store = useConfirmDialogStore();
     <dialog ref="myModalRef" className="modal">
         <div className="modal-box min-w-1/2">
             <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal"><IconX class="text-error-content"/></button>
-            <h3 className="font-semibold text-xl">Add New Product</h3>
+            <h3 v-if="mode === 1" className="font-semibold text-xl">Add New Product</h3>
+            <h3 v-else-if="mode === 2" className="font-semibold text-xl">Update Product</h3>
             <div className="modal-action">
-              <form @submit.prevent="addItem" class="text-base mx-auto">
+              <form @submit.prevent="handleSubmit()" class="text-base mx-auto">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <label class="form-control w-full">
                     <div class="label">
@@ -398,7 +504,7 @@ const store = useConfirmDialogStore();
                       <span class="label-text">Brand</span>
                     </div>
                     <select v-model="form.ProductBrandId" class="select select-bordered w-full rounded-lg">
-                      <option :value="undefined" disabled >Select Brand</option>
+                      <option :value="undefined" disabled ><span v-if="isBrandPending" class=" loading-spinner"></span><span v-else>Select Brand</span></option>
                       <option v-for="(brand,index) in brandList" :key="`brand-${index}`" :value="brand.ProductBrandId">{{ brand.ProductBrandName }}</option>
                     </select>
                   </label>
@@ -408,7 +514,7 @@ const store = useConfirmDialogStore();
                       <span class="label-text">Category</span>
                     </div>
                     <select v-model="form.ProductCategoryId" class="select select-bordered w-full rounded-lg">
-                      <option :value="undefined" disabled >Select Category</option>
+                      <option :value="undefined" disabled ><span v-if="isCatPending" class=" loading-spinner"></span><span v-else>Select Category</span></option>
                       <option v-for="(cat,index) in categoryList" :key="`cat-${index}`" :value="cat.ProductCategoryId">{{ cat.ProductCategoryName }}</option>
                     </select>
                   </label>
@@ -418,7 +524,7 @@ const store = useConfirmDialogStore();
                       <span class="label-text">Status</span>
                     </div>
                     <select v-model="form.ProductStatusId" class="select select-bordered w-full rounded-lg">
-                      <option :value="undefined" disabled >Select Status</option>
+                      <option :value="undefined" disabled ><span v-if="isProductStatusPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
                       <option v-for="(status,index) in productStatusList" :key="`status-${index}`" :value="status.ProductStatusId">{{ status.ProductStatusName }}</option>
                     </select>
                   </label>
@@ -428,7 +534,7 @@ const store = useConfirmDialogStore();
                       <span class="label-text">VAT Type</span>
                     </div>
                     <select v-model="form.ProductTaxTypeId" class="select select-bordered w-full rounded-lg">
-                      <option :value="undefined" disabled >Select VAT Type</option>
+                      <option :value="undefined" disabled ><span v-if="isTaxTypePending" class=" loading-spinner"></span><span v-else>Select VAT Type</span></option>
                       <option v-for="(vat,index) in productTaxTypeList" :key="`vat-${index}`" :value="vat.ProductTaxTypeId">{{ vat.ProductTaxTypeName }}</option>
                     </select>
                   </label>
@@ -489,7 +595,7 @@ const store = useConfirmDialogStore();
                     </div>
                   </label>
                   <div class="flex-3">
-                    <CurrencyInput v-model="form.ProductDiscountAmount" symbol-value="%" class="max-w-xs" :disabled="!form.ProductEnableDiscountAmount"/>
+                    <CurrencyInput v-model="form.ProductDiscountAmount" class="max-w-xs" :disabled="!form.ProductEnableDiscountAmount"/>
                   </div>
                 </div>
 
@@ -505,7 +611,7 @@ const store = useConfirmDialogStore();
                 </div>
 
                 <div class="flex justify-center">
-                  <button type="submit" class="btn btn-primary px-8" :disabled="isLoading">Add Product<span v-if="isLoading" className="loading loading-spinner loading-xs ml-2"></span></button>
+                  <button type="submit" class="btn btn-primary px-8" :disabled="isLoading">Submit<span v-if="isLoading" className="loading loading-spinner loading-xs ml-2"></span></button>
                 </div>
               </form>
             </div>

@@ -4,9 +4,9 @@ import apiClient from "../api/apiService";
 
 export const getExtendCookies = async () => {
     try {
-        const headers = getApiHeaders();
+        
         const apiUrl = '/extend/cookie'
-        const res:baseResponse<extendTime> = await apiClient.get(apiUrl , {headers});
+        const res:baseResponse<extendTime> = await apiClient.get(apiUrl );
         const timeData = res.res_data.FormatingTime
         
         if(!timeData) return console.log('cookie extend failed.');

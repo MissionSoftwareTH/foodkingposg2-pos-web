@@ -7,6 +7,7 @@ export const useAppSetupStore = defineStore('appSetup', () => {
     const theme = ref('light');
     const user_data = ref<User_Data>();
     const permission = ref<string[]>([]);
+    const isSideBarExpanded = ref(false);
 
     const setLocale = (newLocale: string) => {
         locale.value = newLocale;
@@ -22,6 +23,11 @@ export const useAppSetupStore = defineStore('appSetup', () => {
         user_data.value = userData;
         localStorage.setItem('info',JSON.stringify(userData));
     };
+
+    const setSidebarExpand = (value: boolean) => {
+        isSideBarExpanded.value = value;
+        localStorage.setItem('sidebar-expanded',JSON.stringify(value));
+    }
 
     const setPermissionStore = (data: User_Data) => {
         data?.Permission?.forEach((p) => {
@@ -46,6 +52,10 @@ export const useAppSetupStore = defineStore('appSetup', () => {
             setPermissionStore(user_data.value || {});
         }
 
+        const get_sidebar_status = localStorage.getItem('sidebar-expanded');
+        if(get_sidebar_status) {
+            setSidebarExpand(JSON.parse(get_sidebar_status) || false);
+        }
     };
 
     return {
@@ -53,10 +63,12 @@ export const useAppSetupStore = defineStore('appSetup', () => {
         theme,
         user_data,
         permission,
+        isSideBarExpanded,
         setLocale,
         setTheme,
         initialize,
         setUserData,
         setPermissionStore,
+        setSidebarExpand,
     };
 });

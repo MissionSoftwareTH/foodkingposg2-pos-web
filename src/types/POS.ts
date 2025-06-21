@@ -1,7 +1,7 @@
 export interface POSResponse {
-    BranchId?: number;
-    BranchName?: string;
-    PosSystem?: POSSystem[];
+    BranchId: number;
+    BranchName: string;
+    PosSystem: POSSystem[];
 }
 
 export interface POSSystem {
@@ -14,6 +14,7 @@ export interface POSSystem {
 
 export interface POSPayload {
     BranchId?: number;
+    PosSystemsId?: number;
     PosName?: string;
     PosKey?: string;
 }

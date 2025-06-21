@@ -1,6 +1,8 @@
 <template>
     <div v-if="isLogin" class="relative inline-block text-left">
+        <div class=" loading loading-spinner size-12 p-2" v-if="isPending"></div>
         <button
+            v-else
             @click="isOpen = !isOpen"
             type="button"
             class="group hover:bg-base-300 focus:bg-base-300 transition-all duration-300 p-2 rounded-full flex flex-row items-center w-fit h-fit"
@@ -8,12 +10,12 @@
             aria-expanded="false"
             aria-haspopup="true"
         >
-            <div class="size-12 rounded-full overflow-hidden relative bg-primary text-primary-content flex justify-center items-center">
-                <img src="/assets/images/profile-mock.png" alt="myimage">
+            <div class="size-12 rounded-full overflow-hidden relative bg-primary text-primary-content flex justify-center items-center ">
+                <img class="w-full h-full object-fill" src="/assets/images/profile-mock.png" alt="myimage">
             </div>
             <div class="text-start overflow-hidden font-semibold whitespace-nowrap opacity-0 max-w-0 group-focus:opacity-100 group-focus:px-4 group-focus:max-w-xs transition-all duration-500 ease-in-out">
-                <h1 class="text-base font-semibold space-x-1">{{appSetupStore.user_data?.FirstName || 'unknown'}} {{appSetupStore.user_data?.LastName || 'unknown'}}</h1>
-                <h2 class="text-sm text-base-content/70">{{appSetupStore.user_data?.Email || 'unknown'}}</h2>
+                <h1 class="text-base font-semibold space-x-1">{{ isError ? 'unknown' : userData?.FirstName }} {{ isError ? 'unknown' : userData?.LastName}}</h1>
+                <h2 class="text-sm text-base-content/70">{{ isError ? 'unknown' : userData?.Email }}</h2>
             </div>
         </button>
         <div
@@ -39,12 +41,18 @@ import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import { onMounted, onUnmounted } from 'vue';
 import { IconLogout, IconSettings } from '@tabler/icons-vue';
-import { useAppSetupStore } from '../store/appSetupStore';
-import { logout } from '../services/utils';
+import { fetchUserInfo, logout } from '../services/utils';
+import { useQuery } from '@tanstack/vue-query';
+import type { User_Data } from '../types';
 
-const appSetupStore = useAppSetupStore();
 const isOpen = ref<boolean>(false);
 const isLogin = localStorage.getItem('isLoggedIn');
+
+const {data: userData , isPending , isError} = useQuery<User_Data>({
+    queryKey: ['userInfo'],
+    queryFn: fetchUserInfo,
+    enabled: !!isLogin,
+})
 
 onMounted(() => {
     document.addEventListener('click', handleOutsideClick);
@@ -61,6 +69,4 @@ const handleOutsideClick = (event: MouseEvent) => {
         isOpen.value = false;
     }
 };
-
-
 </script>

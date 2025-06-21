@@ -4,8 +4,8 @@ import { ref, shallowRef, watch } from 'vue';
 import { IconBuildingStore, IconChevronsDown, IconDeviceDesktop, IconExclamationCircle, IconFileSettings, IconLayoutDashboard, IconLogs, IconPackage, IconShoppingCart, IconUsers } from '@tabler/icons-vue'; // Import all icons you use
 import type { IconName } from '../../../router/routePath';
 import type { AppRouteRecordRaw } from '../../../types';
+import { useAppSetupStore } from '../../../store/appSetupStore';
 
-// Explicitly type iconComponents with Record<IconName, any>
 const iconComponents = shallowRef<Record<IconName, any>>({
     'Dashboard': IconLayoutDashboard,
     'Management': IconFileSettings,
@@ -23,12 +23,12 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
-const router = useRouter(); // Get the router instance
+const router = useRouter();
 const isExpanded = ref(false);
 const handleToggle = () => {
   isExpanded.value = !isExpanded.value
 }
+const appSetupStore = useAppSetupStore();
 
 watch(() => router.currentRoute.value.path, (newPath) => {
   if (props.item.children && props.item.children.length > 0) {
@@ -58,7 +58,9 @@ watch(() => router.currentRoute.value.path, (newPath) => {
         :is="iconComponents[item.meta.icon]"
         class="size-8"
         />
-                <h1 class="overflow-hidden group-hover:px-4 font-semibold whitespace-nowrap opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs transition-all duration-500 ease-in-out">{{ item.name }}</h1>
+                <h1 
+                :class="appSetupStore.isSideBarExpanded ? `px-4` : `opacity-0 max-w-0 group-hover:px-4 group-hover:opacity-100 group-hover:max-w-xs`"
+                class="overflow-hidden font-semibold whitespace-nowrap transition-all duration-500 ease-in-out">{{ item.name }}</h1>
 
             </button>
             <div class="collapse-content flex flex-col p-0 gap-2 peer-checked:pt-2">
@@ -77,7 +79,9 @@ watch(() => router.currentRoute.value.path, (newPath) => {
                 :is="iconComponents[item.meta.icon]"
                 class="size-8"
             />
-            <h1 class="overflow-hidden group-hover:px-4 font-semibold whitespace-nowrap opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs transition-all duration-500 ease-in-out">{{ item.name }}</h1>
+                <h1 
+                :class="appSetupStore.isSideBarExpanded ? `px-4` : `opacity-0 max-w-0 group-hover:px-4 group-hover:opacity-100 group-hover:max-w-xs`"
+                class="overflow-hidden font-semibold whitespace-nowrap transition-all duration-500 ease-in-out">{{ item.name }}</h1>
         </RouterLink>
     </li>
 </template>

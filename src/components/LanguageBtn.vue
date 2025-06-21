@@ -1,6 +1,6 @@
 <template>
-    <div class="dropdown dropdown-end">
-        <label tabindex="0" class="btn btn-sm text-base w-28">
+    <div class="dropdown dropdown-end ">
+        <label tabindex="0" class="btn btn-sm text-base w-28 bg-base-100">
             {{ selectedLanguage }}
             <svg
                 xmlns="http://www.w3.org/2000/svg"

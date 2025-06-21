@@ -1,22 +1,24 @@
 export interface ProductPayload {
-   ProductName?: string;
-   ProductCode?: string;
-   ProductImagePath?: File | null; 
-   ProductBrandId?: number; 
-   ProductStatusId?: number;
-   ProductCategoryId?: number;
-   ProductPrice?: number;
-   ProductCost?: number;
-   ProductBarcode?: string;
-   ProductTaxTypeId?: number | undefined;
-   ProductEnableDiscountPercent?: boolean;
-   ProductDiscountPercent?: number | undefined;
-   ProductEnableDiscountAmount?: boolean;
-   ProductDiscountAmount?: number | undefined;
-   ProductDescription?: string;
+    ProductInfoId?: number | null;
+    ProductName?: string;
+    ProductCode?: string | null;
+    ProductImagePath?: File | string | null; 
+    ProductBrandId?: number | null; 
+    ProductStatusId?: number | null;
+    ProductCategoryId?: number | null;
+    ProductPrice?: number;
+    ProductCost?: number;
+    ProductBarcode?: string;
+    ProductTaxTypeId?: number | null;
+    ProductEnableDiscountPercent?: boolean;
+    ProductDiscountPercent?: number | null;
+    ProductEnableDiscountAmount?: boolean;
+    ProductDiscountAmount?: number | null;
+    ProductDescription?: string;
 }
 
 export interface ProductResponse {
+    ProductInfoId?: number;
     ProductCode?: string; 
     ProductName?: string;
     ProductBarcode?: string;
@@ -25,9 +27,9 @@ export interface ProductResponse {
     ProductCost?: number; 
     ProductImagePath?: string | null; 
     ProductDiscountPercent?: number | null;
-    ProductEnableDiscountPercent?: boolean;
+    ProductEnableDiscountPercent?: number | null;
     ProductDiscountAmount?: number | null;
-    ProductEnableDiscountAmount?: boolean;
+    ProductEnableDiscountAmount?: number | null;
     ProductBrand?: ProductBrand;
     ProductCategory?: ProductCategory;
     ProductStatus?: ProductStatus;
@@ -35,18 +37,22 @@ export interface ProductResponse {
 }
 
 export interface ProductTable {
-   ProductInfo: ProductInfo;
-   ProductCode: string | null; 
-   ProductStatus: ProductStatus | null;
-   ProductBrand: ProductBrand | null; 
-   ProductPrice: number | null; 
-   ProductCost: number | null; 
-   ProductDiscountPercent: ProductDiscountType;
-   ProductDiscountAmount: ProductDiscountType;
+    ProductInfoId: number | null;
+    ProductInfo: ProductInfo;
+    ProductCode: string | null; 
+    ProductStatus: ProductStatus | null;
+    ProductBrand: ProductBrand | null; 
+    ProductPrice: number; 
+    ProductCost: number ; 
+    ProductDiscountPercent: ProductDiscountType;
+    ProductDiscountAmount: ProductDiscountType;
+    ProductBarcode: string;
+    ProductDescription: string;
+    ProductTaxType: ProductTaxType;
 }
 
 export interface ProductTaxType {
-    ProductTaxTypeId: number;
+    ProductTaxTypeId: number | null;
     ProductTaxTypeName: string;
     ProductTaxTypeDescription: string;
 }
@@ -59,21 +65,21 @@ export interface ProductInfo {
 
 export interface ProductDiscountType {
     ProductEnableDiscount: boolean;
-    ProductDiscountValue: number
+    ProductDiscountValue: number | null;
 }
 
 export interface ProductBrand {
-    ProductBrandId: number;
+    ProductBrandId: number | null;
     ProductBrandName: string;
 }
 
 export interface ProductCategory {
-    ProductCategoryId: number | undefined;
+    ProductCategoryId: number | null;
     ProductCategoryName: string;
 }
 
 export interface ProductStatus {
-    ProductStatusId: number | undefined;
+    ProductStatusId: number | null;
     ProductStatusName: string;
     ProductStatusDescription: string;
 }

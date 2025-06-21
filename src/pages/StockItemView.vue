@@ -122,9 +122,9 @@ const openModal = async () => {
 
 const getCategoryList = async () => {
   try {
-    const headers = getApiHeaders();
+    
     const apiUrl = '/dropdown/product/category';
-    const res:AxiosResponse<baseResponse<Data<CategoryList[]>>> = await apiClient.get(apiUrl , {headers});
+    const res:AxiosResponse<baseResponse<Data<CategoryList[]>>> = await apiClient.get(apiUrl );
     categoryList.value = res?.data?.res_data?.data || [];
   } catch (error:any) {
     console.error();
@@ -134,9 +134,9 @@ const getCategoryList = async () => {
 
 const getBrandList = async () => {
   try {
-    const headers = getApiHeaders();
+    
     const apiUrl = '/dropdown/product/brand';
-    const res:AxiosResponse<baseResponse<Data<BrandList[]>>> = await apiClient.get(apiUrl , {headers});
+    const res:AxiosResponse<baseResponse<Data<BrandList[]>>> = await apiClient.get(apiUrl );
     brandList.value = res?.data?.res_data?.data || [];
   } catch (error:any) {
     console.error();
@@ -146,9 +146,9 @@ const getBrandList = async () => {
 
 const getProductStatusList = async () => {
   try {
-    const headers = getApiHeaders();
+    
     const apiUrl = '/dropdown/product/status';
-    const res:AxiosResponse<baseResponse<Data<ProductStatusList[]>>> = await apiClient.get(apiUrl , {headers});
+    const res:AxiosResponse<baseResponse<Data<ProductStatusList[]>>> = await apiClient.get(apiUrl );
     productStatusList.value = res?.data?.res_data?.data || [];
   } catch (error:any) {
     console.error();
@@ -160,9 +160,9 @@ const selectedOption = ref<string | number>(5);
 
 // const getProduct = async () => {
 //     try {
-//         const headers = getApiHeaders();
+//         
 //         const apiUrl = '/product/list';
-//         const res:AxiosResponse<baseResponse<Data<ProductResponse[]>>> = await apiClient.get(apiUrl , {headers});
+//         const res:AxiosResponse<baseResponse<Data<ProductResponse[]>>> = await apiClient.get(apiUrl );
 //         items.value = res?.data?.res_data?.data?.map((product) => ({
 //           ProductInfo:{
 //               ProductName: product.ProductName || '',
@@ -202,10 +202,10 @@ const selectedOption = ref<string | number>(5);
 const addItem = async () => {
     try {
         isLoading.value = true;
-        const headers = getApiHeaders();
+        
         const payload = form.value;
         const apiUrl = '/product/insert';
-        const res:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload , {headers});
+        const res:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload );
         dialogStore.openDialog(res?.data?.res_message || 'unknown message', {status: 'success'});
         resetForm();
         // getProduct();
@@ -263,7 +263,7 @@ onMounted(() => {
                 <button class="btn rounded-lg btn-sm p-2 btn-ghost ">
                     <IconFilter2/>
                 </button>
-                <ul class="dropdown-content menu bg-base-300 shadow-lg rounded-lg gap-2">
+                <ul class="dropdown-content menu bg-base-100 shadow-lg rounded-lg gap-2">
                     <li v-for="item in ['Product Name','Product Code']" :key="item">
                         <input type="radio" name="product_filter" id="" :value="item" :aria-label="item" class="btn btn-sm text-nowrap rounded-lg">
                     </li>
@@ -273,7 +273,7 @@ onMounted(() => {
                 <button class="btn rounded-lg btn-sm p-2 btn-ghost ">
                     <IconSortAscendingLetters/>
                 </button>
-                <ul class="dropdown-content menu bg-base-300 shadow-lg rounded-lg gap-2">
+                <ul class="dropdown-content menu bg-base-100 shadow-lg rounded-lg gap-2">
                     <li v-for="item in ['ASC','DESC']" :key="item">
                         <input type="radio" name="product_filter" id="" :value="item" :aria-label="item" class="btn btn-sm text-nowrap rounded-lg">
                     </li>
@@ -282,7 +282,7 @@ onMounted(() => {
             <span class="w-full"></span>
             <button class="btn btn-primary btn-sm rounded-lg" @click="openModal"><IconPlus class="size-5"/>Add Item</button>
         </div>
-        <Table :headers="headers" :items="items" class="rounded-xl shadow-lg w-full h-full">
+        <Table :headers="headers" :items="items" class="rounded-xl shadow-lg w-full h-full" :is-loading="false" :is-error="true">
             <template #ProductInfo="product">
                <div class="flex items-center gap-4">
                     <div class="size-20 bg-base-100 rounded-lg overflow-hidden">

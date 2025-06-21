@@ -9,7 +9,7 @@
         </div>
         <span class="divider"></span>
         <div class="space-y-5 p-2 w-full overflow-y-auto">
-            <div class="flex gap-4 rounded-full bg-base-300 p-5">
+            <div class="flex gap-4 rounded-full bg-base-100 p-5">
                 <img src="/assets/images/profile-mock.png" alt="mock image" class="size-20 rounded-full">
                 <div class="flex flex-col justify-between">
                     <div class="flex gap-4">
@@ -24,13 +24,13 @@
                     <label class="label text-base-content">
                         <span class="label-text text-base text-base-content/50">First Name</span>
                     </label>
-                    <input type="text" placeholder="first name" class="input input-bordered w-full" required v-model="form.firstname"/>
+                    <input type="text" placeholder="first name" class="input input-bordered w-full" required v-model="form.FirstName"/>
                 </div>
                 <div class="flex-1 flex flex-col gap-2">
                     <label class="label text-base-content">
                         <span class="label-text text-base text-base-content/50">Last Name</span>
                     </label>
-                    <input type="text" placeholder="last name" class="input input-bordered w-full" required v-model="form.lastname"/>
+                    <input type="text" placeholder="last name" class="input input-bordered w-full" required v-model="form.LastName"/>
                 </div>
             </div>
         </div>
@@ -38,41 +38,53 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { AxiosResponse } from 'axios';
-import { useDialogStore } from '../../../store/dialogStore';
+import type { AxiosError, AxiosResponse } from 'axios';
 import type { baseResponse, formData, Payload } from '../../../types';
-import { getApiHeaders } from '../../../services/api/apiHeader';
 import apiClient from '../../../services/api/apiService';
 import { useAppSetupStore } from '../../../store/appSetupStore';
-import { getInfo } from '../../../services/utils';
+import { useToastStore } from '../../../store/toastStore';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useProgressBarStore } from '../../../store/progressBarStore';
 
-const dialogStore = useDialogStore();
+const toastStore = useToastStore();
 const isLoading = ref<boolean>(false);
 const appSetupStore = useAppSetupStore();
+const progressBarStore = useProgressBarStore();
+const queryClient = useQueryClient();
 
 const form = ref<formData>({
-    firstname: appSetupStore.user_data?.FirstName,
-    lastname: appSetupStore.user_data?.LastName,
+    FirstName: appSetupStore.user_data?.FirstName,
+    LastName: appSetupStore.user_data?.LastName,
 })
 
-const handleSubmit = async () => {
-    try {
-        const { firstname , lastname } = form.value;
-        if( !firstname || !lastname )return dialogStore.openDialog('All required' , {status: 'warning'});
-        const headers = getApiHeaders();
-        const payload:Payload = {
-            FirstName: firstname,
-            LastName: lastname
-        };
-        const apiUrl = '/admins/update/admin/info'
-        const res:AxiosResponse<baseResponse<void>> = await apiClient.patch(apiUrl , payload , {headers});
-        console.log(res)
-        getInfo();
-        dialogStore.openDialog(res.data.res_message || 'unknown message' , {status: 'success'});
+const updateUserInfo = async (payload:Payload) => {
+    const apiUrl = '/admins/update/admin/info'
+    const res:AxiosResponse<baseResponse<void>> = await apiClient.patch(apiUrl , payload );
+    return res.data;
+}
 
-    } catch (error:any) {
-        console.error(error);
-        dialogStore.openDialog(error?.response?.data?.res_message || error , {status: 'error'});
+const updateUserInfoMutation = useMutation<baseResponse<void> , AxiosError<baseResponse<void>> , Payload>({
+    mutationFn: updateUserInfo,
+    onSuccess: (data) => {
+       toastStore.showToast(data.res_message , 'success');
+       queryClient.invalidateQueries({queryKey: ['userInfo']});
+    },
+    onError: (error) => {
+        toastStore.showToast(error.response?.data.res_message || error.message , 'error');
+    },
+    onMutate: () => {
+        progressBarStore.loadingStart();
+    },
+    onSettled: () => {
+        setTimeout(() => {
+            progressBarStore.loadingStop();
+        }, 1000);
     }
+})
+
+const handleSubmit = () => {
+    const { FirstName , LastName } = form.value;
+    if( !FirstName || !LastName ) return toastStore.showToast('ข้อมูลไม่ครบถ้วน' , 'warning');
+    updateUserInfoMutation.mutate(form.value);
 };
 </script>

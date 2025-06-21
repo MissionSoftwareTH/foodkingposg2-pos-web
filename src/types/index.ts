@@ -17,15 +17,14 @@ export interface Layouts {
 }
 
 export interface formData {
-    firstname?: string;
-    lastname?: string;
-    email?: string;
-    password?: string;
+    FirstName?: string;
+    LastName?: string;
+    Email?: string;
+    Password?: string;
     new_password?: string;
     confirm_password?: string;
     data?: any;
     otp?: string;
-    
 }
 
 export interface Payload {

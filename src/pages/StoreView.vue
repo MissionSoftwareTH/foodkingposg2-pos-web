@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import Table from '../components/Table.vue';
 import type { baseResponse, BranchPayload, Data, HeadersTable, BranchResponse , BranchTable } from '../types';
 import { IconAffiliate, IconFilter2, IconPencil, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
-import { getApiHeaders } from '../services/api/apiHeader';
 import apiClient from '../services/api/apiService';
-import type { AxiosResponse } from 'axios';
+import type { AxiosError, AxiosResponse } from 'axios';
 import { useDialogStore } from '../store/dialogStore';
 import { useConfirmDialogStore } from '../store/confirmDialogStore';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { useToastStore } from '../store/toastStore';
+import { useProgressBarStore } from '../store/progressBarStore';
+import { formatDateTime } from '../services/utils';
+import TableSort from '../components/TableSort.vue';
 
 const headers:HeadersTable[] = [
     {
@@ -49,64 +53,185 @@ const headers:HeadersTable[] = [
     }
 ];
 
+const confirmStore = useConfirmDialogStore();
 const dialogStore = useDialogStore();
+const toastStore = useToastStore();
+const queryClient = useQueryClient();
+const progressBarStore = useProgressBarStore();
+const mode = ref<number>(1);
 const myModalRef = ref<HTMLDialogElement | null>(null);
-const isLoading = ref<boolean>(false);
+const defaultform = {
+    MerchantId: 1,
+    BranchName: '',
+    BranchEmail: '',
+    BranchPhone: '',
+}
 const form = ref<BranchPayload>({
     MerchantId: 1,
     BranchName: '',
     BranchEmail: '',
     BranchPhone: '',
 });
-const items = ref<BranchTable[]>([]);
 
-const openModal = () => {
-  if (myModalRef.value) {
-    myModalRef.value.showModal();
-  }
-};
-
-const selectedOption = ref<string | number>(5);
-
-const getBranch = async () => {
-    try {
-        const headers = getApiHeaders();
-        const apiUrl = '/branchs/list';
-        const res:AxiosResponse<baseResponse<Data<BranchResponse[]>>> = await apiClient.get(apiUrl , {headers});
-        
-        items.value = res?.data?.res_data?.data || [];
-        console.log(items.value);
-        
-    } catch (error:any) {
-        console.error(error);
-        dialogStore.openDialog(error?.res?.data?.res_message || error, {status: 'error'});
-    }
+interface PageOption {
+    totalItem: number;
+    itemPerPage: number;
+    currentPage: number;
+    sortOrder: string;
+    sortBy: string;
 }
 
-const addBranch = async () => {
-    try {
-        isLoading.value = true;
-        const headers = getApiHeaders();
-        const payload = form.value;
-        const apiUrl = '/branchs/insert';
-        const res:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload , {headers});
-        dialogStore.openDialog(res?.data?.res_message || 'unknown message', {status: 'success'});
-        getBranch();
-
-    } catch (error:any) {
-        console.error(error);
-        dialogStore.openDialog(error?.res?.data?.res_message || 'unknown message', {status: 'success'});
-    } finally {
-        isLoading.value = false;
-        myModalRef.value?.close();
-    }
-}
-
-onMounted(() => {
-    getBranch();
+const PageOption = ref({
+    totalItem: 500,
+    itemPerPage: 5,
+    currentPage: 1,
+    sortOrder: 'desc',
+    sortBy: '',
 })
 
-const store = useConfirmDialogStore();
+const openModal = (data?:BranchTable) => {
+    if(data) {
+        mode.value = 2;
+        form.value = {
+            BranchId: data.BranchId,
+            BranchName: data.BranchName,
+            BranchEmail: data.ContactEmail,
+            BranchPhone: data.ContactPhone,
+        };
+        return myModalRef?.value?.showModal();
+    }
+    mode.value = 1;
+    myModalRef?.value?.showModal();
+};
+
+// fetch data
+const fetchBranchList = async (): Promise<BranchTable[]> => {
+    // 
+    const apiUrl = '/branchs/list?MerchantId=1';
+    const response:AxiosResponse<baseResponse<Data<BranchResponse[]>>> = await apiClient.get(apiUrl);
+    const branchTable:BranchTable[] = response.data.res_data.data;
+    branchTable.map((branch) => {
+        branch.CreatedAt = formatDateTime(branch.CreatedAt);
+        branch.UpdatedAt = formatDateTime(branch.UpdatedAt);
+    })
+    return branchTable;
+};
+
+const {data: branchData , isPending , isError , error , isFetching } = useQuery<BranchTable[] , AxiosError>({
+    queryKey: ['branchListAxios'] ,
+    queryFn: fetchBranchList ,
+})
+
+if (isError.value) {
+    console.error(error.value?.response); // เข้าถึงข้อมูล error จาก Axios
+    console.error(error.value?.message); // เข้าถึงข้อความ error ทั่วไป
+}
+
+//post data
+const createBranch = async (payload:BranchPayload) => {
+    const apiUrl = '/branchs/insert';
+    const response:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload );
+    return response.data;
+}
+
+const createBranchMutation = useMutation<baseResponse<void>,AxiosError<baseResponse<void>>,BranchPayload>({
+    mutationFn: createBranch,
+    onSuccess: (data) => {
+        myModalRef.value?.close();
+        dialogStore.openDialog(data.res_message , {status: 'success'});
+        queryClient.invalidateQueries({ queryKey: ['branchListAxios']});
+        //ล้างฟอร์ม
+        form.value = {...defaultform};
+    },
+    onError: (error) => {
+        console.error(error.response?.data.res_message || error.message);
+        dialogStore.openDialog(error.response?.data.res_message || error.message , {status: 'error'});
+    },
+    onMutate: () => {
+        progressBarStore.loadingStart();
+    },
+    onSettled: () => {
+        setTimeout(() => {
+        progressBarStore.loadingStop();
+        }, 1000);
+    }  
+})
+
+const handleSubmit = () => {
+    const { MerchantId , BranchName , BranchId } = form.value;
+    switch(mode.value) {
+    //create
+    case 1: {
+        if(!MerchantId || !BranchName) {
+        return toastStore.showToast('ใส่ข้อมูลไม่ครบถ้วน' , 'warning');
+        }
+        createBranchMutation.mutate(form.value);
+        return;
+    }
+    //update
+    case 2: {
+        if(!BranchId) {
+        return toastStore.showToast('ใส่ข้อมูลไม่ครบถ้วน' , 'warning');
+        }
+        updateBranchMutation.mutate(form.value);
+        return; 
+    }
+    default: return;
+  }
+}
+
+//update data
+
+const updateBranch = async (payload:BranchPayload) => {
+    const apiUrl = '/branchs/update';
+    const response:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload );
+    return response.data;
+}
+
+const updateBranchMutation = useMutation<baseResponse<void> , AxiosError<baseResponse<void>> , BranchPayload>({
+    mutationFn: updateBranch,
+    onSuccess: (data) => {
+        toastStore.showToast(data.res_message , 'success');
+        queryClient.invalidateQueries({queryKey: ['branchListAxios']});
+        closeModal();
+    },
+    onError: (error) => {
+        toastStore.showToast(error.response?.data.res_message || error.message , 'error');
+    },
+    onSettled: () => {
+        setTimeout(() => {
+        progressBarStore.loadingStop();
+        }, 1000);
+    },
+    onMutate: () => {
+        progressBarStore.loadingStart();
+    }
+})
+
+const closeModal = () => {
+  myModalRef.value?.close();
+  resetForm();
+}
+
+const resetForm = () => {
+  form.value = {...defaultform};
+}
+
+const handleEmit = (emitValue:number) => { 
+    PageOption.value.currentPage = emitValue;
+    // console.log(PageOption.value.itemPerPage);
+}
+
+const handleSortOrderEmit = (sort:string) => {
+    PageOption.value.sortOrder = sort;
+    console.log(PageOption.value.sortOrder);
+}
+
+const handleSortByEmit = (sort:string) => {
+    PageOption.value.sortBy = sort;
+    console.log(PageOption.value.sortBy);
+}
+
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
@@ -124,37 +249,37 @@ const store = useConfirmDialogStore();
         <div class="flex gap-2 items-center">
             <div class="flex items-center gap-2">
                 <h1>show</h1>
-                <select v-model="selectedOption" className="select select-sm w-fit rounded-lg">
+                <select v-model="PageOption.itemPerPage" className="select select-sm w-fit rounded-lg">
                     <option v-for="item in [5,10,25,50]" :value="item" :key="`item-${item}`">{{item}}</option>
                 </select>
             </div>
-            <div class="dropdown">
-                <button class="btn rounded-lg btn-sm p-2 btn-ghost ">
+            <TableSort :sort-item="[{title: 'Product Name', value: 'productName'},{title: 'Product Code', value: 'productCode'}]" @page-sort="handleSortByEmit">
+                <template #icon>    
                     <IconFilter2/>
-                </button>
-                <ul class="dropdown-content menu bg-base-300 shadow-lg rounded-lg gap-2">
-                    <li v-for="item in ['Product Name','Product Code']" :key="item">
-                        <input type="radio" name="product_filter" id="" :value="item" :aria-label="item" class="btn btn-sm text-nowrap rounded-lg">
-                    </li>
-                </ul>
-            </div>
-            <div class="dropdown">
-                <button class="btn rounded-lg btn-sm p-2 btn-ghost ">
+                </template>
+            </TableSort>
+            <TableSort :sort-item="[{title: 'ASC', value: 'asc'},{title: 'DESC', value: 'desc'}]" @page-sort="handleSortOrderEmit">
+                <template #icon>    
                     <IconSortAscendingLetters/>
-                </button>
-                <ul class="dropdown-content menu bg-base-300 shadow-lg rounded-lg gap-2">
-                    <li v-for="item in ['ASC','DESC']" :key="item">
-                        <input type="radio" name="product_filter" id="" :value="item" :aria-label="item" class="btn btn-sm text-nowrap rounded-lg">
-                    </li>
-                </ul>
-            </div>
+                </template>
+            </TableSort>
             <span class="w-full"></span>
-            <button class="btn btn-primary btn-sm rounded-lg" @click="openModal"><IconPlus class="size-5"/>Add Store</button>
+            <button class="btn btn-primary btn-sm rounded-lg" @click="openModal()"><IconPlus class="size-5"/>Add Store</button>
         </div>
-        <Table :headers="headers" :items="items" class="rounded-xl shadow-lg w-full h-full">
-            <template #actions>
-                <button class="btn btn-circle btn-soft btn-xs bg-info text-info-content mr-2" ><IconPencil class="size-4"/></button>
-                <button class="btn btn-circle btn-soft btn-xs bg-error text-error-content" @click="() => store.isOpen = true"><IconTrash class="size-4"/></button>
+        <Table 
+            class="rounded-xl shadow-lg w-full h-full"
+            :isLoading="isPending"
+            :isError="isError"
+            :headers="headers"
+            :items="branchData"
+            :item-per-page="PageOption.itemPerPage"
+            :total-items="PageOption.totalItem"
+            :current-page="PageOption.currentPage"
+            @page-changed="handleEmit"
+        >
+            <template #actions="product">
+                <button class="btn btn-circle btn-soft btn-xs bg-info text-info-content mr-2" @click="openModal(product.item)"><IconPencil class="size-4"/></button>
+                <button class="btn btn-circle btn-soft btn-xs bg-error text-error-content" @click="() => confirmStore.isOpen = true"><IconTrash class="size-4"/></button>
             </template>
         </Table>
     </div>
@@ -162,30 +287,31 @@ const store = useConfirmDialogStore();
     <!-- add merchant dialog -->
     <dialog ref="myModalRef" className="modal">
         <div className="modal-box">
-            <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="() => myModalRef?.close()"><IconX class="text-error-content"/></button>
-            <h3 className="font-semibold text-xl">Add New Store</h3>
+            <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal"><IconX class="text-error-content"/></button>
+            <h3 v-if="mode === 1" className="font-semibold text-xl">Add New Store</h3>
+            <h3 v-else-if="mode === 2" className="font-semibold text-xl">Update Store</h3>
             <div className="modal-action">
-                <form class="card-body" @submit.prevent="addBranch">
+                <form class="card-body" @submit.prevent="handleSubmit">
                     <div class="form-control flex">
                         <label class="label text-base-content flex-1">
                             <span class="label-text">Store Name</span>
                         </label>
-                        <input type="text" placeholder="Store Name" class="input input-bordered flex-2" required v-model="form.BranchName"/>
+                        <input type="text" placeholder="Store Name" class="input input-bordered flex-2 validator" v-model="form.BranchName"/>
                     </div>
                     <div class="form-control flex">
                         <label class="label text-base-content flex-1">
                             <span class="label-text">Store Phone</span>
                         </label>
-                        <input type="text" placeholder="Store Email" class="input input-bordered flex-2" required v-model="form.BranchPhone"/>
+                        <input type="text" placeholder="Store Email" class="input input-bordered flex-2" v-model="form.BranchPhone"/>
                     </div>
                     <div class="form-control flex">
                         <label class="label text-base-content flex-1">
                             <span class="label-text">Store Email</span>
                         </label>
-                        <input type="text" placeholder="Store Email" class="input input-bordered flex-2" required v-model="form.BranchEmail"/>
+                        <input type="text" placeholder="Store Email" class="input input-bordered flex-2" v-model="form.BranchEmail"/>
                     </div>
                     <div class="form-control mt-6">
-                        <button type="submit" class="btn btn-primary" :disabled="isLoading">Add<span v-if="isLoading" className="loading loading-spinner loading-xs ml-2"></span></button>
+                        <button type="submit" class="btn btn-primary" :disabled="isFetching">Submit<span v-if="isFetching" className="loading loading-spinner loading-xs ml-2"></span></button>
                     </div>
                 </form>
             </div>

@@ -22,7 +22,7 @@
 import { useRoute } from 'vue-router';
 import SettingMenu from '../components/setting_menu/SettingMenu.vue';
 import type { MenuItem } from '../types';
-import { computed, watch } from 'vue';
+import { computed } from 'vue';
 
 const menuItems: MenuItem[] = [
   {
@@ -59,21 +59,12 @@ const menuItems: MenuItem[] = [
   },
 ];
 
-
-
 const route = useRoute();
 const mypath = computed(() => {
   let path:typeof route.name[] = []
   route.matched.forEach(r => {
     path.push(r.name)
   });
-  console.log(route.matched)
   return path;
 });
-
-watch(mypath , (newVal) => {
-  console.log(newVal)
-},{immediate: true})
-
-
 </script>

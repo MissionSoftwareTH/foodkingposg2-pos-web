@@ -1,9 +1,9 @@
 import { useAppSetupStore } from '../../store/appSetupStore';
 import Cookies from 'js-cookie';
-import { getApiHeaders } from '../api/apiHeader';
 import type { baseResponse, User_Data } from '../../types';
 import type { AxiosResponse } from 'axios';
 import apiClient from '../api/apiService';
+import { updateAbility } from '../plugin/permissions';
 
 export * from './CookieExtend';
 export * from './appController';
@@ -26,18 +26,14 @@ export const logout = () => {
     console.log('Logout...');
 };
 
-export const getInfo = async () => {
-    try {
-        const appSetupStore = useAppSetupStore();
-        const headers = getApiHeaders();
-        const apiUrl = '/admins/admin/info';
-        const res:AxiosResponse<baseResponse<User_Data>> = await apiClient.get(apiUrl , {headers});
-        console.log('res',res?.data?.res_data);
-        appSetupStore.setUserData(res?.data?.res_data);
-        return res?.data?.res_data || undefined;
-    } catch (error) {
-        console.error(error);
-    }
+export const fetchUserInfo = async ():Promise<User_Data> => {
+    const appSetupStore = useAppSetupStore();
+    const apiUrl = '/admins/admin/info';
+    const res:AxiosResponse<baseResponse<User_Data>> = await apiClient.get(apiUrl );
+    const user_data = res.data.res_data;
+    appSetupStore.setUserData(user_data);
+    updateAbility(user_data.Roles || []);
+    return res?.data?.res_data;
 }
 
 

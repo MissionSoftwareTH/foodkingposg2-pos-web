@@ -6,6 +6,14 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import caslPlugin from './services/plugin/casl'
 import { resetAbility, updateAbility } from './services/plugin/permissions'
+import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query'
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+    },
+  },
+});
 
 const pinia = createPinia()
 const app = createApp(App)
@@ -24,7 +32,10 @@ if(rawUserinfo) {
     resetAbility();
 }
 
+app.use(VueQueryPlugin,{
+    queryClient,
+});
 app.use(caslPlugin);
-app.use(pinia)
-app.use(router)
-app.mount('#app')
+app.use(pinia);
+app.use(router);
+app.mount('#app');

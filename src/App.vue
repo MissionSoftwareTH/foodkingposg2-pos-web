@@ -8,6 +8,9 @@ import type { Layouts } from './types';
 import DialogMessage from './components/dialogs/DialogMessage.vue';
 import appController from './services/utils/appController';
 import ConfirmDialog from './components/dialogs/ConfirmDialog.vue';
+import ProgressBar from './components/ProgressBar.vue';
+import NotificationToast from './components/NotificationToast.vue';
+import { VueQueryDevtools } from '@tanstack/vue-query-devtools';
 
 // setup layout router
 const layouts: Layouts = {
@@ -20,7 +23,6 @@ const currentLayout = computed(() => {
   return layouts[layoutName] || BlankLayout;
 });
 
-
 // setup theme locale
 appController.setup();
 
@@ -32,8 +34,11 @@ appController.setup();
         <RouterView />
       </Transition>
     </component>
+    <ProgressBar/>
     <DialogMessage />
     <ConfirmDialog />
+    <NotificationToast />
+    <VueQueryDevtools/>
 </template>
 
 <style>
