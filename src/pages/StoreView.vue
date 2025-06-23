@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import Table from '../components/Table.vue';
-import type { baseResponse, BranchPayload, Data, HeadersTable, BranchResponse , BranchTable } from '../types';
-import { IconAffiliate, IconFilter2, IconPencil, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
+import type { baseResponse, BranchPayload, Data, BranchResponse , BranchTable, DataBaseResponse } from '../types';
+import { IconFilter2, IconPencil, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
 import apiClient from '../services/api/apiService';
-import type { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError, type AxiosResponse } from 'axios';
 import { useDialogStore } from '../store/dialogStore';
 import { useConfirmDialogStore } from '../store/confirmDialogStore';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
@@ -12,46 +12,12 @@ import { useToastStore } from '../store/toastStore';
 import { useProgressBarStore } from '../store/progressBarStore';
 import { formatDateTime } from '../services/utils';
 import TableSort from '../components/TableSort.vue';
-
-const headers:HeadersTable[] = [
-    {
-        key: 'BranchId',
-        title: 'Store Id',
-    },
-    {
-        key: 'BranchName',
-        title: 'Store Name',
-    },
-    {
-        key: 'ContactPhone',
-        title: 'Contact Phone',
-    },
-    {
-        key: 'ContactEmail',
-        title: 'Contact Email',
-    },
-    {
-        key: 'NumberOfPos',
-        title: 'number of POS',
-    },
-    {
-        key: 'CreatedAt',
-        title: 'Created At',
-    },
-    {
-        key: 'UpdatedAt',
-        title: 'Updated At',
-    },
-    {
-        key: 'Status',
-        title: 'Status',
-    },
-    {
-        key: 'actions',
-        title: 'Actions',
-        type: 'actions',
-    }
-];
+// import TestTable from '../components/testTable.vue';
+// import Test from '../components/Test.vue';
+import { storeForm } from '../constants/form';
+import { storeTableHeaders } from '../constants/table';
+import { SortOrderOption, storePageOption, storeSortColumnOption } from '../constants/page_option';
+import { extractPageOption } from '../services/utils/dataExtract';
 
 const confirmStore = useConfirmDialogStore();
 const dialogStore = useDialogStore();
@@ -60,34 +26,10 @@ const queryClient = useQueryClient();
 const progressBarStore = useProgressBarStore();
 const mode = ref<number>(1);
 const myModalRef = ref<HTMLDialogElement | null>(null);
-const defaultform = {
-    MerchantId: 1,
-    BranchName: '',
-    BranchEmail: '',
-    BranchPhone: '',
-}
-const form = ref<BranchPayload>({
-    MerchantId: 1,
-    BranchName: '',
-    BranchEmail: '',
-    BranchPhone: '',
-});
-
-interface PageOption {
-    totalItem: number;
-    itemPerPage: number;
-    currentPage: number;
-    sortOrder: string;
-    sortBy: string;
-}
-
-const PageOption = ref({
-    totalItem: 500,
-    itemPerPage: 5,
-    currentPage: 1,
-    sortOrder: 'desc',
-    sortBy: '',
-})
+const form = ref(storeForm);
+const pageOption = ref(storePageOption);
+const headers = storeTableHeaders;
+const sortColumnOption = storeSortColumnOption;
 
 const openModal = (data?:BranchTable) => {
     if(data) {
@@ -106,26 +48,25 @@ const openModal = (data?:BranchTable) => {
 
 // fetch data
 const fetchBranchList = async (): Promise<BranchTable[]> => {
-    // 
-    const apiUrl = '/branchs/list?MerchantId=1';
-    const response:AxiosResponse<baseResponse<Data<BranchResponse[]>>> = await apiClient.get(apiUrl);
-    const branchTable:BranchTable[] = response.data.res_data.data;
-    branchTable.map((branch) => {
+    const {MerchantId , CurrentPage , PageSize , SortColumn , SortOrder} = pageOption.value
+    const params = {
+        SortOrder , SortColumn ,  MerchantId , PageSize , Page: CurrentPage
+    }
+    const apiUrl = '/branchs/list';
+    const response:AxiosResponse<baseResponse<DataBaseResponse<BranchResponse[]>>> = await apiClient.get(apiUrl, {params});
+    const data:BranchTable[] = response.data.res_data.ConstructData || []
+    data.map((branch) => {
         branch.CreatedAt = formatDateTime(branch.CreatedAt);
         branch.UpdatedAt = formatDateTime(branch.UpdatedAt);
-    })
-    return branchTable;
+    }) || [];
+    pageOption.value = extractPageOption(response.data.res_data , pageOption.value);
+    return data;
 };
 
-const {data: branchData , isPending , isError , error , isFetching } = useQuery<BranchTable[] , AxiosError>({
+const {data: branchData , isPending , isError , isFetching } = useQuery<BranchTable[] , AxiosError>({
     queryKey: ['branchListAxios'] ,
     queryFn: fetchBranchList ,
 })
-
-if (isError.value) {
-    console.error(error.value?.response); // เข้าถึงข้อมูล error จาก Axios
-    console.error(error.value?.message); // เข้าถึงข้อความ error ทั่วไป
-}
 
 //post data
 const createBranch = async (payload:BranchPayload) => {
@@ -141,7 +82,7 @@ const createBranchMutation = useMutation<baseResponse<void>,AxiosError<baseRespo
         dialogStore.openDialog(data.res_message , {status: 'success'});
         queryClient.invalidateQueries({ queryKey: ['branchListAxios']});
         //ล้างฟอร์ม
-        form.value = {...defaultform};
+        form.value = {...storeForm};
     },
     onError: (error) => {
         console.error(error.response?.data.res_message || error.message);
@@ -181,7 +122,6 @@ const handleSubmit = () => {
 }
 
 //update data
-
 const updateBranch = async (payload:BranchPayload) => {
     const apiUrl = '/branchs/update';
     const response:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload );
@@ -214,23 +154,32 @@ const closeModal = () => {
 }
 
 const resetForm = () => {
-  form.value = {...defaultform};
+  form.value = {...storeForm};
 }
 
-const handleEmit = (emitValue:number) => { 
-    PageOption.value.currentPage = emitValue;
-    // console.log(PageOption.value.itemPerPage);
+const handleEmit = (page:number) => {
+  pageOption.value.CurrentPage = page;
+  queryClient.invalidateQueries({queryKey: ['branchListAxios']});
+  console.log(pageOption.value.CurrentPage)
 }
 
 const handleSortOrderEmit = (sort:string) => {
-    PageOption.value.sortOrder = sort;
-    console.log(PageOption.value.sortOrder);
+    pageOption.value.SortOrder = sort;
+    queryClient.invalidateQueries({queryKey: ['branchListAxios']});
+    console.log(pageOption.value.SortOrder);
 }
 
-const handleSortByEmit = (sort:string) => {
-    PageOption.value.sortBy = sort;
-    console.log(PageOption.value.sortBy);
+const handleSortColumnEmit = (sort:string) => {
+    pageOption.value.SortColumn = sort;
+    queryClient.invalidateQueries({queryKey: ['branchListAxios']});
+    console.log(pageOption.value.SortColumn);
 }
+
+watch(() => pageOption.value.PageSize ,() => {
+  pageOption.value.CurrentPage = 1;
+  queryClient.invalidateQueries({queryKey: ['branchListAxios']});
+  console.log(pageOption.value.PageSize);
+})
 
 </script>
 <template>
@@ -249,17 +198,19 @@ const handleSortByEmit = (sort:string) => {
         <div class="flex gap-2 items-center">
             <div class="flex items-center gap-2">
                 <h1>show</h1>
-                <select v-model="PageOption.itemPerPage" className="select select-sm w-fit rounded-lg">
+                <select v-model="pageOption.PageSize" className="select select-sm w-fit rounded-lg">
                     <option v-for="item in [5,10,25,50]" :value="item" :key="`item-${item}`">{{item}}</option>
                 </select>
             </div>
-            <TableSort :sort-item="[{title: 'Product Name', value: 'productName'},{title: 'Product Code', value: 'productCode'}]" @page-sort="handleSortByEmit">
-                <template #icon>    
+           <TableSort :sort-item="sortColumnOption" @page-sort="handleSortColumnEmit">
+                <template #icon>
+                    {{ pageOption.SortColumn }}  
                     <IconFilter2/>
                 </template>
             </TableSort>
-            <TableSort :sort-item="[{title: 'ASC', value: 'asc'},{title: 'DESC', value: 'desc'}]" @page-sort="handleSortOrderEmit">
+            <TableSort :sort-item="SortOrderOption" @page-sort="handleSortOrderEmit">
                 <template #icon>    
+                    {{ SortOrderOption.find((s) => s.value === pageOption.SortOrder)?.title  }}
                     <IconSortAscendingLetters/>
                 </template>
             </TableSort>
@@ -272,9 +223,9 @@ const handleSortByEmit = (sort:string) => {
             :isError="isError"
             :headers="headers"
             :items="branchData"
-            :item-per-page="PageOption.itemPerPage"
-            :total-items="PageOption.totalItem"
-            :current-page="PageOption.currentPage"
+            :item-per-page="pageOption.PageSize"
+            :total-items="pageOption.TotalRecords"
+            :current-page="pageOption.CurrentPage"
             @page-changed="handleEmit"
         >
             <template #actions="product">
@@ -282,6 +233,23 @@ const handleSortByEmit = (sort:string) => {
                 <button class="btn btn-circle btn-soft btn-xs bg-error text-error-content" @click="() => confirmStore.isOpen = true"><IconTrash class="size-4"/></button>
             </template>
         </Table>
+        <!-- <TestTable
+            class="rounded-xl shadow-lg w-full h-full"
+            :isLoading="isPending"
+            :isError="isError"
+            :headers="headers"
+            :items="branchData"
+            :item-per-page="pageOption.PageSize"
+            :total-items="pageOption.TotalRecords"
+            :current-page="pageOption.CurrentPage"
+            @page-changed="handleEmit"
+        >
+            <template #actions="product">
+                <button class="btn btn-circle btn-soft btn-xs bg-info text-info-content mr-2" @click="openModal(product.item)"><IconPencil class="size-4"/></button>
+                <button class="btn btn-circle btn-soft btn-xs bg-error text-error-content" @click="() => confirmStore.isOpen = true"><IconTrash class="size-4"/></button>
+            </template>
+        </TestTable> -->
+        <!-- <Test/> -->
     </div>
 
     <!-- add merchant dialog -->

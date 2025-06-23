@@ -1,6 +1,7 @@
 
 import { createApp } from 'vue'
 import './style.css'
+import 'overlayscrollbars/overlayscrollbars.css';
 import router from './router'
 import { createPinia } from 'pinia'
 import App from './App.vue'

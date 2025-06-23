@@ -34,13 +34,13 @@
       </li>
     </ul>
     <div class="text-base-content/50 flex items-center">
-      Page <input type="number" v-model="inputPage" @change="handleInputPage" class="min-w-4 max-w-8 text-center"> of {{ totalPages }}
+      Page <input type="number" v-model="inputPage" @change="handleInputPage" class="min-w-4 max-w-8 text-center appearance-none"> of {{ totalPages }}
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 interface Props {
   currentPage: number;
@@ -143,4 +143,21 @@ const handleInputPage = () => {
   goToPage(inputPage.value);
 }
 
+watch(()=>props.currentPage, (value) => {
+  inputPage.value = value;
+})
+
 </script>
+
+<style>
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* สำหรับ Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+</style>

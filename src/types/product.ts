@@ -3,16 +3,16 @@ export interface ProductPayload {
     ProductName?: string;
     ProductCode?: string | null;
     ProductImagePath?: File | string | null; 
-    ProductBrandId?: number | null; 
-    ProductStatusId?: number | null;
-    ProductCategoryId?: number | null;
+    ProductBrandId?: number | undefined; 
+    ProductStatusId?: number | undefined;
+    ProductCategoryId?: number | undefined;
     ProductPrice?: number;
     ProductCost?: number;
     ProductBarcode?: string;
-    ProductTaxTypeId?: number | null;
-    ProductEnableDiscountPercent?: boolean;
+    ProductTaxTypeId?: number | undefined;
+    ProductEnableDiscountPercent?: 0 | 1;
     ProductDiscountPercent?: number | null;
-    ProductEnableDiscountAmount?: boolean;
+    ProductEnableDiscountAmount?: 0 | 1;
     ProductDiscountAmount?: number | null;
     ProductDescription?: string;
 }

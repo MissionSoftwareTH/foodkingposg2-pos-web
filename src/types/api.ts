@@ -11,6 +11,14 @@ export interface Data<T> {
   data: T
 }
 
+export interface DataBaseResponse<T> {
+    CurrentPage?: number;
+    PageSize?: number;
+    TotalRecords?: number;
+    TotalPages?: number;
+    ConstructData?: T;
+}
+
 export interface OTP_Response {
     TempToken: string;
     RefCode: string;
@@ -41,4 +49,12 @@ export interface TimeType {
     isostring: string;
 }
 
+export interface PageOption {
+    TotalRecords?: number | undefined;
+    PageSize?: number | undefined;
+    CurrentPage?: number | undefined;
+    SortOrder?: string;
+    SortColumn?: string;
+    MerchantId?: number;
+}
 

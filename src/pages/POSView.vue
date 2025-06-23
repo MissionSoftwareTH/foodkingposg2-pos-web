@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import Table from '../components/Table.vue';
-import type { baseResponse, Data, HeadersTable, POSPayload , POSResponse , POSTable } from '../types';
+import type { baseResponse, Data , POSPayload , POSResponse , POSTable } from '../types';
 import { IconFilter2, IconPencil, IconPhotoOff, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
 import apiClient from '../services/api/apiService';
 import type { AxiosError, AxiosResponse } from 'axios';
@@ -11,39 +11,10 @@ import { formatDateTime } from '../services/utils';
 import { useProgressBarStore } from '../store/progressBarStore';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { useToastStore } from '../store/toastStore';
+import { posTableHeaders } from '../constants/table';
+import { posPayloadForm } from '../constants/form';
 
-const headers:HeadersTable[] = [
-    {
-      key: 'PosSystemId',
-      title: 'Id',
-    },
-    {
-        key: 'PosSystemName',
-        title: 'Pos System Name',
-      },
-    {
-      key: 'PosSystemKey',
-        title: 'Pos System Key',
-    },
-    {
-      key: 'BranchName',
-      title: 'Branch Name',
-    },
-    {
-      key: 'PosCreatedAt',
-      title: 'Created At',
-    },
-    {
-        key: 'PosUpdatedAt',
-        title: 'Updated At',
-    },
-    {
-        key: 'actions',
-        title: 'Actions',
-        type: 'actions',
-    }
-];
-
+const headers = posTableHeaders;
 const dialogStore = useDialogStore();
 const myModalRef = ref<HTMLDialogElement | null>(null);
 const selectedOption = ref<string | number>(5);
@@ -51,20 +22,10 @@ const mode = ref<number>(1);
 const progressBarStore = useProgressBarStore();
 const queryClient = useQueryClient();
 const toastStore = useToastStore();
-
-const defaultForm:POSPayload = {
-  BranchId: undefined,
-  PosName: '',
-  PosKey: '',
-};
-const form = ref<POSPayload>({
-  BranchId: undefined,
-  PosName: '',
-  PosKey: '',
-});
+const form = ref(posPayloadForm);
 
 const resetForm = () => {
-  form.value = {...defaultForm};
+  form.value = {...posPayloadForm};
 }
 
 const closeModal = () => {
@@ -123,7 +84,7 @@ const fetchBranchList = async ():Promise<BranchList[]> => {
     return res.data.res_data.data;
 }
 
-const {data: branchList , isPending: isBranchPending , isError: isBranchError } = useQuery<BranchList[] ,AxiosError<baseResponse<void>>>({
+const {data: branchList } = useQuery<BranchList[] ,AxiosError<baseResponse<void>>>({
   queryKey: ['branchList'],
   queryFn: fetchBranchList,
 })

@@ -1,14 +1,14 @@
 <template>
   <div v-if="!isLoading" class="overflow-x-auto text-nowrap bg-base-100">
-    <table class="min-w-full relative">
-      <thead class="bg-primary">
-        <tr>
-          <th
+      <table class="min-w-full relative">
+        <thead class="bg-primary">
+          <tr>
+            <th
             v-for="header in headers"
             :key="header.key"
             scope="col"
             class="px-6 py-4 text-left text-sm font-semibold text-primary-content uppercase tracking-wider"
-          >
+            >
             {{ header.title }}
           </th>
         </tr>
@@ -66,7 +66,7 @@ const handleEmit = (emitValue:number) => {
   emit('page-changed', emitValue);
 }
 
-const props = defineProps({
+defineProps({
   headers: {
     type: Array as () => HeadersTable[],
     required: true,

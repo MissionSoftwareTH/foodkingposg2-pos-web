@@ -1,17 +1,17 @@
 <script setup lang="ts">
 
-const props = defineProps({
+defineProps({
     sortItem: {
         type: Array as () => any[] | undefined,
         required: true,
     }
-})
+});
 
 const emit = defineEmits<{
   (e: 'page-sort', sort: string): void;
 }>();
 
-const handleSendEmit = (value:string) => {
+const handleEmitSubmit = (value:string) => {
     emit('page-sort', value);
 }
 
@@ -23,7 +23,7 @@ const handleSendEmit = (value:string) => {
         </button>
         <ul class="dropdown-content menu bg-base-100 shadow-lg rounded-lg gap-2">
             <li v-for="item in sortItem" :key="item.value">
-                <input type="radio" name="product_filter" id="" :value="item.value" :aria-label="item.title" @click="handleSendEmit(item.value)" class="btn btn-sm text-nowrap rounded-lg">
+                <input type="radio" name="product_filter" id="" :value="item.value" :aria-label="item.title" @click="handleEmitSubmit(item.value)" class="btn btn-sm text-nowrap rounded-lg">
             </li>
         </ul>
     </div>

@@ -54,7 +54,7 @@ export interface MenuItem {
 export interface HeadersTable {
     key: string;
     title: string;
-    type?: 'actions' | 'default';
+    type?: 'actions' | 'custom' | 'default';
 }
 
 export interface RouteMeta {
@@ -67,3 +67,8 @@ export interface RouteMeta {
 export type AppRouteRecordRaw = RouteRecordRaw & {
     meta?: RouteMeta;
 };
+
+export interface Sort {
+  title: string;
+  value: string;
+}

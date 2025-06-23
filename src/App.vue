@@ -38,7 +38,7 @@ appController.setup();
     <DialogMessage />
     <ConfirmDialog />
     <NotificationToast />
-    <VueQueryDevtools/>
+    <!-- <VueQueryDevtools/> -->
 </template>
 
 <style>

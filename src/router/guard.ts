@@ -19,12 +19,5 @@ export const routeGuard = (router: routeGuardType) => {
         }
         next('/')
     }
-    // if (to.meta.requiresAuth && !isLoggedIn) {
-    //     next('/');
-    // } else if (!to.meta.requiresAuth && isLoggedIn) {
-    //     next('/dashboard')
-    // } else{ 
-    //     next();
-    // }
     })
 }

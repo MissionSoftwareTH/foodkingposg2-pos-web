@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { updateAbility } from '../services/plugin/permissions';
 import { useDialogStore } from '../store/dialogStore';
 import OTPinput from '../components/OTPinput.vue';
-import type { baseResponse, extendTime, Payload, OTP_Response, formData, User_Data } from '../types';
+import type { baseResponse, extendTime, Payload, OTP_Response } from '../types';
 import CountdownTimer from '../components/CountdownTimer.vue';
 import apiClient from '../services/api/apiService';
 import type { AxiosError, AxiosResponse } from 'axios';
 import appController from '../services/utils/appController';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { useQuery } from '@tanstack/vue-query';
+import { LoginForm, OTPdataForm } from '../constants/form';
 
 const route = useRouter();
 const dialogStore = useDialogStore();
@@ -18,19 +17,8 @@ const authCompleted = ref<boolean>(false);
 const isOTPTimerFinish = ref<boolean>(false);
 const isdelayOTPTimerFinish = ref<boolean>(false);
 const queryClient = useQueryClient();
-
-const OTPdata = ref<OTP_Response>({
-    TempToken: '',
-    RefCode: '',
-    RequestTime: '',
-    RemainingTime: 10,
-    OtpExpireIn: 10,
-})
-
-const form = ref<formData>({
-    Email: '',
-    Password: '',
-})
+const OTPdata = ref(OTPdataForm);
+const form = ref(LoginForm)
 
 //verify identity login
 const handleSubmit = () => {

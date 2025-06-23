@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import Table from '../components/Table.vue';
-import type { baseResponse, Data, HeadersTable } from '../types';
+import type { baseResponse, Data, DataBaseResponse } from '../types';
 import { IconFilter2, IconPencil, IconPhotoOff, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
 import apiClient from '../services/api/apiService';
 import type { AxiosError, AxiosResponse } from 'axios';
@@ -13,96 +13,20 @@ import { useConfirmDialogStore } from '../store/confirmDialogStore';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { useToastStore } from '../store/toastStore';
 import { useProgressBarStore } from '../store/progressBarStore';
-import { debounce } from '../services/utils/debounce';
+import TableSort from '../components/TableSort.vue';
+import { productTableHeaders } from '../constants/table';
+import { productPayloadForm } from '../constants/form';
+import { productPageOption, productSortColumnOption, SortOrderOption } from '../constants/page_option';
+import { extractPageOption } from '../services/utils/dataExtract';
 
-const headers:HeadersTable[] = [
-    {
-        key: 'ProductInfo',
-        title: 'Product',
-        type: 'actions',
-    },
-    {
-        key: 'ProductCode',
-        title: 'Product Code',
-    },
-    {
-        key: 'ProductStatus',
-        title: 'Status',
-        type: 'actions',
-    },
-    {
-        key: 'ProductPrice',
-        title: 'Price',
-        type: 'actions',
-    },
-    {
-        key: 'ProductCost',
-        title: 'Cost',
-        type: 'actions',
-    },
-    {
-        key: 'ProductTaxType',
-        title: 'Vat Type',
-        type: 'actions',
-    },
-    {
-        key: 'ProductDiscountPercent',
-        title: 'Percent Discount',
-        type: 'actions',
-    },
-    {
-        key: 'ProductDiscountAmount',
-        title: 'Amount Discount',
-        type: 'actions',
-    },
-    {
-        key: 'actions',
-        title: 'Actions',
-        type: 'actions',
-    }
-];
-
+const headers = productTableHeaders;
 const dialogStore = useDialogStore();
 const myModalRef = ref<HTMLDialogElement | null>(null);
 const isLoading = ref<boolean>(false);
-const mode = ref<number>(1);
-const default_form:ProductPayload = {
-    ProductName: '',
-    ProductCode: '',
-    ProductImagePath: null,
-    ProductBrandId: undefined,
-    ProductStatusId: undefined,
-    ProductCategoryId: undefined,
-    ProductPrice: 0,
-    ProductCost: 0,
-    ProductBarcode: '',
-    ProductTaxTypeId: undefined,
-    ProductEnableDiscountPercent: false,
-    ProductDiscountPercent: 0,
-    ProductEnableDiscountAmount: false,
-    ProductDiscountAmount: 0,
-    ProductDescription: '',
-};
-const form = ref<ProductPayload>({
-    ProductInfoId: undefined,
-    ProductName: '',
-    ProductCode: '',
-    ProductImagePath: null,
-    ProductBrandId: undefined,
-    ProductStatusId: undefined,
-    ProductCategoryId: undefined,
-    ProductPrice: 0,
-    ProductCost: 0,
-    ProductBarcode: '',
-    ProductTaxTypeId: undefined,
-    ProductEnableDiscountPercent: false,
-    ProductDiscountPercent: 0,
-    ProductEnableDiscountAmount: false,
-    ProductDiscountAmount: 0,
-    ProductDescription: '',
-  });
-
-const selectedOption = ref<string | number>(5);
+const mode = ref(1);
+const form = ref(productPayloadForm);
+const pageOption = ref(productPageOption);
+const sortColumnOption = productSortColumnOption;
 const store = useConfirmDialogStore();
 const queryClient = useQueryClient();
 const toastStore = useToastStore();
@@ -110,10 +34,13 @@ const progressBarStore = useProgressBarStore();
   
 //fetch product
 const fetchProduct = async ():Promise<ProductTable[]> => {
-          
         const apiUrl = '/product/list';
-        const res:AxiosResponse<baseResponse<Data<ProductResponse[]>>> = await apiClient.get(apiUrl );
-        const productList:ProductTable[] = res?.data?.res_data?.data?.map((product) => ({
+        const {SortColumn , SortOrder} = pageOption.value;
+        const params = {
+          SortColumn ,SortOrder , PageSize:pageOption.value.PageSize , Page: pageOption.value.CurrentPage,
+        }
+        const res:AxiosResponse<baseResponse<DataBaseResponse<ProductResponse[]>>> = await apiClient.get(apiUrl , {params} );
+        const productList:ProductTable[] = res?.data?.res_data?.ConstructData?.map((product) => ({
           ProductInfoId: product.ProductInfoId || null,
           ProductBarcode: product.ProductBarcode || '',
           ProductDescription: product.ProductDescription || '',
@@ -148,10 +75,11 @@ const fetchProduct = async ():Promise<ProductTable[]> => {
             ProductDiscountValue: product.ProductDiscountAmount || 0,
           },
         })) || [];
+        extractPageOption(res.data.res_data , pageOption.value);
         return productList;
 }
 
-const {data: product , isPending: isTablePending , isError: isTableError , error: tableError , isFetching: isTableFetching } = useQuery<ProductTable[] , AxiosError>({
+const {data: product , isPending: isTablePending , isError: isTableError } = useQuery<ProductTable[] , AxiosError>({
     queryKey: ['productListAxios'] ,
     queryFn: fetchProduct ,
 })
@@ -166,7 +94,7 @@ const fetchCategoryList = async ():Promise<CategoryList[]> => {
     return catDropdown;
   }
 
-const { data: categoryList , isPending: isCatPending , isError: isCatError , error: catError , isFetching: isCatFetching } = useQuery<CategoryList[] , AxiosError>({
+const { data: categoryList , isPending: isCatPending } = useQuery<CategoryList[] , AxiosError>({
   queryKey: ['catListAxios'],
   queryFn: fetchCategoryList,
 })
@@ -179,7 +107,7 @@ const fetchBrandList = async ():Promise<BrandList[]> => {
   return brandDropdown;
 }
 
-const { data: brandList , isPending: isBrandPending , isError: isBrandError , error: brandError , isFetching: isBrandFetching } = useQuery<BrandList[] , AxiosError>({
+const { data: brandList , isPending: isBrandPending} = useQuery<BrandList[] , AxiosError>({
   queryKey: ['brandListAxios'],
   queryFn: fetchBrandList,
 })
@@ -192,7 +120,7 @@ const fetchProductStatusList = async ():Promise<ProductStatusList[]> => {
   return productStatusList;
 }
 
-const { data: productStatusList , isPending: isProductStatusPending , isError: isProductStatusError , error: productStatusError , isFetching: isProductStatusFetching } = useQuery<ProductStatusList[] , AxiosError>({
+const { data: productStatusList , isPending: isProductStatusPending } = useQuery<ProductStatusList[] , AxiosError>({
   queryKey: ['productStatusListAxios'],
   queryFn: fetchProductStatusList,
 })
@@ -205,14 +133,13 @@ const fetchTaxTypeList = async ():Promise<TaxTypeList[]> => {
   return taxTypeList;
 }
 
-const { data: productTaxTypeList , isPending: isTaxTypePending , isError: isTaxTypeError , error: taxtypeError , isFetching: isTaxTypeFetching } = useQuery<TaxTypeList[] , AxiosError>({
+const { data: productTaxTypeList , isPending: isTaxTypePending } = useQuery<TaxTypeList[] , AxiosError>({
   queryKey: ['taxTypeListAxios'],
   queryFn: fetchTaxTypeList,
 })
 
 //post product
 const createProduct = async (payload:ProductPayload) => {
-  
   const apiUrl = '/product/insert';
   const res:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload );
   return res.data;
@@ -244,6 +171,7 @@ const handleSubmit = () => {
     }
     //update
     case 2: {
+      console.log(form.value)
       updateProductMutation.mutate(form.value);
       return; 
     }
@@ -253,7 +181,6 @@ const handleSubmit = () => {
 
 //update product
 const updateProduct = async (payload:ProductPayload) => {
-  
   const apiUrl = '/product/update';
   const res:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload );
   return res.data;
@@ -287,15 +214,13 @@ const handleUpdateSubmit = () => {
   updateProductMutation.mutate(form.value);
 }
 
-// const debounceUpdateForm = debounce(handleUpdateSubmit , 500);
-
 const closeModal = () => {
   myModalRef.value?.close();
   resetForm();
 }
 
 const resetForm = () => {
-  form.value = {...default_form};
+  form.value = {...productPayloadForm};
 }
 
 const handleSelecterUpdate = <T extends keyof ProductPayload>(key: T, newValue: ProductPayload[T] ,productId:any) => {
@@ -311,20 +236,20 @@ const openModal = (data?:ProductTable) => {
   if(data) {
     console.log(data)
     const payloadData:ProductPayload = {
-      ProductInfoId: data.ProductInfoId || null,
+      ProductInfoId: data.ProductInfoId || undefined,
       ProductName: data.ProductInfo.ProductName,
-      ProductCode: data.ProductCode || null,
-      ProductImagePath: data.ProductInfo?.ProductImagePath || null,
-      ProductBrandId: data.ProductBrand?.ProductBrandId ,
-      ProductStatusId: data.ProductStatus?.ProductStatusId,
-      ProductCategoryId: data.ProductInfo.ProductCategory?.ProductCategoryId,
+      ProductCode: data.ProductCode || undefined,
+      ProductImagePath: data.ProductInfo?.ProductImagePath || undefined,
+      ProductBrandId: data.ProductBrand?.ProductBrandId || undefined,
+      ProductStatusId: data.ProductStatus?.ProductStatusId || undefined,
+      ProductCategoryId: data.ProductInfo.ProductCategory?.ProductCategoryId || undefined,
       ProductPrice: data.ProductPrice,
       ProductCost: data.ProductCost,
       ProductBarcode: data.ProductBarcode,
-      ProductTaxTypeId: data.ProductTaxType.ProductTaxTypeId,
-      ProductEnableDiscountPercent: data.ProductDiscountPercent.ProductEnableDiscount,
+      ProductTaxTypeId: data.ProductTaxType.ProductTaxTypeId || undefined,
+      ProductEnableDiscountPercent: data.ProductDiscountPercent.ProductEnableDiscount === true ? 1 : 0,
       ProductDiscountPercent: data.ProductDiscountPercent.ProductDiscountValue,
-      ProductEnableDiscountAmount: data.ProductDiscountAmount.ProductEnableDiscount,
+      ProductEnableDiscountAmount: data.ProductDiscountAmount.ProductEnableDiscount === true ? 1 : 0,
       ProductDiscountAmount: data.ProductDiscountAmount.ProductDiscountValue,
       ProductDescription: data.ProductDescription,
     }
@@ -351,6 +276,30 @@ const handleImageUpload = (event:any) => {
   }
 };
 
+const handleEmit = (page:number) => {
+  pageOption.value.CurrentPage = page;
+  queryClient.invalidateQueries({queryKey: ['productListAxios']});
+  console.log(pageOption.value.CurrentPage)
+}
+
+const handleSortOrderEmit = (sort:string) => {
+    pageOption.value.SortOrder = sort;
+    queryClient.invalidateQueries({queryKey: ['productListAxios']});
+    console.log(pageOption.value.SortOrder);
+}
+
+const handleSortColumnEmit = (sort:string) => {
+    pageOption.value.SortColumn = sort;
+    queryClient.invalidateQueries({queryKey: ['productListAxios']});
+    console.log(pageOption.value.SortColumn);
+}
+
+watch(() => pageOption.value.PageSize ,() => {
+  pageOption.value.CurrentPage = 1;
+  queryClient.invalidateQueries({queryKey: ['productListAxios']});
+  console.log(pageOption.value.PageSize);
+})
+
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
@@ -368,30 +317,22 @@ const handleImageUpload = (event:any) => {
         <div class="flex gap-2 items-center">
             <div class="flex items-center gap-2">
                 <h1>show</h1>
-                <select v-model="selectedOption" className="select select-sm w-fit rounded-lg">
+                <select v-model="pageOption.PageSize" className="select select-sm w-fit rounded-lg">
                     <option v-for="item in [5,10,25,50]" :value="item" :key="`item-${item}`">{{item}}</option>
                 </select>
             </div>
-            <div class="dropdown">
-                <button class="btn rounded-lg btn-sm p-2 btn-ghost ">
+            <TableSort :sort-item="sortColumnOption" @page-sort="handleSortColumnEmit">
+                <template #icon>
+                    {{ pageOption.SortColumn }}  
                     <IconFilter2/>
-                </button>
-                <ul class="dropdown-content menu bg-base-100 shadow-lg rounded-lg gap-2">
-                    <li v-for="item in ['Product Name','Product Code']" :key="item">
-                        <input type="radio" name="product_filter" :value="item" :aria-label="item" class="btn btn-sm text-nowrap rounded-lg">
-                    </li>
-                </ul>
-            </div>
-            <div class="dropdown">
-                <button class="btn rounded-lg btn-sm p-2 btn-ghost ">
+                </template>
+            </TableSort>
+            <TableSort :sort-item="SortOrderOption" @page-sort="handleSortOrderEmit">
+                <template #icon>    
+                    {{ SortOrderOption.find((s) => s.value === pageOption.SortOrder)?.title  }}
                     <IconSortAscendingLetters/>
-                </button>
-                <ul class="dropdown-content menu bg-base-100 shadow-lg rounded-lg gap-2">
-                    <li v-for="item in ['ASC','DESC']" :key="item">
-                        <input type="radio" name="product_filter" :value="item" :aria-label="item" class="btn btn-sm text-nowrap rounded-lg">
-                    </li>
-                </ul>
-            </div>
+                </template>
+            </TableSort>
             <span class="w-full"></span>
             <button class="btn btn-primary btn-sm rounded-lg" @click="openModal()"><IconPlus class="size-5"/>Add Product</button>
         </div>
@@ -401,6 +342,10 @@ const handleImageUpload = (event:any) => {
           :items="product" 
           :isLoading="isTablePending" 
           :isError="isTableError"
+          :item-per-page="pageOption.PageSize"
+          :current-page="pageOption.CurrentPage"
+          :total-items="pageOption.TotalRecords"
+          @page-changed="handleEmit"
         >
             <template #ProductInfo="product">
                <div class="flex items-center gap-4">
@@ -414,6 +359,9 @@ const handleImageUpload = (event:any) => {
                     </div>
                </div>
             </template>
+            <template #ProductBrand="product">
+              {{ product.item.ProductBrand.ProductBrandName }}
+            </template>
             <template #ProductStatus="product">
               <select :value="product.item.ProductStatus.ProductStatusId" @change="e => handleSelecterUpdate('ProductStatusId', Number((e.target as HTMLSelectElement).value), product.item.ProductInfoId)" class="select select-bordered w-full rounded-lg bg-transparent border-0 outline-0 p-1 focus:bg-base-100">
                 <option v-for="(status,index) in productStatusList" :key="`status-${index}`" :value="status.ProductStatusId">{{ status.ProductStatusName }}</option>
@@ -426,10 +374,9 @@ const handleImageUpload = (event:any) => {
               {{ product.item.ProductCost }} ฿
             </template>
             <template #ProductTaxType="product">
-              <select :value="product.item.ProductTaxType.ProductTaxTypeId" @change="e => handleSelecterUpdate('ProductStatusId', Number((e.target as HTMLSelectElement).value), product.item.ProductInfoId)" class="select select-bordered w-full rounded-lg bg-transparent border-0 outline-0 p-1 focus:bg-base-100">
+              <select :value="product.item.ProductTaxType.ProductTaxTypeId" @change="e => handleSelecterUpdate('ProductTaxTypeId', Number((e.target as HTMLSelectElement).value), product.item.ProductInfoId)" class="select select-bordered w-full rounded-lg bg-transparent border-0 outline-0 p-1 focus:bg-base-100">
                 <option v-for="(status,index) in productTaxTypeList" :key="`status-${index}`" :value="status.ProductTaxTypeId">{{ status.ProductTaxTypeName }}</option>
               </select>
-              <!-- {{ product.item.ProductTaxType.ProductTaxTypeName }} -->
             </template>
             <template #ProductDiscountPercent="product">
                 <h1 v-if="product.item.ProductDiscountPercent.ProductEnableDiscount">{{ product.item.ProductDiscountPercent.ProductDiscountValue }}%</h1>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useAbility } from '@casl/vue';
-import { useDialogStore } from '../store/dialogStore';
 import { onMounted, ref, watch } from 'vue';
 import { useProgressBarStore } from '../store/progressBarStore';
 import { useToastStore } from '../store/toastStore';
