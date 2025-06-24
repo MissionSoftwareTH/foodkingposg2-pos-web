@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import Table from '../components/Table.vue';
-import type { baseResponse, Data , POSPayload , POSResponse , POSTable } from '../types';
-import { IconFilter2, IconPencil, IconPhotoOff, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
+import type { baseResponse, Data , DataBaseResponse, POSPayload , POSResponse , POSTable } from '../types';
+import { IconFilter2, IconPencil, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
 import apiClient from '../services/api/apiService';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useDialogStore } from '../store/dialogStore';
@@ -13,16 +13,21 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { useToastStore } from '../store/toastStore';
 import { posTableHeaders } from '../constants/table';
 import { posPayloadForm } from '../constants/form';
+import { posSortColumnOption, SortOrderOption } from '../constants/page_option';
+import TableSort from '../components/TableSort.vue';
+import { extractPageOption } from '../services/utils/dataExtract';
+import { usePageOptionStore } from '../store/sortingStore';
 
 const headers = posTableHeaders;
 const dialogStore = useDialogStore();
 const myModalRef = ref<HTMLDialogElement | null>(null);
-const selectedOption = ref<string | number>(5);
 const mode = ref<number>(1);
 const progressBarStore = useProgressBarStore();
 const queryClient = useQueryClient();
 const toastStore = useToastStore();
 const form = ref(posPayloadForm);
+const pageOptionStore = usePageOptionStore();
+const sortColumnOption = posSortColumnOption;
 
 const resetForm = () => {
   form.value = {...posPayloadForm};
@@ -49,9 +54,13 @@ const openModal = (data?:POSTable) => {
 
 //fetch POS
 const fetchPOSList = async (): Promise<POSTable[]> => {
+  const {SortColumn , SortOrder} = pageOptionStore.pos;
+  const params = {
+    SortColumn ,SortOrder , PageSize:pageOptionStore.pos.PageSize , Page: pageOptionStore.pos.CurrentPage,
+  }
   const apiUrl = '/branchs/pos/list';
-  const res:AxiosResponse<baseResponse<Data<POSResponse[]>>> = await apiClient.get(apiUrl);
-  const resData = res?.data?.res_data?.data?.flatMap((data) => 
+  const res:AxiosResponse<baseResponse<DataBaseResponse<POSResponse[]>>> = await apiClient.get(apiUrl , {params});
+  const resData:POSTable[] = res?.data?.res_data?.ConstructData?.flatMap((data) => 
           data?.PosSystem?.map((pos) => ({
             BranchId: data.BranchId,
             BranchName: data.BranchName,
@@ -61,7 +70,8 @@ const fetchPOSList = async (): Promise<POSTable[]> => {
             PosCreatedAt: formatDateTime(pos?.PosCreatedAt) || '',
             PosUpdatedAt: formatDateTime(pos?.PosUpdatedAt) || '',
           })) || []
-        )
+        ) || [];
+  pageOptionStore.pos = extractPageOption(res.data.res_data , pageOptionStore.pos)
   return resData;
 }
 
@@ -69,10 +79,6 @@ const {data: items , isPending , isError } = useQuery<POSTable[] , AxiosError<ba
   queryKey: ['POSList'],
   queryFn: fetchPOSList ,
 });
-
-if(isError.value) {
-  toastStore.showToast('โหลดข้อมูลไม่สำเร็จ', 'error');
-}
 
 // fetch BranchList
 const fetchBranchList = async ():Promise<BranchList[]> => {
@@ -148,7 +154,8 @@ const updatePOSMutation = useMutation<baseResponse<void> , AxiosError<baseRespon
 })
 
 const handleSubmit = () => {
-    const { PosKey , PosName , BranchId } = form.value;
+    const { PosKey , PosName , PosSystemsId } = form.value;
+    console.log(PosKey , PosName , PosSystemsId)
     switch(mode.value) {
     //create
     case 1: {
@@ -160,7 +167,7 @@ const handleSubmit = () => {
     }
     //update
     case 2: {
-        if(!BranchId) {
+        if(!PosSystemsId) {
         return toastStore.showToast('ใส่ข้อมูลไม่ครบถ้วน' , 'warning');
         }
         updatePOSMutation.mutate(form.value);
@@ -169,80 +176,74 @@ const handleSubmit = () => {
     default: return;
   }
 }
+
+const handleEmit = (page:number) => {
+  pageOptionStore.pos.CurrentPage = page;
+  queryClient.invalidateQueries({queryKey: ['POSList']});
+}
+
+const handleSortOrderEmit = (sort:string) => {
+    pageOptionStore.pos.SortOrder = sort;
+    queryClient.invalidateQueries({queryKey: ['POSList']});
+}
+
+const handleSortColumnEmit = (sort:string) => {
+    pageOptionStore.pos.SortColumn = sort;
+    queryClient.invalidateQueries({queryKey: ['POSList']});
+}
+
+watch(() => pageOptionStore.pos.PageSize ,() => {
+  pageOptionStore.pos.CurrentPage = 1;
+  queryClient.invalidateQueries({queryKey: ['POSList']});
+})
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
     <h1 class="text-3xl font-semibold">POS Management</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
-        <div class="w-full h-full flex justify-between p-4 items-center">
-            <div class="">
-                <div class="rounded-lg bg-base-100/50 backdrop-blur-lg p-4">
-                    POS of this merchant
-                </div>
-            </div>
+        <div class="w-full h-full flex gap-4 p-4 items-center">
+          <div class="rounded-lg bg-base-100/50 backdrop-blur-lg p-4 max-w-1/5 flex-1">
+              <h1 class="text-sm">Total POS</h1>
+              <div class="flex justify-center items-center w-full">
+                    <h1 class="text-4xl" v-if="!isPending">{{ pageOptionStore.pos.TotalRecords }}</h1><span v-else class=" loading loading-dots"></span>
+              </div>
+          </div>
         </div>
     </div>
     <div class="flex gap-4 flex-col">
         <div class="flex gap-2 items-center">
             <div class="flex items-center gap-2">
                 <h1>show</h1>
-                <select v-model="selectedOption" className="select select-sm w-fit rounded-lg">
+                <select v-model="pageOptionStore.pos.PageSize" className="select select-sm w-fit rounded-lg">
                     <option v-for="item in [5,10,25,50]" :value="item" :key="`item-${item}`">{{item}}</option>
                 </select>
             </div>
-            <div class="dropdown">
-                <button class="btn rounded-lg btn-sm p-2 btn-ghost ">
+            <TableSort :sort-item="sortColumnOption" @page-sort="handleSortColumnEmit">
+                <template #icon>
+                    {{ pageOptionStore.pos.SortColumn }}  
                     <IconFilter2/>
-                </button>
-                <ul class="dropdown-content menu bg-base-100 shadow-lg rounded-lg gap-2">
-                    <li v-for="item in ['Product Name','Product Code']" :key="item">
-                        <input type="radio" name="product_filter" :value="item" :aria-label="item" class="btn btn-sm text-nowrap rounded-lg">
-                    </li>
-                </ul>
-            </div>
-            <div class="dropdown">
-                <button class="btn rounded-lg btn-sm p-2 btn-ghost ">
+                </template>
+            </TableSort>
+            <TableSort :sort-item="SortOrderOption" @page-sort="handleSortOrderEmit">
+                <template #icon>    
+                    {{ SortOrderOption.find((s) => s.value === pageOptionStore.pos.SortOrder)?.title  }}
                     <IconSortAscendingLetters/>
-                </button>
-                <ul class="dropdown-content menu bg-base-100 shadow-lg rounded-lg gap-2">
-                    <li v-for="item in ['ASC','DESC']" :key="item">
-                        <input type="radio" name="product_filter" id="" :value="item" :aria-label="item" class="btn btn-sm text-nowrap rounded-lg">
-                    </li>
-                </ul>
-            </div>
+                </template>
+            </TableSort>
             <span class="w-full"></span>
             <button class="btn btn-primary btn-sm rounded-lg" @click="openModal()"><IconPlus class="size-5"/>Add POS</button>
         </div>
-        <Table :headers="headers" :items="items" class="rounded-xl shadow-lg w-full h-full" :is-loading="isPending" :is-error="isError">
-            <template #ProductInfo="product">
-               <div class="flex items-center gap-4">
-                    <div class="size-20 bg-base-100 rounded-lg overflow-hidden">
-                        <img v-if="product.item.ProductInfo.ProductImagePath" :src="product.item.ProductInfo.ProductImagePath" :alt="product.item.ProductInfo.ProductName" class="w-full h-full object-cover object-center">
-                        <IconPhotoOff v-else class="w-full h-full text-base-300 scale-70"/>
-                    </div>
-                    <div class="">
-                        <h1>{{ product.item.ProductInfo.ProductName }}</h1>
-                        <h2 class="text-base-content/50 text-sm">{{product.item.ProductInfo.ProductCategory.ProductCategoryName}}</h2>
-                    </div>
-               </div> 
-            </template>
-            <template #ProductStatus="product">
-              {{ product.item.ProductStatus.ProductStatusName }}
-            </template>
-            <template #ProductPrice="product">
-              {{ product.item.ProductPrice }} ฿
-            </template>
-            <template #ProductCost="product">
-              {{ product.item.ProductCost }} ฿
-            </template>
-            <template #ProductDiscountPercent="product">
-                <h1 v-if="product.item.ProductDiscountPercent.ProductEnableDiscount">{{ product.item.ProductDiscountPercent.ProductDiscountValue }}%</h1>
-                <h1 v-else class="text-error">disabled</h1>
-            </template>
-            <template #ProductDiscountAmount="product">
-                <h1 v-if="product.item.ProductDiscountAmount.ProductEnableDiscount">{{ product.item.ProductDiscountAmount.ProductDiscountValue }}฿</h1>
-                <h1 v-else class="text-error">disabled</h1>
-            </template>
+        <Table 
+        class="rounded-xl shadow-lg w-full h-full" 
+        :headers="headers" 
+        :items="items" 
+        :is-loading="isPending" 
+        :is-error="isError"
+        :current-page="pageOptionStore.pos.CurrentPage"
+        :item-per-page="pageOptionStore.pos.PageSize"
+        :total-items="pageOptionStore.pos.TotalRecords"
+        @page-changed="handleEmit"
+        >
             <template #actions="data">
                 <button class="btn btn-circle btn-soft btn-xs bg-info text-info-content mr-2" @click="openModal(data.item)"><IconPencil class="size-4"/></button>
                 <button class="btn btn-circle btn-soft btn-xs bg-error text-error-content" ><IconTrash class="size-4"/></button>
@@ -264,7 +265,7 @@ const handleSubmit = () => {
                     </div>
                     <select v-model="form.BranchId" class="select select-bordered w-full rounded-lg">
                       <option :value="undefined" disabled>Select Brand</option>
-                      <option v-for="(branch,index) in branchList" :key="`branch-${index}`" :value="branch">{{ branch.BranchName }}</option>
+                      <option v-for="(branch,index) in branchList" :key="`branch-${index}`" :value="branch.BranchId">{{ branch.BranchName }}</option>
                     </select>
                   </label>
                   <label class="form-control w-full">

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import Table from '../components/Table.vue';
-import type { baseResponse, BranchPayload, Data, BranchResponse , BranchTable, DataBaseResponse } from '../types';
+import type { baseResponse, BranchPayload, BranchResponse , BranchTable, DataBaseResponse } from '../types';
 import { IconFilter2, IconPencil, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
 import apiClient from '../services/api/apiService';
 import { AxiosError, type AxiosResponse } from 'axios';
@@ -16,8 +16,9 @@ import TableSort from '../components/TableSort.vue';
 // import Test from '../components/Test.vue';
 import { storeForm } from '../constants/form';
 import { storeTableHeaders } from '../constants/table';
-import { SortOrderOption, storePageOption, storeSortColumnOption } from '../constants/page_option';
+import { SortOrderOption, storeSortColumnOption } from '../constants/page_option';
 import { extractPageOption } from '../services/utils/dataExtract';
+import { usePageOptionStore } from '../store/sortingStore';
 
 const confirmStore = useConfirmDialogStore();
 const dialogStore = useDialogStore();
@@ -27,9 +28,9 @@ const progressBarStore = useProgressBarStore();
 const mode = ref<number>(1);
 const myModalRef = ref<HTMLDialogElement | null>(null);
 const form = ref(storeForm);
-const pageOption = ref(storePageOption);
 const headers = storeTableHeaders;
 const sortColumnOption = storeSortColumnOption;
+const pageOptionStore = usePageOptionStore();
 
 const openModal = (data?:BranchTable) => {
     if(data) {
@@ -48,7 +49,7 @@ const openModal = (data?:BranchTable) => {
 
 // fetch data
 const fetchBranchList = async (): Promise<BranchTable[]> => {
-    const {MerchantId , CurrentPage , PageSize , SortColumn , SortOrder} = pageOption.value
+    const {MerchantId , CurrentPage , PageSize , SortColumn , SortOrder} = pageOptionStore.store
     const params = {
         SortOrder , SortColumn ,  MerchantId , PageSize , Page: CurrentPage
     }
@@ -59,7 +60,7 @@ const fetchBranchList = async (): Promise<BranchTable[]> => {
         branch.CreatedAt = formatDateTime(branch.CreatedAt);
         branch.UpdatedAt = formatDateTime(branch.UpdatedAt);
     }) || [];
-    pageOption.value = extractPageOption(response.data.res_data , pageOption.value);
+    pageOptionStore.store = extractPageOption(response.data.res_data , pageOptionStore.store);
     return data;
 };
 
@@ -158,27 +159,23 @@ const resetForm = () => {
 }
 
 const handleEmit = (page:number) => {
-  pageOption.value.CurrentPage = page;
+  pageOptionStore.store.CurrentPage = page;
   queryClient.invalidateQueries({queryKey: ['branchListAxios']});
-  console.log(pageOption.value.CurrentPage)
 }
 
 const handleSortOrderEmit = (sort:string) => {
-    pageOption.value.SortOrder = sort;
+    pageOptionStore.store.SortOrder = sort;
     queryClient.invalidateQueries({queryKey: ['branchListAxios']});
-    console.log(pageOption.value.SortOrder);
 }
 
 const handleSortColumnEmit = (sort:string) => {
-    pageOption.value.SortColumn = sort;
+    pageOptionStore.store.SortColumn = sort;
     queryClient.invalidateQueries({queryKey: ['branchListAxios']});
-    console.log(pageOption.value.SortColumn);
 }
 
-watch(() => pageOption.value.PageSize ,() => {
-  pageOption.value.CurrentPage = 1;
+watch(() => pageOptionStore.store.PageSize ,() => {
+  pageOptionStore.store.CurrentPage = 1;
   queryClient.invalidateQueries({queryKey: ['branchListAxios']});
-  console.log(pageOption.value.PageSize);
 })
 
 </script>
@@ -187,9 +184,10 @@ watch(() => pageOption.value.PageSize ,() => {
     <h1 class="text-3xl font-semibold">Store Management</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <div class="w-full h-full flex justify-between p-4 items-center">
-            <div class="">
-                <div class="rounded-lg bg-base-100/50 backdrop-blur-lg p-4">
-                    Store of this merchant
+            <div class="rounded-lg bg-base-100/50 backdrop-blur-lg p-4 max-w-1/5 flex-1">
+                <h1 class="text-sm">Total Store</h1>
+                <div class="flex justify-center items-center w-full">
+                     <h1 class="text-4xl" v-if="!isPending">{{ pageOptionStore.store.TotalRecords }}</h1><span v-else class=" loading loading-dots"></span>
                 </div>
             </div>
         </div>
@@ -198,19 +196,19 @@ watch(() => pageOption.value.PageSize ,() => {
         <div class="flex gap-2 items-center">
             <div class="flex items-center gap-2">
                 <h1>show</h1>
-                <select v-model="pageOption.PageSize" className="select select-sm w-fit rounded-lg">
+                <select v-model="pageOptionStore.store.PageSize" className="select select-sm w-fit rounded-lg">
                     <option v-for="item in [5,10,25,50]" :value="item" :key="`item-${item}`">{{item}}</option>
                 </select>
             </div>
            <TableSort :sort-item="sortColumnOption" @page-sort="handleSortColumnEmit">
                 <template #icon>
-                    {{ pageOption.SortColumn }}  
+                    {{ pageOptionStore.store.SortColumn }}  
                     <IconFilter2/>
                 </template>
             </TableSort>
             <TableSort :sort-item="SortOrderOption" @page-sort="handleSortOrderEmit">
                 <template #icon>    
-                    {{ SortOrderOption.find((s) => s.value === pageOption.SortOrder)?.title  }}
+                    {{ SortOrderOption.find((s) => s.value === pageOptionStore.store.SortOrder)?.title  }}
                     <IconSortAscendingLetters/>
                 </template>
             </TableSort>
@@ -223,9 +221,9 @@ watch(() => pageOption.value.PageSize ,() => {
             :isError="isError"
             :headers="headers"
             :items="branchData"
-            :item-per-page="pageOption.PageSize"
-            :total-items="pageOption.TotalRecords"
-            :current-page="pageOption.CurrentPage"
+            :item-per-page="pageOptionStore.store.PageSize"
+            :total-items="pageOptionStore.store.TotalRecords"
+            :current-page="pageOptionStore.store.CurrentPage"
             @page-changed="handleEmit"
         >
             <template #actions="product">
@@ -239,9 +237,9 @@ watch(() => pageOption.value.PageSize ,() => {
             :isError="isError"
             :headers="headers"
             :items="branchData"
-            :item-per-page="pageOption.PageSize"
-            :total-items="pageOption.TotalRecords"
-            :current-page="pageOption.CurrentPage"
+            :item-per-page="pageOptionStore.store.PageSize"
+            :total-items="pageOptionStore.store.TotalRecords"
+            :current-page="pageOptionStore.store.CurrentPage"
             @page-changed="handleEmit"
         >
             <template #actions="product">

@@ -23,6 +23,14 @@ export const storePageOption:PageOption = {
     MerchantId: 1,
 }
 
+export const posPageOption:PageOption = {
+    TotalRecords: 10,
+    PageSize: 5,
+    CurrentPage: 1,
+    SortOrder: 'desc',
+    SortColumn: 'POSSYSTEMID',
+    MerchantId: 1,
+}
 
 //sort column
 export const productSortColumnOption:Sort[] = [
@@ -50,3 +58,12 @@ export const storeSortColumnOption: Sort[] = [
   { title: 'Number of POS', value: 'NUMBEROFPOS' },
 ];
 
+export const posSortColumnOption: Sort[] = [
+  { title: 'POS System ID', value: 'POSSYSTEMID' },
+  { title: 'POS System Name', value: 'POSSYSTEMNAME' },
+  { title: 'POS System Key', value: 'POSSYSTEMKEY' },
+  { title: 'POS Created At', value: 'POSCREATEDAT' },
+  { title: 'POS Updated At', value: 'POSUPDATEDAT' },
+  { title: 'Branch Name', value: 'BRANCHNAME' },
+  { title: 'Branch ID', value: 'BRANCHID' },
+];

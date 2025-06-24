@@ -16,8 +16,9 @@ import { useProgressBarStore } from '../store/progressBarStore';
 import TableSort from '../components/TableSort.vue';
 import { productTableHeaders } from '../constants/table';
 import { productPayloadForm } from '../constants/form';
-import { productPageOption, productSortColumnOption, SortOrderOption } from '../constants/page_option';
+import { productSortColumnOption, SortOrderOption } from '../constants/page_option';
 import { extractPageOption } from '../services/utils/dataExtract';
+import { usePageOptionStore } from '../store/sortingStore';
 
 const headers = productTableHeaders;
 const dialogStore = useDialogStore();
@@ -25,19 +26,19 @@ const myModalRef = ref<HTMLDialogElement | null>(null);
 const isLoading = ref<boolean>(false);
 const mode = ref(1);
 const form = ref(productPayloadForm);
-const pageOption = ref(productPageOption);
 const sortColumnOption = productSortColumnOption;
 const store = useConfirmDialogStore();
 const queryClient = useQueryClient();
 const toastStore = useToastStore();
 const progressBarStore = useProgressBarStore();
+const pageOptionStore = usePageOptionStore();
   
 //fetch product
 const fetchProduct = async ():Promise<ProductTable[]> => {
         const apiUrl = '/product/list';
-        const {SortColumn , SortOrder} = pageOption.value;
+        const {SortColumn , SortOrder} = pageOptionStore.product;
         const params = {
-          SortColumn ,SortOrder , PageSize:pageOption.value.PageSize , Page: pageOption.value.CurrentPage,
+          SortColumn ,SortOrder , PageSize:pageOptionStore.product.PageSize , Page: pageOptionStore.product.CurrentPage,
         }
         const res:AxiosResponse<baseResponse<DataBaseResponse<ProductResponse[]>>> = await apiClient.get(apiUrl , {params} );
         const productList:ProductTable[] = res?.data?.res_data?.ConstructData?.map((product) => ({
@@ -75,7 +76,7 @@ const fetchProduct = async ():Promise<ProductTable[]> => {
             ProductDiscountValue: product.ProductDiscountAmount || 0,
           },
         })) || [];
-        extractPageOption(res.data.res_data , pageOption.value);
+        pageOptionStore.product = extractPageOption(res.data.res_data , pageOptionStore.product);
         return productList;
 }
 
@@ -158,7 +159,6 @@ const createProductMutation = useMutation<baseResponse<void>,AxiosError,ProductP
 });
 
 const handleSubmit = () => {
-  console.log(mode.value)
   const {ProductCode , ProductName} = form.value;
   if(!ProductCode || !ProductName) {
     return toastStore.showToast('กรอกข้อมูลให้ครบถ้วน','warning');
@@ -171,7 +171,6 @@ const handleSubmit = () => {
     }
     //update
     case 2: {
-      console.log(form.value)
       updateProductMutation.mutate(form.value);
       return; 
     }
@@ -253,7 +252,6 @@ const openModal = (data?:ProductTable) => {
       ProductDiscountAmount: data.ProductDiscountAmount.ProductDiscountValue,
       ProductDescription: data.ProductDescription,
     }
-    console.log(payloadData)
     form.value = payloadData;
     mode.value = 2;
     return myModalRef?.value?.showModal();
@@ -270,34 +268,29 @@ const handleImageUpload = (event:any) => {
     // หากต้องการส่งไฟล์จริงไปที่ backend คุณจะต้องเก็บ file object นี้ไว้ใน state อื่น
     // เช่น const selectedImageFile = ref(null);
     // selectedImageFile.value = file;
-    console.log('Selected file:', file);
   } else {
     form.value.ProductImagePath = null;
   }
 };
 
 const handleEmit = (page:number) => {
-  pageOption.value.CurrentPage = page;
+  pageOptionStore.product.CurrentPage = page;
   queryClient.invalidateQueries({queryKey: ['productListAxios']});
-  console.log(pageOption.value.CurrentPage)
 }
 
 const handleSortOrderEmit = (sort:string) => {
-    pageOption.value.SortOrder = sort;
+    pageOptionStore.product.SortOrder = sort;
     queryClient.invalidateQueries({queryKey: ['productListAxios']});
-    console.log(pageOption.value.SortOrder);
 }
 
 const handleSortColumnEmit = (sort:string) => {
-    pageOption.value.SortColumn = sort;
+    pageOptionStore.product.SortColumn = sort;
     queryClient.invalidateQueries({queryKey: ['productListAxios']});
-    console.log(pageOption.value.SortColumn);
 }
 
-watch(() => pageOption.value.PageSize ,() => {
-  pageOption.value.CurrentPage = 1;
+watch(() => pageOptionStore.product.PageSize ,() => {
+  pageOptionStore.product.CurrentPage = 1;
   queryClient.invalidateQueries({queryKey: ['productListAxios']});
-  console.log(pageOption.value.PageSize);
 })
 
 </script>
@@ -306,9 +299,10 @@ watch(() => pageOption.value.PageSize ,() => {
     <h1 class="text-3xl font-semibold">Product Management</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <div class="w-full h-full flex justify-between p-4 items-center">
-            <div class="">
-                <div class="rounded-lg bg-base-100/50 backdrop-blur-lg p-4">
-                    Product of this merchant
+            <div class="rounded-lg bg-base-100/50 backdrop-blur-lg p-4 max-w-1/5 flex-1">
+                <h1 class="text-sm">Total Store</h1>
+                <div class="flex justify-center items-center w-full">
+                    <h1 class="text-4xl" v-if="!isTablePending">{{ pageOptionStore.product.TotalRecords }}</h1><span v-else class=" loading loading-dots"></span>
                 </div>
             </div>
         </div>
@@ -317,19 +311,19 @@ watch(() => pageOption.value.PageSize ,() => {
         <div class="flex gap-2 items-center">
             <div class="flex items-center gap-2">
                 <h1>show</h1>
-                <select v-model="pageOption.PageSize" className="select select-sm w-fit rounded-lg">
+                <select v-model="pageOptionStore.product.PageSize" className="select select-sm w-fit rounded-lg">
                     <option v-for="item in [5,10,25,50]" :value="item" :key="`item-${item}`">{{item}}</option>
                 </select>
             </div>
             <TableSort :sort-item="sortColumnOption" @page-sort="handleSortColumnEmit">
                 <template #icon>
-                    {{ pageOption.SortColumn }}  
+                    {{ pageOptionStore.product.SortColumn }}  
                     <IconFilter2/>
                 </template>
             </TableSort>
             <TableSort :sort-item="SortOrderOption" @page-sort="handleSortOrderEmit">
                 <template #icon>    
-                    {{ SortOrderOption.find((s) => s.value === pageOption.SortOrder)?.title  }}
+                    {{ SortOrderOption.find((s) => s.value === pageOptionStore.product.SortOrder)?.title  }}
                     <IconSortAscendingLetters/>
                 </template>
             </TableSort>
@@ -342,9 +336,9 @@ watch(() => pageOption.value.PageSize ,() => {
           :items="product" 
           :isLoading="isTablePending" 
           :isError="isTableError"
-          :item-per-page="pageOption.PageSize"
-          :current-page="pageOption.CurrentPage"
-          :total-items="pageOption.TotalRecords"
+          :item-per-page="pageOptionStore.product.PageSize"
+          :current-page="pageOptionStore.product.CurrentPage"
+          :total-items="pageOptionStore.product.TotalRecords"
           @page-changed="handleEmit"
         >
             <template #ProductInfo="product">
