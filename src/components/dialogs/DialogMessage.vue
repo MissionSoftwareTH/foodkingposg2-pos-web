@@ -72,7 +72,6 @@ const handleCloseBtn = () => {
             }
             break;
         default:
-            console.log('ปิด dialog');
             break;
     }
     dialogStore.closeDialog();
@@ -80,7 +79,6 @@ const handleCloseBtn = () => {
 
 watch(() =>  dialogStore.isOpen , () => {
     if(dialogStore.props?.type === 'force') {
-        console.log('force')
         setTimeout(() => {
             dialogStore.closeDialog();
             logout();

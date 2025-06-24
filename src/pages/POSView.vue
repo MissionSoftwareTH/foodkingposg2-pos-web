@@ -124,7 +124,7 @@ const postPOSMutation = useMutation<baseResponse<void> , AxiosError<baseResponse
   }
 })
 
-//create POS
+//update POS
 const UpdatePOS = async (payload:POSPayload) => {
   const apiUrl = '/branchs/pos/update';
   const res:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload );
@@ -153,6 +153,7 @@ const updatePOSMutation = useMutation<baseResponse<void> , AxiosError<baseRespon
   }
 })
 
+//handle
 const handleSubmit = () => {
     const { PosKey , PosName , PosSystemsId } = form.value;
     console.log(PosKey , PosName , PosSystemsId)

@@ -22,16 +22,15 @@ import { usePageOptionStore } from '../store/sortingStore';
 
 const headers = productTableHeaders;
 const dialogStore = useDialogStore();
+const store = useConfirmDialogStore();
+const progressBarStore = useProgressBarStore();
+const pageOptionStore = usePageOptionStore();
+const toastStore = useToastStore();
 const myModalRef = ref<HTMLDialogElement | null>(null);
-const isLoading = ref<boolean>(false);
 const mode = ref(1);
 const form = ref(productPayloadForm);
 const sortColumnOption = productSortColumnOption;
-const store = useConfirmDialogStore();
 const queryClient = useQueryClient();
-const toastStore = useToastStore();
-const progressBarStore = useProgressBarStore();
-const pageOptionStore = usePageOptionStore();
   
 //fetch product
 const fetchProduct = async ():Promise<ProductTable[]> => {
@@ -59,7 +58,10 @@ const fetchProduct = async ():Promise<ProductTable[]> => {
             ProductStatusName: product.ProductStatus?.ProductStatusName || 'not availiable',
             ProductStatusDescription: product.ProductStatus?.ProductStatusDescription || 'not availiable',
           },
-          ProductBrand: product.ProductBrand || null,
+          ProductBrand: {
+            ProductBrandId: product.ProductBrand?.ProductBrandId || null,
+            ProductBrandName: product.ProductBrand?.ProductBrandName || 'not availiable'
+          },
           ProductPrice: product.ProductPrice || 0,
           ProductCost: product.ProductCost || 0,
           ProductTaxType:{
@@ -542,7 +544,7 @@ watch(() => pageOptionStore.product.PageSize ,() => {
 
                 <div class="form-control w-full mb-6 flex flex-col">
                   <div class="label">
-                    <span class="label-text">ProductDescription</span>
+                    <span class="label-text">Product Description</span>
                   </div>
                   <textarea
                     v-model="form.ProductDescription"
@@ -552,12 +554,11 @@ watch(() => pageOptionStore.product.PageSize ,() => {
                 </div>
 
                 <div class="flex justify-center">
-                  <button type="submit" class="btn btn-primary px-8" :disabled="isLoading">Submit<span v-if="isLoading" className="loading loading-spinner loading-xs ml-2"></span></button>
+                  <button type="submit" class="btn btn-primary px-8" :disabled="createProductMutation.isPending.value || updateProductMutation.isPending.value">Submit<span v-if="createProductMutation.isPending.value || updateProductMutation.isPending.value" className="loading loading-spinner loading-xs ml-2"></span></button>
                 </div>
               </form>
             </div>
         </div>
-    
     </dialog>
 </div>
 </template>

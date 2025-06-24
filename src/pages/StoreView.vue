@@ -44,15 +44,16 @@ const openModal = (data?:BranchTable) => {
         return myModalRef?.value?.showModal();
     }
     mode.value = 1;
+    console.log(form.value)
     myModalRef?.value?.showModal();
 };
 
 // fetch data
 const fetchBranchList = async (): Promise<BranchTable[]> => {
-    const {MerchantId , CurrentPage , PageSize , SortColumn , SortOrder} = pageOptionStore.store
+    const {MerchantId , CurrentPage , PageSize , SortColumn , SortOrder} = pageOptionStore.store;
     const params = {
         SortOrder , SortColumn ,  MerchantId , PageSize , Page: CurrentPage
-    }
+    };
     const apiUrl = '/branchs/list';
     const response:AxiosResponse<baseResponse<DataBaseResponse<BranchResponse[]>>> = await apiClient.get(apiUrl, {params});
     const data:BranchTable[] = response.data.res_data.ConstructData || []
@@ -83,7 +84,7 @@ const createBranchMutation = useMutation<baseResponse<void>,AxiosError<baseRespo
         dialogStore.openDialog(data.res_message , {status: 'success'});
         queryClient.invalidateQueries({ queryKey: ['branchListAxios']});
         //ล้างฟอร์ม
-        form.value = {...storeForm};
+        resetForm();
     },
     onError: (error) => {
         console.error(error.response?.data.res_message || error.message);

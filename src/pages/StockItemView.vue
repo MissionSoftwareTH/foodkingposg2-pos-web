@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import Table from '../components/Table.vue';
 import type { baseResponse, Data, HeadersTable } from '../types';
 import { IconFilter2, IconPencil, IconPhotoOff, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
-import { getApiHeaders } from '../services/api/apiHeader';
 import apiClient from '../services/api/apiService';
 import type { AxiosResponse } from 'axios';
 import { useDialogStore } from '../store/dialogStore';
@@ -72,9 +71,9 @@ const default_form:ProductPayload = {
     ProductCost: 0,
     ProductBarcode: '',
     ProductTaxTypeId: undefined,
-    ProductEnableDiscountPercent: false,
+    ProductEnableDiscountPercent: 0,
     ProductDiscountPercent: 0,
-    ProductEnableDiscountAmount: false,
+    ProductEnableDiscountAmount: 0,
     ProductDiscountAmount: 0,
     ProductDescription: '',
 };
@@ -89,9 +88,9 @@ const form = ref<ProductPayload>({
     ProductCost: 0,
     ProductBarcode: '',
     ProductTaxTypeId: undefined,
-    ProductEnableDiscountPercent: false,
+    ProductEnableDiscountPercent: 0,
     ProductDiscountPercent: 0,
-    ProductEnableDiscountAmount: false,
+    ProductEnableDiscountAmount: 0,
     ProductDiscountAmount: 0,
     ProductDescription: '',
 });
@@ -234,9 +233,6 @@ const handleImageUpload = (event:any) => {
   }
 };
 
-onMounted(() => {
-    // getProduct();
-})
 
 </script>
 <template>

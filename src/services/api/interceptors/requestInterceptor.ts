@@ -16,7 +16,7 @@ export const handleReq = (config:InternalAxiosRequestConfig) => {
 
 export const handleCookie = () => {
     const rawExtendedTime = localStorage.getItem("extendTime") || "";
-    console.log(rawExtendedTime)
+    // console.log(rawExtendedTime)
     if(rawExtendedTime.length === 0) return;
     const extendedTime = JSON.parse(rawExtendedTime) ;
 
