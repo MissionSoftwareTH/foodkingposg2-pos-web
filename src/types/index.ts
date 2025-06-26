@@ -9,6 +9,8 @@ export * from './POS';
 export * from './branch';
 export * from './product';
 export * from './dropdown';
+export * from './categories';
+export * from './brand';
 
 export interface Layouts {
   [key: string]: typeof BlankLayout | typeof AuthLayout;

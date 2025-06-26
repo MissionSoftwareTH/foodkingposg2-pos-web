@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import Table from '../components/Table.vue';
 import type { baseResponse, BranchPayload, BranchResponse , BranchTable, DataBaseResponse } from '../types';
 import { IconFilter2, IconPencil, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
@@ -12,13 +12,13 @@ import { useToastStore } from '../store/toastStore';
 import { useProgressBarStore } from '../store/progressBarStore';
 import { formatDateTime } from '../services/utils';
 import TableSort from '../components/TableSort.vue';
-// import TestTable from '../components/testTable.vue';
-// import Test from '../components/Test.vue';
 import { storeForm } from '../constants/form';
 import { storeTableHeaders } from '../constants/table';
 import { SortOrderOption, storeSortColumnOption } from '../constants/page_option';
 import { extractPageOption } from '../services/utils/dataExtract';
 import { usePageOptionStore } from '../store/sortingStore';
+import TitleBarCard from '../components/TitleBarCard.vue';
+import TestTable from '../components/TestTable.vue';
 
 const confirmStore = useConfirmDialogStore();
 const dialogStore = useDialogStore();
@@ -83,8 +83,9 @@ const createBranchMutation = useMutation<baseResponse<void>,AxiosError<baseRespo
         myModalRef.value?.close();
         dialogStore.openDialog(data.res_message , {status: 'success'});
         queryClient.invalidateQueries({ queryKey: ['branchListAxios']});
+        queryClient.invalidateQueries({ queryKey: ['branchList']});
         //ล้างฟอร์ม
-        resetForm();
+        closeModal();
     },
     onError: (error) => {
         console.error(error.response?.data.res_message || error.message);
@@ -97,7 +98,7 @@ const createBranchMutation = useMutation<baseResponse<void>,AxiosError<baseRespo
         setTimeout(() => {
         progressBarStore.loadingStop();
         }, 1000);
-    }  
+    }
 })
 
 const handleSubmit = () => {
@@ -179,18 +180,20 @@ watch(() => pageOptionStore.store.PageSize ,() => {
   queryClient.invalidateQueries({queryKey: ['branchListAxios']});
 })
 
+const mostPOS = computed(() => {
+    return branchData.value?.reduce((max, branch) => {
+        return branch.NumberOfPos > max ? branch.NumberOfPos : max;
+    }, 0);
+})
+
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
     <h1 class="text-3xl font-semibold">Store Management</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
-        <div class="w-full h-full flex justify-between p-4 items-center">
-            <div class="rounded-lg bg-base-100/50 backdrop-blur-lg p-4 max-w-1/5 flex-1">
-                <h1 class="text-sm">Total Store</h1>
-                <div class="flex justify-center items-center w-full">
-                     <h1 class="text-4xl" v-if="!isPending">{{ pageOptionStore.store.TotalRecords }}</h1><span v-else class=" loading loading-dots"></span>
-                </div>
-            </div>
+        <div class="w-full h-full flex gap-4 p-4 items-center">
+            <TitleBarCard title="Total Store" :text="pageOptionStore.store.TotalRecords" :is-pending="isPending"/>
+            <TitleBarCard title="Most Amount of POS" :text="mostPOS" :is-pending="isPending" />
         </div>
     </div>
     <div class="flex gap-4 flex-col">
@@ -217,7 +220,6 @@ watch(() => pageOptionStore.store.PageSize ,() => {
             <button class="btn btn-primary btn-sm rounded-lg" @click="openModal()"><IconPlus class="size-5"/>Add Store</button>
         </div>
         <Table 
-            class="rounded-xl shadow-lg w-full h-full"
             :isLoading="isPending"
             :isError="isError"
             :headers="headers"
@@ -232,23 +234,7 @@ watch(() => pageOptionStore.store.PageSize ,() => {
                 <button class="btn btn-circle btn-soft btn-xs bg-error text-error-content" @click="() => confirmStore.isOpen = true"><IconTrash class="size-4"/></button>
             </template>
         </Table>
-        <!-- <TestTable
-            class="rounded-xl shadow-lg w-full h-full"
-            :isLoading="isPending"
-            :isError="isError"
-            :headers="headers"
-            :items="branchData"
-            :item-per-page="pageOptionStore.store.PageSize"
-            :total-items="pageOptionStore.store.TotalRecords"
-            :current-page="pageOptionStore.store.CurrentPage"
-            @page-changed="handleEmit"
-        >
-            <template #actions="product">
-                <button class="btn btn-circle btn-soft btn-xs bg-info text-info-content mr-2" @click="openModal(product.item)"><IconPencil class="size-4"/></button>
-                <button class="btn btn-circle btn-soft btn-xs bg-error text-error-content" @click="() => confirmStore.isOpen = true"><IconTrash class="size-4"/></button>
-            </template>
-        </TestTable> -->
-        <!-- <Test/> -->
+        <!-- <TestTable/> -->
     </div>
 
     <!-- add merchant dialog -->

@@ -44,7 +44,7 @@ export const productTableHeaders:HeadersTable[] = [
     {
         key: 'ProductInfo',
         title: 'Product',
-        type: 'actions',
+        type: 'custom',
     },
     {
         key: 'ProductCode',
@@ -53,37 +53,37 @@ export const productTableHeaders:HeadersTable[] = [
     {
       key: 'ProductBrand',
       title: 'Product Brand',
-      type: 'actions'
+      type: 'custom'
     },
     {
         key: 'ProductStatus',
         title: 'Status',
-        type: 'actions',
+        type: 'custom',
     },
     {
         key: 'ProductPrice',
         title: 'Price',
-        type: 'actions',
+        type: 'custom',
     },
     {
         key: 'ProductCost',
         title: 'Cost',
-        type: 'actions',
+        type: 'custom',
     },
     {
         key: 'ProductTaxType',
         title: 'Vat Type',
-        type: 'actions',
+        type: 'custom',
     },
     {
         key: 'ProductDiscountPercent',
         title: 'Percent Discount',
-        type: 'actions',
+        type: 'custom',
     },
     {
         key: 'ProductDiscountAmount',
         title: 'Amount Discount',
-        type: 'actions',
+        type: 'custom',
     },
     {
         key: 'actions',
@@ -116,6 +116,80 @@ export const posTableHeaders:HeadersTable[] = [
     {
         key: 'PosUpdatedAt',
         title: 'Updated At',
+    },
+    {
+        key: 'actions',
+        title: 'Actions',
+        type: 'actions',
+    }
+];
+
+export const testHeaders:HeadersTable[] = [
+    {
+        key: 'BranchId',
+        title: 'Store Id',
+    },
+    {
+        key: 'BranchName',
+        title: 'Store Name',
+    },
+    {
+        key: 'ContactPhone',
+        title: 'Contact Phone',
+    },
+    {
+        key: 'ContactEmail',
+        title: 'Contact Email',
+    },
+    {
+        key: 'NumberOfPos',
+        title: 'number of POS',
+    },
+    {
+        key: 'CreatedAt',
+        title: 'Created At',
+    },
+    {
+        key: 'UpdatedAt',
+        title: 'Updated At',
+    },
+    {
+        key: 'Status',
+        title: 'Status',
+    },
+    {
+        key: 'actions',
+        title: 'Actions',
+        type: 'actions',
+    }
+];
+
+export const brandTableHeaders:HeadersTable[] = [
+    {
+      key: 'ProductBrandId',
+      title: 'Id',
+    },
+    {
+      key: 'ProductBrandName',
+      title: 'Brand Name',
+      type: 'custom',
+    },
+    {
+        key: 'actions',
+        title: 'Actions',
+        type: 'actions',
+    }
+];
+
+export const categoriesTableHeaders:HeadersTable[] = [
+    {
+      key: 'ProductCategoryId',
+      title: 'Id',
+    },
+    {
+      key: 'ProductCategoryName',
+      title: 'Category Name',
+      type: 'custom',
     },
     {
         key: 'actions',

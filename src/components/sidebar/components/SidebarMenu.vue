@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import { RouterLink, useRouter } from 'vue-router';
 import { ref, shallowRef, watch } from 'vue';
-import { IconBuildingStore, IconChevronsDown, IconDeviceDesktop, IconExclamationCircle, IconFileSettings, IconLayoutDashboard, IconLogs, IconPackage, IconShoppingCart, IconUsers } from '@tabler/icons-vue'; // Import all icons you use
+import { IconBuildings, IconBuildingStore, IconCategory, IconChevronsDown, IconDeviceDesktop, IconExclamationCircle, IconFileSettings, IconHome, IconLayoutDashboard, IconLogs, IconPackage, IconShoppingCart, IconUsers } from '@tabler/icons-vue'; // Import all icons you use
 import type { IconName } from '../../../router/routePath';
 import type { AppRouteRecordRaw } from '../../../types';
 import { useAppSetupStore } from '../../../store/appSetupStore';
 
 const iconComponents = shallowRef<Record<IconName, any>>({
-    'Dashboard': IconLayoutDashboard,
+    'Dashboard': IconHome,
     'Management': IconFileSettings,
     'Store Management': IconBuildingStore,
     'Product Management': IconShoppingCart,
     'Stock Management': IconPackage,
     'POS Management': IconDeviceDesktop,
     'Admin Management': IconUsers,
+    'Categories Management': IconCategory,
+    'Brand Management': IconBuildings,
     'Activity logs': IconLogs,
     'non_icon': IconExclamationCircle,
 });

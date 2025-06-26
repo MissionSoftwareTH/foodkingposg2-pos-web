@@ -38,7 +38,6 @@ const navLinks = computed(() => {
 });
 
 const handleSidebarToggle = (value: boolean) => {
-    console.log(value)
     appSetupStore.setSidebarExpand(value);
 }
 

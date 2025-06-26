@@ -32,6 +32,24 @@ export const posPageOption:PageOption = {
     MerchantId: 1,
 }
 
+export const brandPageOption:PageOption = {
+    TotalRecords: 1,
+    PageSize: 5,
+    CurrentPage: 1,
+    SortOrder: 'desc',
+    SortColumn: '',
+    MerchantId: 1,
+}
+
+export const categoriesPageOption:PageOption = {
+    TotalRecords: 1,
+    PageSize: 5,
+    CurrentPage: 1,
+    SortOrder: 'desc',
+    SortColumn: '',
+    MerchantId: 1,
+}
+
 //sort column
 export const productSortColumnOption:Sort[] = [
   { title: 'Product Name', value: 'PRODUCTNAME' },
@@ -66,4 +84,14 @@ export const posSortColumnOption: Sort[] = [
   { title: 'POS Updated At', value: 'POSUPDATEDAT' },
   { title: 'Branch Name', value: 'BRANCHNAME' },
   { title: 'Branch ID', value: 'BRANCHID' },
+];
+
+export const categoriesSortColumnOption: Sort[] = [
+  {title: 'Product Category Id', value: 'ProductCategoryId'},
+  {title: 'Product Category Name', value: 'ProductCategoryName'}
+];
+
+export const brandSortColumnOption: Sort[] = [
+  {title: 'Product Brand Id', value: 'ProductBrandId'},
+  {title: 'Product Brand Name', value: 'ProductBrandName'}
 ];

@@ -1,4 +1,4 @@
-import type { BranchPayload, formData, OTP_Response, POSPayload, ProductPayload } from "../types";
+import type { BranchPayload, BrandPayload, CategoriesPayload, formData, OTP_Response, POSPayload, ProductPayload } from "../types";
 
 export const OTPdataForm:OTP_Response = {
     TempToken: '',
@@ -42,5 +42,13 @@ export const productPayloadForm:ProductPayload = {
 export const posPayloadForm:POSPayload = {
   BranchId: undefined,
   PosName: '',
-  PosKey: '', 
+  PosKey: '',
+}
+
+export const brandPayloadForm:BrandPayload = {
+    BrandName: '',
+}
+
+export const categoriesPayloadForm:CategoriesPayload = {
+    ProductCategoryName: '',
 }

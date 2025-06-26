@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import Table from '../components/Table.vue';
 import type { baseResponse, Data, DataBaseResponse } from '../types';
 import { IconFilter2, IconPencil, IconPhotoOff, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
@@ -19,6 +19,7 @@ import { productPayloadForm } from '../constants/form';
 import { productSortColumnOption, SortOrderOption } from '../constants/page_option';
 import { extractPageOption } from '../services/utils/dataExtract';
 import { usePageOptionStore } from '../store/sortingStore';
+import TitleBarCard from '../components/TitleBarCard.vue';
 
 const headers = productTableHeaders;
 const dialogStore = useDialogStore();
@@ -161,7 +162,7 @@ const createProductMutation = useMutation<baseResponse<void>,AxiosError,ProductP
 });
 
 const handleSubmit = () => {
-  const {ProductCode , ProductName} = form.value;
+  const {ProductCode , ProductName , ProductEnableDiscountAmount , ProductEnableDiscountPercent} = form.value;
   if(!ProductCode || !ProductName) {
     return toastStore.showToast('กรอกข้อมูลให้ครบถ้วน','warning');
   }
@@ -183,7 +184,7 @@ const handleSubmit = () => {
 //update product
 const updateProduct = async (payload:ProductPayload) => {
   const apiUrl = '/product/update';
-  const res:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload );
+  const res:AxiosResponse<baseResponse<void>> = await apiClient.patch(apiUrl , payload );
   return res.data;
 }
 
@@ -255,6 +256,7 @@ const openModal = (data?:ProductTable) => {
       ProductDescription: data.ProductDescription,
     }
     form.value = payloadData;
+    console.log('form',form.value);
     mode.value = 2;
     return myModalRef?.value?.showModal();
   }
@@ -274,6 +276,28 @@ const handleImageUpload = (event:any) => {
     form.value.ProductImagePath = null;
   }
 };
+
+const enableDiscountPercentComputed = computed({
+  get() {
+    // เมื่ออ่านค่าจาก checkbox
+    return form.value.ProductEnableDiscountPercent === 1;
+  },
+  set(newValue: boolean) {
+    // เมื่อ checkbox ถูกเปลี่ยน (true/false) ให้แปลงเป็น 1/0
+    form.value.ProductEnableDiscountPercent = newValue ? 1 : 0;
+  }
+});
+
+const enableDiscountAmountComputed = computed({
+  get() {
+    // เมื่ออ่านค่าจาก checkbox
+    return form.value.ProductEnableDiscountAmount === 1;
+  },
+  set(newValue: boolean) {
+    // เมื่อ checkbox ถูกเปลี่ยน (true/false) ให้แปลงเป็น 1/0
+    form.value.ProductEnableDiscountAmount = newValue ? 1 : 0;
+  }
+});
 
 const handleEmit = (page:number) => {
   pageOptionStore.product.CurrentPage = page;
@@ -300,13 +324,9 @@ watch(() => pageOptionStore.product.PageSize ,() => {
 <div class="flex flex-col p-2 gap-4">
     <h1 class="text-3xl font-semibold">Product Management</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
-        <div class="w-full h-full flex justify-between p-4 items-center">
-            <div class="rounded-lg bg-base-100/50 backdrop-blur-lg p-4 max-w-1/5 flex-1">
-                <h1 class="text-sm">Total Store</h1>
-                <div class="flex justify-center items-center w-full">
-                    <h1 class="text-4xl" v-if="!isTablePending">{{ pageOptionStore.product.TotalRecords }}</h1><span v-else class=" loading loading-dots"></span>
-                </div>
-            </div>
+        <div class="w-full h-full flex gap-4 p-4 items-center">
+          <TitleBarCard title="Total Product" :text="pageOptionStore.product.TotalRecords" :is-pending="isTablePending"/>
+          
         </div>
     </div>
     <div class="flex gap-4 flex-col">
@@ -333,7 +353,6 @@ watch(() => pageOptionStore.product.PageSize ,() => {
             <button class="btn btn-primary btn-sm rounded-lg" @click="openModal()"><IconPlus class="size-5"/>Add Product</button>
         </div>
         <Table 
-          class="rounded-xl shadow-lg w-full h-full" 
           :headers="headers" 
           :items="product" 
           :isLoading="isTablePending" 
@@ -359,7 +378,7 @@ watch(() => pageOptionStore.product.PageSize ,() => {
               {{ product.item.ProductBrand.ProductBrandName }}
             </template>
             <template #ProductStatus="product">
-              <select :value="product.item.ProductStatus.ProductStatusId" @change="e => handleSelecterUpdate('ProductStatusId', Number((e.target as HTMLSelectElement).value), product.item.ProductInfoId)" class="select select-bordered w-full rounded-lg bg-transparent border-0 outline-0 p-1 focus:bg-base-100">
+              <select :value="product.item.ProductStatus.ProductStatusId" @change="e => handleSelecterUpdate('ProductStatusId', Number((e.target as HTMLSelectElement).value), product.item.ProductInfoId)" class="select select-bordered  min-w-[120px] rounded-lg bg-transparent border-0 outline-0 p-1 focus:bg-base-100">
                 <option v-for="(status,index) in productStatusList" :key="`status-${index}`" :value="status.ProductStatusId">{{ status.ProductStatusName }}</option>
               </select>
             </template>
@@ -370,7 +389,7 @@ watch(() => pageOptionStore.product.PageSize ,() => {
               {{ product.item.ProductCost }} ฿
             </template>
             <template #ProductTaxType="product">
-              <select :value="product.item.ProductTaxType.ProductTaxTypeId" @change="e => handleSelecterUpdate('ProductTaxTypeId', Number((e.target as HTMLSelectElement).value), product.item.ProductInfoId)" class="select select-bordered w-full rounded-lg bg-transparent border-0 outline-0 p-1 focus:bg-base-100">
+              <select :value="product.item.ProductTaxType.ProductTaxTypeId" @change="e => handleSelecterUpdate('ProductTaxTypeId', Number((e.target as HTMLSelectElement).value), product.item.ProductInfoId)" class="select select-bordered min-w-[120px] rounded-lg bg-transparent border-0 outline-0 p-1 focus:bg-base-100">
                 <option v-for="(status,index) in productTaxTypeList" :key="`status-${index}`" :value="status.ProductTaxTypeId">{{ status.ProductTaxTypeName }}</option>
               </select>
             </template>
@@ -515,7 +534,7 @@ watch(() => pageOptionStore.product.PageSize ,() => {
                     <div class="label cursor-pointer">
                       <input
                         type="checkbox"
-                        v-model="form.ProductEnableDiscountPercent"
+                        v-model="enableDiscountPercentComputed"
                         class="checkbox checkbox-primary mr-2"
                       />
                       <span class="label-text">Percent Discount</span>
@@ -531,7 +550,7 @@ watch(() => pageOptionStore.product.PageSize ,() => {
                     <div class="label cursor-pointer">
                       <input
                         type="checkbox"
-                        v-model="form.ProductEnableDiscountAmount"
+                        v-model="enableDiscountAmountComputed"
                         class="checkbox checkbox-primary mr-2 "
                       />
                       <span class="label-text">Amount Discount</span>

@@ -3,7 +3,6 @@ import { onMounted, ref } from 'vue';
 import Table from '../components/Table.vue';
 import type { baseResponse, Data, HeadersTable, MerchantData, Payload } from '../types';
 import { IconFilter2, IconPencil, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
-import { getApiHeaders } from '../services/api/apiHeader';
 import apiClient from '../services/api/apiService';
 import type { AxiosResponse } from 'axios';
 import { useDialogStore } from '../store/dialogStore';

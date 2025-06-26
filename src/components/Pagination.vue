@@ -51,7 +51,7 @@ interface Props {
 
 
 const props = withDefaults(defineProps<Props>(), {
-  itemsPerPage: 10,
+  itemsPerPage: 5,
   maxVisibleButtons: 5, // ปรับค่านี้ให้เป็นจำนวนปุ่มที่คุณต้องการให้แสดง 'กลางๆ' เช่น 3, 5
 });
 

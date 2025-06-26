@@ -17,6 +17,7 @@ import { posSortColumnOption, SortOrderOption } from '../constants/page_option';
 import TableSort from '../components/TableSort.vue';
 import { extractPageOption } from '../services/utils/dataExtract';
 import { usePageOptionStore } from '../store/sortingStore';
+import TitleBarCard from '../components/TitleBarCard.vue';
 
 const headers = posTableHeaders;
 const dialogStore = useDialogStore();
@@ -31,6 +32,8 @@ const sortColumnOption = posSortColumnOption;
 
 const resetForm = () => {
   form.value = {...posPayloadForm};
+  console.log(form.value);
+  console.log(posPayloadForm);
 }
 
 const closeModal = () => {
@@ -106,7 +109,7 @@ const postPOSMutation = useMutation<baseResponse<void> , AxiosError<baseResponse
   mutationFn:PostPOS,
   onSuccess: (data) => {
     dialogStore.openDialog(data?.res_message, {status: 'success'});
-    queryClient.invalidateQueries({queryKey: ['branchList']});
+    queryClient.invalidateQueries({queryKey: ['branchListAxios']});
     queryClient.invalidateQueries({queryKey: ['POSList']});
     closeModal();
   },
@@ -127,7 +130,7 @@ const postPOSMutation = useMutation<baseResponse<void> , AxiosError<baseResponse
 //update POS
 const UpdatePOS = async (payload:POSPayload) => {
   const apiUrl = '/branchs/pos/update';
-  const res:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload );
+  const res:AxiosResponse<baseResponse<void>> = await apiClient.patch(apiUrl , payload );
   return res.data;
 }
 
@@ -135,7 +138,6 @@ const updatePOSMutation = useMutation<baseResponse<void> , AxiosError<baseRespon
   mutationFn:UpdatePOS,
   onSuccess: (data) => {
     toastStore.showToast(data?.res_message,'success');
-    queryClient.invalidateQueries({queryKey: ['branchList']});
     queryClient.invalidateQueries({queryKey: ['POSList']});
     closeModal();
   },
@@ -203,12 +205,7 @@ watch(() => pageOptionStore.pos.PageSize ,() => {
     <h1 class="text-3xl font-semibold">POS Management</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <div class="w-full h-full flex gap-4 p-4 items-center">
-          <div class="rounded-lg bg-base-100/50 backdrop-blur-lg p-4 max-w-1/5 flex-1">
-              <h1 class="text-sm">Total POS</h1>
-              <div class="flex justify-center items-center w-full">
-                    <h1 class="text-4xl" v-if="!isPending">{{ pageOptionStore.pos.TotalRecords }}</h1><span v-else class=" loading loading-dots"></span>
-              </div>
-          </div>
+          <TitleBarCard title="Total POS" :text="pageOptionStore.pos.TotalRecords" :is-pending="isPending"/>
         </div>
     </div>
     <div class="flex gap-4 flex-col">
@@ -235,7 +232,6 @@ watch(() => pageOptionStore.pos.PageSize ,() => {
             <button class="btn btn-primary btn-sm rounded-lg" @click="openModal()"><IconPlus class="size-5"/>Add POS</button>
         </div>
         <Table 
-        class="rounded-xl shadow-lg w-full h-full" 
         :headers="headers" 
         :items="items" 
         :is-loading="isPending" 
@@ -254,7 +250,7 @@ watch(() => pageOptionStore.pos.PageSize ,() => {
     <!-- add product dialog -->
     <dialog ref="myModalRef" className="modal">
         <div className="modal-box min-w-1/2">
-            <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal"><IconX class="text-error-content"/></button>
+            <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal()"><IconX class="text-error-content"/></button>
             <h3 v-if="mode === 1" className="font-semibold text-xl">Add New POS</h3>
             <h3 v-else-if="mode === 2" className="font-semibold text-xl">Update POS</h3>
             <div className="modal-action">

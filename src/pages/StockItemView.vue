@@ -278,40 +278,45 @@ const handleImageUpload = (event:any) => {
             <span class="w-full"></span>
             <button class="btn btn-primary btn-sm rounded-lg" @click="openModal"><IconPlus class="size-5"/>Add Item</button>
         </div>
-        <Table :headers="headers" :items="items" class="rounded-xl shadow-lg w-full h-full" :is-loading="false" :is-error="true">
-            <template #ProductInfo="product">
-               <div class="flex items-center gap-4">
-                    <div class="size-20 bg-base-100 rounded-lg overflow-hidden">
-                        <img v-if="product.item.ProductInfo.ProductImagePath" :src="product.item.ProductInfo.ProductImagePath" :alt="product.item.ProductInfo.ProductName" class="w-full h-full object-cover object-center">
-                        <IconPhotoOff v-else class="w-full h-full text-base-300 scale-70"/>
-                    </div>
-                    <div class="">
-                        <h1>{{ product.item.ProductInfo.ProductName }}</h1>
-                        <h2 class="text-base-content/50 text-sm">{{product.item.ProductInfo.ProductCategory.ProductCategoryName}}</h2>
-                    </div>
-               </div> 
-            </template>
-            <template #ProductStatus="product">
-              {{ product.item.ProductStatus.ProductStatusName }}
-            </template>
-            <template #ProductPrice="product">
-              {{ product.item.ProductPrice }} ฿
-            </template>
-            <template #ProductCost="product">
-              {{ product.item.ProductCost }} ฿
-            </template>
-            <template #ProductDiscountPercent="product">
-                <h1 v-if="product.item.ProductDiscountPercent.ProductEnableDiscount">{{ product.item.ProductDiscountPercent.ProductDiscountValue }}%</h1>
-                <h1 v-else class="text-error">disabled</h1>
-            </template>
-            <template #ProductDiscountAmount="product">
-                <h1 v-if="product.item.ProductDiscountAmount.ProductEnableDiscount">{{ product.item.ProductDiscountAmount.ProductDiscountValue }}฿</h1>
-                <h1 v-else class="text-error">disabled</h1>
-            </template>
-            <template #actions>
-                <button class="btn btn-circle btn-soft btn-xs bg-info text-info-content mr-2" ><IconPencil class="size-4"/></button>
-                <button class="btn btn-circle btn-soft btn-xs bg-error text-error-content" ><IconTrash class="size-4"/></button>
-            </template>
+        <Table 
+          :headers="headers" 
+          :items="items" 
+          :is-loading="false" 
+          :is-error="true"
+        >
+          <template #ProductInfo="product">
+             <div class="flex items-center gap-4">
+                  <div class="size-20 bg-base-100 rounded-lg overflow-hidden">
+                      <img v-if="product.item.ProductInfo.ProductImagePath" :src="product.item.ProductInfo.ProductImagePath" :alt="product.item.ProductInfo.ProductName" class="w-full h-full object-cover object-center">
+                      <IconPhotoOff v-else class="w-full h-full text-base-300 scale-70"/>
+                  </div>
+                  <div class="">
+                      <h1>{{ product.item.ProductInfo.ProductName }}</h1>
+                      <h2 class="text-base-content/50 text-sm">{{product.item.ProductInfo.ProductCategory.ProductCategoryName}}</h2>
+                  </div>
+             </div> 
+          </template>
+          <template #ProductStatus="product">
+            {{ product.item.ProductStatus.ProductStatusName }}
+          </template>
+          <template #ProductPrice="product">
+            {{ product.item.ProductPrice }} ฿
+          </template>
+          <template #ProductCost="product">
+            {{ product.item.ProductCost }} ฿
+          </template>
+          <template #ProductDiscountPercent="product">
+              <h1 v-if="product.item.ProductDiscountPercent.ProductEnableDiscount">{{ product.item.ProductDiscountPercent.ProductDiscountValue }}%</h1>
+              <h1 v-else class="text-error">disabled</h1>
+          </template>
+          <template #ProductDiscountAmount="product">
+              <h1 v-if="product.item.ProductDiscountAmount.ProductEnableDiscount">{{ product.item.ProductDiscountAmount.ProductDiscountValue }}฿</h1>
+              <h1 v-else class="text-error">disabled</h1>
+          </template>
+          <template #actions>
+              <button class="btn btn-circle btn-soft btn-xs bg-info text-info-content mr-2" ><IconPencil class="size-4"/></button>
+              <button class="btn btn-circle btn-soft btn-xs bg-error text-error-content" ><IconTrash class="size-4"/></button>
+          </template>
         </Table>
     </div>
 

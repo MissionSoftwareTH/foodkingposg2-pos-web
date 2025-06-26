@@ -19,11 +19,11 @@ export interface BranchResponse {
 }
 
 export interface BranchTable {
-   BranchId: number;
+   BranchId: number | undefined;
    BranchName: string;
    ContactPhone: string;
    ContactEmail: string;
-   CreatedAt: string
+   CreatedAt: string;
    UpdatedAt: string;
-   NumberOfPos: number; 
+   NumberOfPos: number;
 }
