@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue';
 import Table from '../components/Table.vue';
 import type { baseResponse, CategoriesResponse , CategoriesTable, CategoriesPayload, Data } from '../types';
-import { IconFilter2, IconPlus, IconSortAscendingLetters, IconTrash } from '@tabler/icons-vue';
+import { IconFilter2, IconPlus, IconSortAscendingLetters, IconTrash ,IconEdit } from '@tabler/icons-vue';
 import apiClient from '../services/api/apiService';
 import { AxiosError, type AxiosResponse } from 'axios';
 import { useDialogStore } from '../store/dialogStore';
@@ -21,10 +21,9 @@ const dialogStore = useDialogStore();
 const toastStore = useToastStore();
 const queryClient = useQueryClient();
 const progressBarStore = useProgressBarStore();
-const mode = ref<number>(1);
 const myModalRef = ref<HTMLDialogElement | null>(null);
-const form = ref(categoriesPayloadForm);
-const updateForm = ref(categoriesPayloadForm);
+const form = ref({...categoriesPayloadForm});
+const updateForm = ref({...categoriesPayloadForm});
 const headers = categoriesTableHeaders;
 const sortColumnOption = categoriesSortColumnOption;
 const pageOptionStore = usePageOptionStore();
@@ -60,7 +59,6 @@ const createCategoriesMutation = useMutation<baseResponse<void>,AxiosError<baseR
         toastStore.showToast(data.res_message , 'success');
         queryClient.invalidateQueries({ queryKey: ['categoriesListAxios']});
         queryClient.invalidateQueries({ queryKey: ['categoriesList']});
-        //ล้างฟอร์ม
         closeModal();
     },
     onError: (error) => {
@@ -78,28 +76,12 @@ const createCategoriesMutation = useMutation<baseResponse<void>,AxiosError<baseR
 })
 
 const handleSubmit = () => {
-    const { ProductCategoryName , ProductCategoryId } = form.value;
+    const { ProductCategoryName } = form.value;
     if(!ProductCategoryName) {
         return toastStore.showToast('ใส่ข้อมูลไม่ครบถ้วน' , 'warning');
     }
-    switch(mode.value) {
-    //create
-    case 1: {
-        
-        createCategoriesMutation.mutate(form.value);
-        return;
-    }
-    //update
-    case 2: {
-        if(!ProductCategoryId) {
-        return toastStore.showToast('ใส่ข้อมูลไม่ครบถ้วน' , 'warning');
-        }
-        updateCategoriesMutation.mutate(form.value);
-        return; 
-    }
-    default: return;
-  }
-}
+    createCategoriesMutation.mutate(form.value);
+ }
 
 //update data
 const updateCategories = async (payload:CategoriesPayload) => {
@@ -170,7 +152,6 @@ const handleTextInputUpdate = ( newValue: string ,productId:number) => {
         updateForm.value.ProductCategoryId = productId;
         updateForm.value.ProductCategoryName = newValue;
     }
-    isInputUpdated.value = productId;
     console.log(isInputUpdated.value);
 };
 
@@ -225,8 +206,12 @@ watch(() => pageOptionStore.categories.PageSize ,() => {
         >
             <template #ProductCategoryName="categories">
                 <div class="flex items-center gap-2 w-fit">
-                    <input type="text" class="input input-ghost max-w-[150px]" :value="categories.item.ProductCategoryName" @input="e => handleTextInputUpdate(String((e.target as HTMLSelectElement).value),categories.item.ProductCategoryId)">
-                    <button v-if="isInputUpdated === categories.item.ProductCategoryId" @click="handleUpdateSubmit()" class="btn btn-primary btn-sm">Update</button>
+                    <input type="text" class="input input-ghost max-w-[150px] disabled:text-base-content disabled:bg-transparent disabled:border-none disabled:cursor-default" :disabled="isInputUpdated !== categories.item.ProductCategoryId" :value="categories.item.ProductCategoryName" @input="e => handleTextInputUpdate(String((e.target as HTMLSelectElement).value),categories.item.ProductCategoryId)">
+                    <span v-if="isInputUpdated === categories.item.ProductCategoryId" class="flex items-center gap-2">
+                        <button @click="handleUpdateSubmit()" class="btn btn-primary btn-sm">Update</button>
+                        <button @click="() => isInputUpdated = undefined" class="btn btn-error btn-sm">Close</button>
+                    </span>
+                    <button v-else class="btn btn-xs" @click="() => isInputUpdated = categories.item.ProductCategoryId"><IconEdit class="size-4"/></button>
                 </div>
             </template>
             <template #actions>

@@ -1,4 +1,5 @@
 import type { BranchPayload, BrandPayload, CategoriesPayload, formData, OTP_Response, POSPayload, ProductPayload } from "../types";
+import type { StockCardPayload } from "../types/stock";
 
 export const OTPdataForm:OTP_Response = {
     TempToken: '',
@@ -51,4 +52,8 @@ export const brandPayloadForm:BrandPayload = {
 
 export const categoriesPayloadForm:CategoriesPayload = {
     ProductCategoryName: '',
+}
+
+export const stockCardPayload:StockCardPayload = {
+    
 }

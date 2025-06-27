@@ -29,7 +29,7 @@ const pageOptionStore = usePageOptionStore();
 const toastStore = useToastStore();
 const myModalRef = ref<HTMLDialogElement | null>(null);
 const mode = ref(1);
-const form = ref(productPayloadForm);
+const form = ref({...productPayloadForm});
 const sortColumnOption = productSortColumnOption;
 const queryClient = useQueryClient();
   
@@ -162,7 +162,7 @@ const createProductMutation = useMutation<baseResponse<void>,AxiosError,ProductP
 });
 
 const handleSubmit = () => {
-  const {ProductCode , ProductName , ProductEnableDiscountAmount , ProductEnableDiscountPercent} = form.value;
+  const {ProductCode , ProductName} = form.value;
   if(!ProductCode || !ProductName) {
     return toastStore.showToast('กรอกข้อมูลให้ครบถ้วน','warning');
   }
@@ -378,7 +378,7 @@ watch(() => pageOptionStore.product.PageSize ,() => {
               {{ product.item.ProductBrand.ProductBrandName }}
             </template>
             <template #ProductStatus="product">
-              <select :value="product.item.ProductStatus.ProductStatusId" @change="e => handleSelecterUpdate('ProductStatusId', Number((e.target as HTMLSelectElement).value), product.item.ProductInfoId)" class="select select-bordered  min-w-[120px] rounded-lg bg-transparent border-0 outline-0 p-1 focus:bg-base-100">
+              <select :value="product.item.ProductStatus.ProductStatusId" @change="e => handleSelecterUpdate('ProductStatusId', Number((e.target as HTMLSelectElement).value), product.item.ProductInfoId)" class="select select-bordered  min-w-[120px] rounded-lg bg-transparent border-none shadow-none p-1 focus:bg-base-100">
                 <option v-for="(status,index) in productStatusList" :key="`status-${index}`" :value="status.ProductStatusId">{{ status.ProductStatusName }}</option>
               </select>
             </template>
@@ -389,7 +389,7 @@ watch(() => pageOptionStore.product.PageSize ,() => {
               {{ product.item.ProductCost }} ฿
             </template>
             <template #ProductTaxType="product">
-              <select :value="product.item.ProductTaxType.ProductTaxTypeId" @change="e => handleSelecterUpdate('ProductTaxTypeId', Number((e.target as HTMLSelectElement).value), product.item.ProductInfoId)" class="select select-bordered min-w-[120px] rounded-lg bg-transparent border-0 outline-0 p-1 focus:bg-base-100">
+              <select :value="product.item.ProductTaxType.ProductTaxTypeId" @change="e => handleSelecterUpdate('ProductTaxTypeId', Number((e.target as HTMLSelectElement).value), product.item.ProductInfoId)" class="select select-bordered min-w-[120px] rounded-lg bg-transparent border-none shadow-none p-1 focus:bg-base-100">
                 <option v-for="(status,index) in productTaxTypeList" :key="`status-${index}`" :value="status.ProductTaxTypeId">{{ status.ProductTaxTypeName }}</option>
               </select>
             </template>

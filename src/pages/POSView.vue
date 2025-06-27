@@ -26,7 +26,7 @@ const mode = ref<number>(1);
 const progressBarStore = useProgressBarStore();
 const queryClient = useQueryClient();
 const toastStore = useToastStore();
-const form = ref(posPayloadForm);
+const form = ref({...posPayloadForm});
 const pageOptionStore = usePageOptionStore();
 const sortColumnOption = posSortColumnOption;
 

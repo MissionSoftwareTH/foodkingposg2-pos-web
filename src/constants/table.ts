@@ -197,3 +197,11 @@ export const categoriesTableHeaders:HeadersTable[] = [
         type: 'actions',
     }
 ];
+
+export const stockTableHeaders:HeadersTable[] = [
+
+]
+
+export const stockCardTableHeaders:HeadersTable[] = [
+
+]

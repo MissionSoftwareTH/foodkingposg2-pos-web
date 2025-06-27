@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue';
 import Table from '../components/Table.vue';
 import type { baseResponse, BrandResponse , BrandTable, BrandPayload, Data } from '../types';
-import { IconFilter2, IconPlus, IconSortAscendingLetters, IconTrash } from '@tabler/icons-vue';
+import { IconEdit, IconFilter2, IconPlus, IconSortAscendingLetters, IconTrash } from '@tabler/icons-vue';
 import apiClient from '../services/api/apiService';
 import { AxiosError, type AxiosResponse } from 'axios';
 import { useDialogStore } from '../store/dialogStore';
@@ -21,10 +21,9 @@ const dialogStore = useDialogStore();
 const toastStore = useToastStore();
 const queryClient = useQueryClient();
 const progressBarStore = useProgressBarStore();
-const mode = ref<number>(1);
 const myModalRef = ref<HTMLDialogElement | null>(null);
-const form = ref(brandPayloadForm);
-const updateForm = ref(brandPayloadForm);
+const form = ref<BrandPayload>({...brandPayloadForm});
+const updateForm = ref<BrandPayload>({...brandPayloadForm});
 const headers = brandTableHeaders;
 const sortColumnOption = brandSortColumnOption;
 const pageOptionStore = usePageOptionStore();
@@ -38,7 +37,7 @@ const fetchBrandList = async (): Promise<BrandTable[]> => {
     };
     const apiUrl = '/dropdown/product/brand';
     const response:AxiosResponse<baseResponse<Data<BrandResponse[]>>> = await apiClient.get(apiUrl, {params});
-    const data:BrandTable[] = response.data.res_data.data || []
+    const data:BrandTable[] = response.data.res_data.data || [];
     return data;
 };
 
@@ -60,7 +59,6 @@ const createBrandMutation = useMutation<baseResponse<void>,AxiosError<baseRespon
         toastStore.showToast(data.res_message , 'success');
         queryClient.invalidateQueries({ queryKey: ['brandListAxios']});
         queryClient.invalidateQueries({ queryKey: ['brandList']});
-        //ล้างฟอร์ม
         closeModal();
     },
     onError: (error) => {
@@ -78,27 +76,11 @@ const createBrandMutation = useMutation<baseResponse<void>,AxiosError<baseRespon
 })
 
 const handleSubmit = () => {
-    const { BrandName , ProductBrandId } = form.value;
+    const { BrandName } = form.value;
     if(!BrandName) {
         return toastStore.showToast('ใส่ข้อมูลไม่ครบถ้วน' , 'warning');
     }
-    switch(mode.value) {
-    //create
-    case 1: {
-        
-        createBrandMutation.mutate(form.value);
-        return;
-    }
-    //update
-    case 2: {
-        if(!ProductBrandId) {
-        return toastStore.showToast('ใส่ข้อมูลไม่ครบถ้วน' , 'warning');
-        }
-        updateBrandMutation.mutate(form.value);
-        return; 
-    }
-    default: return;
-  }
+    createBrandMutation.mutate(form.value);
 }
 
 //update data
@@ -168,7 +150,6 @@ const handleTextInputUpdate = ( newValue: string ,productId:number) => {
         updateForm.value.ProductBrandId = productId;
         updateForm.value.BrandName = newValue;
     }
-    isInputUpdated.value = productId;
     console.log(isInputUpdated.value);
 };
 
@@ -223,9 +204,13 @@ watch(() => pageOptionStore.brand.PageSize ,() => {
             @page-changed="handleEmit"
         >
             <template #ProductBrandName="brand">
-                <div class="flex items-center">
-                    <input type="text" :value="brand.item.ProductBrandName" @input="e => handleTextInputUpdate(String((e.target as HTMLSelectElement).value),brand.item.ProductBrandId)">
-                    <button v-if="isInputUpdated === brand.item.ProductBrandId" @click="handleUpdateSubmit()" class="btn btn-primary btn-xs">Update</button>
+                <div class="flex items-center gap-2 w-fit">
+                    <input type="text" class="input input-ghost max-w-[150px] disabled:text-base-content disabled:bg-transparent disabled:border-none disabled:cursor-default" :disabled="isInputUpdated !== brand.item.ProductBrandId" :value="brand.item.ProductBrandName" @input="e => handleTextInputUpdate(String((e.target as HTMLSelectElement).value),brand.item.ProductBrandId)">
+                    <span v-if="isInputUpdated === brand.item.ProductBrandId" class="flex items-center gap-2">
+                        <button @click="handleUpdateSubmit()" class="btn btn-primary btn-sm">Update</button>
+                        <button @click="() => isInputUpdated = undefined" class="btn btn-error btn-sm">Close</button>
+                    </span>
+                    <button v-else class="btn btn-xs" @click="() => isInputUpdated = brand.item.ProductBrandId"><IconEdit class="size-4"/></button>
                 </div>
             </template>
             <template #actions>

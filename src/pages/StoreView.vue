@@ -18,7 +18,6 @@ import { SortOrderOption, storeSortColumnOption } from '../constants/page_option
 import { extractPageOption } from '../services/utils/dataExtract';
 import { usePageOptionStore } from '../store/sortingStore';
 import TitleBarCard from '../components/TitleBarCard.vue';
-import TestTable from '../components/TestTable.vue';
 
 const confirmStore = useConfirmDialogStore();
 const dialogStore = useDialogStore();
@@ -27,7 +26,7 @@ const queryClient = useQueryClient();
 const progressBarStore = useProgressBarStore();
 const mode = ref<number>(1);
 const myModalRef = ref<HTMLDialogElement | null>(null);
-const form = ref(storeForm);
+const form = ref({...storeForm});
 const headers = storeTableHeaders;
 const sortColumnOption = storeSortColumnOption;
 const pageOptionStore = usePageOptionStore();

@@ -13,7 +13,6 @@ const progress = ref(0);
 const disabled1 = ref(false);
 const progress2 = ref(0);
 
-
 const loadingMethod = () => {
     progressBarStore.loadingStart();
     setTimeout(() => {
@@ -49,9 +48,7 @@ onMounted(() => {
         progress2.value = 80;
     },200)
 })
-
 </script>
-
 <template>
     <div class="flex flex-col p-2">
         <h1 class="text-3xl font-semibold mb-4">Dashboard</h1>

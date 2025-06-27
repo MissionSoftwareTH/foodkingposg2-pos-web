@@ -50,6 +50,24 @@ export const categoriesPageOption:PageOption = {
     MerchantId: 1,
 }
 
+export const stockPageOption:PageOption = {
+    TotalRecords: 1,
+    PageSize: 5,
+    CurrentPage: 1,
+    SortOrder: 'desc',
+    SortColumn: '',
+    MerchantId: 1, 
+}
+
+export const stockCardPageOption:PageOption = {
+    TotalRecords: 1,
+    PageSize: 5,
+    CurrentPage: 1,
+    SortOrder: 'desc',
+    SortColumn: '',
+    MerchantId: 1, 
+}
+
 //sort column
 export const productSortColumnOption:Sort[] = [
   { title: 'Product Name', value: 'PRODUCTNAME' },
@@ -94,4 +112,12 @@ export const categoriesSortColumnOption: Sort[] = [
 export const brandSortColumnOption: Sort[] = [
   {title: 'Product Brand Id', value: 'ProductBrandId'},
   {title: 'Product Brand Name', value: 'ProductBrandName'}
+];
+
+export const stockSortColumnOption: Sort[] = [
+
+];
+
+export const stockCardSortColumnOption: Sort[] = [
+
 ];

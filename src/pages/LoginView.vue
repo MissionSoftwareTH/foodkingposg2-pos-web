@@ -17,8 +17,8 @@ const authCompleted = ref<boolean>(false);
 const isOTPTimerFinish = ref<boolean>(false);
 const isdelayOTPTimerFinish = ref<boolean>(false);
 const queryClient = useQueryClient();
-const OTPdata = ref(OTPdataForm);
-const form = ref(LoginForm)
+const OTPdata = ref({...OTPdataForm});
+const form = ref({...LoginForm})
 
 //verify identity login
 const handleSubmit = () => {
