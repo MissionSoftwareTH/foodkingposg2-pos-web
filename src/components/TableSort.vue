@@ -18,7 +18,7 @@ const handleEmitSubmit = (value:string) => {
 </script>
 <template>
     <div class="dropdown">
-        <button class="btn rounded-lg btn-sm p-2 btn-ghost ">
+        <button class="btn rounded-lg btn-sm p-2 btn-ghost uppercase">
             <slot name="icon"></slot>
         </button>
         <ul class="dropdown-content menu bg-base-100 shadow-lg rounded-lg gap-2">

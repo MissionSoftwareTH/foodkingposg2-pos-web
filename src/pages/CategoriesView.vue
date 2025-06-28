@@ -95,6 +95,7 @@ const updateCategoriesMutation = useMutation<baseResponse<void> , AxiosError<bas
     onSuccess: (data) => {
         toastStore.showToast(data.res_message , 'success');
         queryClient.invalidateQueries({queryKey: ['categoriesListAxios']});
+        queryClient.invalidateQueries({queryKey: ['productListAxios']});
         closeModal();
     },
     onError: (error) => {
