@@ -7,12 +7,13 @@ import SidebarMenu from './components/SidebarMenu.vue';
 import { IconLock, IconLockOpen } from '@tabler/icons-vue';
 import { useQuery } from '@tanstack/vue-query';
 import { fetchUserInfo } from '../../services/utils';
-import { computed } from 'vue';
+import { computed, toValue } from 'vue';
 
 // Explicitly type iconComponents with Record<IconName, any>
 const isLogin = localStorage.getItem('isLoggedIn');
 const router = useRouter();
 const appSetupStore = useAppSetupStore();
+const sourceMap = new Map();
 
 const {data: userData } = useQuery<User_Data>({
     queryKey: ['userInfo'],
@@ -24,6 +25,21 @@ const navLinks = computed(() => {
     if (!userData.value?.Permission) {
         return [];
     }
+    //
+    userData.value.Permission.forEach((item) => {
+        sourceMap.set(item.PermissionName , item.SubPermissions);
+    })
+    console.log(sourceMap)
+    router.getRoutes().forEach((route) => {
+        if(!sourceMap.has(route.name)) return;
+        const newItem = route;
+        const sourceChildren = sourceMap.get(route.name);
+        if(!route.children || route.children.length <= 0 || !sourceChildren) return;
+        const newChildren = [];
+        console.log(sourceChildren);
+    })
+    //
+
     return router.getRoutes().filter(route => {
         return route.name &&
                typeof route.name === 'string' &&
@@ -36,6 +52,21 @@ const navLinks = computed(() => {
         };
     });
 });
+
+const navLinks2 = computed(() => {
+    if(!userData.value?.Permission) return [];
+    userData.value.Permission.forEach((item) => {
+        sourceMap.set(item.PermissionName , item.SubPermissions);
+    })
+    console.log(sourceMap)
+    router.getRoutes().forEach((route) => {
+        if(!sourceMap.has(route.name)) return;
+        const sourceChildren = sourceMap.get(route.name);
+        console.log(sourceChildren);
+    })
+})
+
+
 
 const handleSidebarToggle = (value: boolean) => {
     appSetupStore.setSidebarExpand(value);

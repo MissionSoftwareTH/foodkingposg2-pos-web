@@ -54,7 +54,7 @@ watch(() => router.currentRoute.value.path, (newPath) => {
         <button
         @click="handleToggle"
         :class="isExpanded ? `text-primary-content stroke-primary-content bg-primary` : ``"
-        class=" collapse-title flex items-center px-2 py-2 bg-base-100 rounded-xl hover:bg-primary/80 hover:text-primary-content hover:stroke-primary-content transition-all duration-500 ease-in-out">
+        class="collapse-title flex items-center px-2 py-2 bg-base-100 rounded-xl hover:bg-primary/80 hover:text-primary-content hover:stroke-primary-content transition-all duration-500 ease-in-out">
         <component 
         v-if="item?.meta?.icon && iconComponents[item.meta.icon]" 
         :is="iconComponents[item.meta.icon]"

@@ -30,7 +30,6 @@ export const productPayloadForm:ProductPayload = {
     ProductStatusId: undefined,
     ProductCategoryId: undefined,
     ProductPrice: 0,
-    ProductCost: 0,
     ProductBarcode: '',
     ProductTaxTypeId: undefined,
     ProductEnableDiscountPercent: 0,

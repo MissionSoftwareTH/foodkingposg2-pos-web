@@ -7,7 +7,6 @@ export interface ProductPayload {
     ProductStatusId?: number | undefined;
     ProductCategoryId?: number | undefined;
     ProductPrice?: number;
-    ProductCost?: number;
     ProductBarcode?: string;
     ProductTaxTypeId?: number | undefined;
     ProductEnableDiscountPercent?: 0 | 1;
@@ -24,7 +23,6 @@ export interface ProductResponse {
     ProductBarcode?: string;
     ProductDescription?: string;
     ProductPrice?: number; 
-    ProductCost?: number; 
     ProductImagePath?: string | null; 
     ProductDiscountPercent?: number | null;
     ProductEnableDiscountPercent?: number | null;
@@ -43,7 +41,6 @@ export interface ProductTable {
     ProductStatus: ProductStatus | null;
     ProductBrand: ProductBrand | null; 
     ProductPrice: number; 
-    ProductCost: number ; 
     ProductDiscountPercent: ProductDiscountType;
     ProductDiscountAmount: ProductDiscountType;
     ProductBarcode: string;

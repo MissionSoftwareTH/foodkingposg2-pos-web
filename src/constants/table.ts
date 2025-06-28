@@ -66,11 +66,6 @@ export const productTableHeaders:HeadersTable[] = [
         type: 'custom',
     },
     {
-        key: 'ProductCost',
-        title: 'Cost',
-        type: 'custom',
-    },
-    {
         key: 'ProductTaxType',
         title: 'Vat Type',
         type: 'custom',

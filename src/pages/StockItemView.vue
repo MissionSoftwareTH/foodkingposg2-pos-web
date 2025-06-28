@@ -64,7 +64,6 @@ const fetchProduct = async ():Promise<ProductTable[]> => {
             ProductBrandName: product.ProductBrand?.ProductBrandName || 'not availiable'
           },
           ProductPrice: product.ProductPrice || 0,
-          ProductCost: product.ProductCost || 0,
           ProductTaxType:{
             ProductTaxTypeId: product.ProductTaxType?.ProductTaxTypeId || null,
             ProductTaxTypeName: product.ProductTaxType?.ProductTaxTypeName || 'not availiable',
@@ -246,7 +245,6 @@ const openModal = (data?:ProductTable) => {
       ProductStatusId: data.ProductStatus?.ProductStatusId || undefined,
       ProductCategoryId: data.ProductInfo.ProductCategory?.ProductCategoryId || undefined,
       ProductPrice: data.ProductPrice,
-      ProductCost: data.ProductCost,
       ProductBarcode: data.ProductBarcode,
       ProductTaxTypeId: data.ProductTaxType.ProductTaxTypeId || undefined,
       ProductEnableDiscountPercent: data.ProductDiscountPercent.ProductEnableDiscount === true ? 1 : 0,
@@ -385,10 +383,7 @@ watch(() => pageOptionStore.product.PageSize ,() => {
             <template #ProductPrice="product">
               {{ product.item.ProductPrice }} ฿
             </template>
-            <template #ProductCost="product">
-              {{ product.item.ProductCost }} ฿
-            </template>
-            <template #ProductTaxType="product">
+             <template #ProductTaxType="product">
               <select :value="product.item.ProductTaxType.ProductTaxTypeId" @change="e => handleSelecterUpdate('ProductTaxTypeId', Number((e.target as HTMLSelectElement).value), product.item.ProductInfoId)" class="select select-bordered min-w-[120px] rounded-lg bg-transparent border-0 outline-0 p-1 focus:bg-base-100">
                 <option v-for="(status,index) in productTaxTypeList" :key="`status-${index}`" :value="status.ProductTaxTypeId">{{ status.ProductTaxTypeName }}</option>
               </select>
@@ -520,12 +515,6 @@ watch(() => pageOptionStore.product.PageSize ,() => {
                       <span class="label-text">Product Price</span>
                     </div>
                     <CurrencyInput v-model="form.ProductPrice"/>
-                  </label>
-                  <label class="form-control w-full">
-                    <div class="label">
-                      <span class="label-text">Product Cost</span>
-                    </div>
-                    <CurrencyInput v-model="form.ProductCost"/>
                   </label>
                 </div>
 

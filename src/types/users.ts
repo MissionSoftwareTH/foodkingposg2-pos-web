@@ -16,4 +16,11 @@ export interface getAbility {
 export interface getPermission {
     PermissionName: string;
     PermissionDescription: string;
+    SubPermissions: getSubPermission[];
+}
+
+export interface getSubPermission {
+    SubPermissionId: number;
+    SubPermissionName: string;
+    SubPermissionDescription: string;
 }
