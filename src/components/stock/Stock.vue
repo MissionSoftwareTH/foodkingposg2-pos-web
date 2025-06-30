@@ -14,10 +14,10 @@ import { extractPageOption } from '../../services/utils/dataExtract';
 import { IconEye, IconFilter2, IconSortAscendingLetters } from '@tabler/icons-vue';
 
 const emit = defineEmits<{
-  (e: 'selectStock', selected: StockCardTable): void;
+  (e: 'selectStock', selected: StockTable): void;
 }>();
 
-const handleEmit = (emitValue:StockCardTable) => {
+const handleEmit = (emitValue:StockTable) => {
     emit('selectStock', emitValue);
 }
 
@@ -28,14 +28,19 @@ const sortColumnOption = stockSortColumnOption;
 
 //fetch stock
 const fetchStock = async ():Promise<StockTable[]> => {
-        const apiUrl = '/product/list';
+        const apiUrl = '/product/inventory/list';
         const {SortColumn , SortOrder} = pageOptionStore.stock;
         const params = {
           SortColumn ,SortOrder , PageSize:pageOptionStore.stock.PageSize , Page: pageOptionStore.stock.CurrentPage,
         }
         const res:AxiosResponse<baseResponse<DataBaseResponse<StockResponse[]>>> = await apiClient.get(apiUrl , {params} );
-        const stockList:StockTable[] = res.data.res_data.ConstructData;
+        const stockList:StockTable[] = res.data.res_data.ConstructData?.map((item) => ({
+            ProductName: item.ProductName,
+            BranchName: item.BranchName,
+            CurrectStock: item.CurrectStock,
+        })) || [];
         pageOptionStore.stock = extractPageOption(res.data.res_data , pageOptionStore.stock);
+        console.log(res.data.res_data.ConstructData)
         return stockList;
 }
 

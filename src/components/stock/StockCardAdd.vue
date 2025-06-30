@@ -1,14 +1,115 @@
 <script lang="ts" setup>
+import { ref } from 'vue';
+import { stockCardPayload } from '../../constants/form';
+import apiClient from '../../services/api/apiService';
+import type { baseResponse, BranchList, Data } from '../../types';
+import type { AxiosError, AxiosResponse } from 'axios';
+import { useQuery } from '@tanstack/vue-query';
+import { IconPlus, IconX } from '@tabler/icons-vue';
+import type { StockCardPayloadData } from '../../types/stock';
+
+
+defineProps({
+  isOpen: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const myModalRef = ref<HTMLDialogElement | null>(null);
+
+const form = ref({...stockCardPayload});
+const productForm = ref<StockCardPayloadData>({
+  NumberOfProduct: 0,
+  ProductInfoId: 0,
+  ProductCost: 0
+});
+
+const resetForm = () => {
+  form.value = {...stockCardPayload};
+}
+
+const CloseModal = () => {
+  myModalRef.value?.close();
+  resetForm();
+}
+
+const handleSubmit = () => {
+  console.log('submitted');
+}  
+
+// const fetchProductList = async () => {
+//   const apiUrl = '/product/status/list';
+//   const res = await apiClient.get(apiUrl);
+// }
+
+// fetch BranchList
+const fetchBranchList = async ():Promise<BranchList[]> => {
+    const apiUrl = '/dropdown/branchs';
+    const params = {
+      MerchantId: 1
+    };
+    const res:AxiosResponse<baseResponse<Data<BranchList[]>>> = await apiClient.get(apiUrl , {params});
+    return res.data.res_data.data;
+}
+
+const {data: branchList , isPending: isBranchPending } = useQuery<BranchList[] ,AxiosError<baseResponse<void>>>({
+  queryKey: ['branchList'],
+  queryFn: fetchBranchList,
+})
+
 
 </script>
 <template>
     <dialog ref="myModalRef" className="modal">
-        <div className="modal-box min-w-1/2">
-            <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal"><IconX class="text-error-content"/></button>
-            <h3 v-if="mode === 1" className="font-semibold text-xl">Add New Product</h3>
-            <h3 v-else-if="mode === 2" className="font-semibold text-xl">Update Product</h3>
+        <div className="modal-box min-w-2/3">
+            <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="CloseModal"><IconX class="text-error-content"/></button>
             <div className="modal-action">
-              <form @submit.prevent="handleSubmit()" class="text-base mx-auto">
+              <form @submit.prevent="handleSubmit" class="text-base mx-auto">
+                <div class="flex justify-between items-start mb-4">
+                  <h3 className="font-semibold text-xl">Add New Product</h3>
+                  <button class="btn btn-info btn-sm">Submit</button>
+                </div>
+                <div class="flex items-end gap-4">
+                  <label class="form-control w-full">
+                    <div class="label">
+                      <span class="label-text">Product</span>
+                    </div>
+                    <select class="select select-bordered w-full rounded-lg">
+                      <option :value="undefined" disabled ><span v-if="isBranchPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
+                      <option v-for="(b,index) in branchList" :key="`product-${index}`" :value="b.BranchId">{{ b.BranchName }}</option>
+                    </select>
+                  </label>
+                  <label class="form-control w-full">
+                    <div class="label">
+                      <span class="label-text">Branch</span>
+                    </div>
+                    <select class="select select-bordered w-full rounded-lg">
+                      <option :value="undefined" disabled ><span v-if="isBranchPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
+                      <option v-for="(b,index) in branchList" :key="`product-${index}`" :value="b.BranchId">{{ b.BranchName }}</option>
+                    </select>
+                  </label>
+                  <label class="form-control w-full">
+                    <div class="label">
+                      <span class="label-text">Amount</span>
+                      <!-- <span class="label-text text-error">*</span> -->
+                    </div>                  
+                    <input type="number" v-model="productForm.NumberOfProduct" class="input text-center appearance-none">
+                  </label>
+                  <button class="btn btn-success"><IconPlus/></button>
+                </div>
+                <!-- <div class="form-control w-full mb-6 flex flex-col">
+                  <div class="label">
+                    <span class="label-text">Product Description</span>
+                  </div>
+                  <textarea
+                    v-model="form."
+                    class="textarea textarea-bordered h-24 w-full rounded-lg"
+                    placeholder="Enter product ProductDescription here..."
+                  ></textarea>
+                </div> -->
+              </form>
+              <!-- <form @submit.prevent="handleSubmit" class="text-base mx-auto">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <label class="form-control w-full">
                     <div class="label">
@@ -162,8 +263,9 @@
                 <div class="flex justify-center">
                   <button type="submit" class="btn btn-primary px-8" :disabled="createProductMutation.isPending.value || updateProductMutation.isPending.value">Submit<span v-if="createProductMutation.isPending.value || updateProductMutation.isPending.value" className="loading loading-spinner loading-xs ml-2"></span></button>
                 </div>
-              </form>
+              </form> -->
             </div>
         </div>
     </dialog>
+    <button class="modal-button btn btn-soft btn-primary" @click="myModalRef?.showModal()">open</button>
 </template>

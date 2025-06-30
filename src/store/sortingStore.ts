@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { brandPageOption, categoriesPageOption, posPageOption, productPageOption, stockPageOption, storePageOption } from '../constants/page_option';
+import { brandPageOption, categoriesPageOption, posPageOption, productPageOption, stockCardPageOption, stockPageOption, storePageOption } from '../constants/page_option';
 
 export const usePageOptionStore = defineStore('page-option', () => {
     //page option
@@ -8,6 +8,7 @@ export const usePageOptionStore = defineStore('page-option', () => {
     const product = ref(productPageOption);
     const store = ref(storePageOption);
     const stock = ref(stockPageOption);
+    const stockCard = ref(stockCardPageOption);
     const brand = ref(brandPageOption);
     const categories = ref(categoriesPageOption);
 
@@ -17,6 +18,7 @@ export const usePageOptionStore = defineStore('page-option', () => {
         product,
         store,
         stock,
+        stockCard,
         brand,
         categories,
 

@@ -203,7 +203,7 @@ export const stockTableHeaders:HeadersTable[] = [
         title: 'Branch Name',
     },
     {
-        key: 'InStock',
+        key: 'CurrectStock',
         title: 'In Stock',
     },
     {
