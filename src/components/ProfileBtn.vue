@@ -1,3 +1,37 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+import { RouterLink } from 'vue-router';
+import { onMounted, onUnmounted } from 'vue';
+import { IconLogout, IconSettings } from '@tabler/icons-vue';
+import { fetchUserInfo, logout } from '../services/utils';
+import { useQuery } from '@tanstack/vue-query';
+import type { User_Data } from '../types';
+
+const isOpen = ref<boolean>(false);
+const isLogin = localStorage.getItem('isLoggedIn');
+
+const {data: userData , isPending , isError} = useQuery<User_Data>({
+    queryKey: ['userInfo'],
+    queryFn: fetchUserInfo,
+    enabled: !!isLogin,
+})
+
+onMounted(() => {
+    document.addEventListener('click', handleOutsideClick);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('click', handleOutsideClick);
+});
+
+const handleOutsideClick = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    const button = document.getElementById('menu-button');
+    if (isOpen.value && button && !button.contains(target) ) {
+        isOpen.value = false;
+    }
+};
+</script>
 <template>
     <div v-if="isLogin" class="relative inline-block text-left">
         <div class=" loading loading-spinner size-12 p-2" v-if="isPending"></div>
@@ -35,38 +69,3 @@
         </div>
     </div>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue';
-import { RouterLink } from 'vue-router';
-import { onMounted, onUnmounted } from 'vue';
-import { IconLogout, IconSettings } from '@tabler/icons-vue';
-import { fetchUserInfo, logout } from '../services/utils';
-import { useQuery } from '@tanstack/vue-query';
-import type { User_Data } from '../types';
-
-const isOpen = ref<boolean>(false);
-const isLogin = localStorage.getItem('isLoggedIn');
-
-const {data: userData , isPending , isError} = useQuery<User_Data>({
-    queryKey: ['userInfo'],
-    queryFn: fetchUserInfo,
-    enabled: !!isLogin,
-})
-
-onMounted(() => {
-    document.addEventListener('click', handleOutsideClick);
-});
-
-onUnmounted(() => {
-    document.removeEventListener('click', handleOutsideClick);
-});
-
-const handleOutsideClick = (event: MouseEvent) => {
-    const target = event.target as HTMLElement;
-    const button = document.getElementById('menu-button');
-    if (isOpen.value && button && !button.contains(target) ) {
-        isOpen.value = false;
-    }
-};
-</script>

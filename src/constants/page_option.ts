@@ -115,9 +115,12 @@ export const brandSortColumnOption: Sort[] = [
 ];
 
 export const stockSortColumnOption: Sort[] = [
-
+  { title: 'Product Name', value: 'ProductName' },
+  { title: 'Branch Name', value: 'BranchName' },
+  { title: 'In Stock', value: 'InStock' },
+  { title: 'Status', value: 'Status' },
 ];
 
 export const stockCardSortColumnOption: Sort[] = [
-
+ 
 ];

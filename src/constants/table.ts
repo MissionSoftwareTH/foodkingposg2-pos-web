@@ -194,9 +194,85 @@ export const categoriesTableHeaders:HeadersTable[] = [
 ];
 
 export const stockTableHeaders:HeadersTable[] = [
-
+    {
+        key: 'ProductName',
+        title: 'Product Name',
+    },
+    {
+        key: 'BranchName',
+        title: 'Branch Name',
+    },
+    {
+        key: 'InStock',
+        title: 'In Stock',
+    },
+    {
+        key: 'Status',
+        title: 'Status',
+    },
+    {
+        key: 'actions',
+        title: 'Actions',
+        type: 'actions',
+    }
 ]
 
 export const stockCardTableHeaders:HeadersTable[] = [
-
+    {
+        key: 'StockCardId',
+        title: 'Stock Card Id',
+    },
+    {
+        key: 'ProductName',
+        title: 'Product Name',
+    },
+    {
+        key: 'BranchName',
+        title: 'Branch Name',
+    },
+    {
+        key: 'Status',
+        title: 'Status',
+    },
+    {
+        key: 'InStock',
+        title: 'In Stock',
+    },
+    {
+        key: 'Type',
+        title: 'Type',
+    },
+    {
+        key: 'Amount',
+        title: 'Amount',
+    },
+    {
+        key: 'DateRecorded',
+        title: 'Date Recorded',
+    },
+    {
+        key: 'Cost',
+        title: 'Cost',
+    },
+    {
+        key: 'Price',
+        title: 'Price',
+    },
+    {
+        key: 'Vat',
+        title: 'Vat',
+    },
+    {
+        key: 'VatType',
+        title: 'Vat Type',
+    },
+    {
+        key: 'Note',
+        title: 'Note',
+    },
+    {
+        key: 'actions',
+        title: 'Actions',
+        type: 'actions',
+    }
 ]

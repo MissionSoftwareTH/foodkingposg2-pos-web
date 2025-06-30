@@ -23,7 +23,7 @@ const handleEmitSubmit = (value:string) => {
         </button>
         <ul class="dropdown-content menu bg-base-100 shadow-lg rounded-lg gap-2">
             <li v-for="item in sortItem" :key="item.value">
-                <input type="radio" name="product_filter" id="" :value="item.value" :aria-label="item.title" @click="handleEmitSubmit(item.value)" class="btn btn-sm text-nowrap rounded-lg">
+                <input type="radio" name="product_filter" id="" :value="item.value" :aria-label="item.title" @click="handleEmitSubmit(item.value)" class="btn btn-sm text-nowrap rounded-lg p-2 btn-ghost uppercase" />
             </li>
         </ul>
     </div>
