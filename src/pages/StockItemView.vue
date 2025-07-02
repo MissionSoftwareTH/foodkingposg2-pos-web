@@ -6,12 +6,26 @@ import StockCard from '../components/stock/StockCard.vue';
 import type { StockTable } from '../types/stock';
 import { usePageOptionStore } from '../store/sortingStore';
 import StockCardAdd from '../components/stock/StockCardAdd.vue';
+import { useQueryClient } from '@tanstack/vue-query';
 
 const isSelected = ref(false);
+interface Props {
+  ProductInfoId?: number;
+  BranchId?: number;
+}
+const defaultStockCardData = {
+  ProductInfoId: undefined,
+  BranchId: undefined
+} as Props;
+
+const queryClient = useQueryClient();
+const stockCardData = ref<Props>({...defaultStockCardData});
 const pageOptionStore = usePageOptionStore();
 const handleSelectedEmit = (value:StockTable) => {
   isSelected.value = true;
-  console.log(value);
+  stockCardData.value.BranchId = value.BranchInfo.BranchId;
+  stockCardData.value.ProductInfoId = value.ProductInfo.ProductInfoId;
+  queryClient.invalidateQueries({ queryKey: ['stockCardListAxios'] });
 }
 
 </script>
@@ -24,10 +38,11 @@ const handleSelectedEmit = (value:StockTable) => {
            <button v-if="isSelected" class="btn btn-soft btn-primary" @click="isSelected = false">
               Back to Stock
            </button>
+           <div class="w-full"></div>
+           <StockCardAdd />
         </div>
     </div>
     <Stock @select-stock="handleSelectedEmit" v-if="!isSelected"/>
-    <StockCard v-else />
-    <StockCardAdd />
+    <StockCard v-else :product-id="stockCardData?.ProductInfoId" :BranchId="stockCardData?.BranchId" />
 </div>
 </template>

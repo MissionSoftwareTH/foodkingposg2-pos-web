@@ -13,9 +13,11 @@ import POSView from '../pages/POSView.vue';
 import StoreView from '../pages/StoreView.vue';
 import BrandView from '../pages/BrandView.vue';
 import CategoriesView from '../pages/CategoriesView.vue';
+import PermissionView from '../pages/PermissionView.vue';
+
 
 // Define a Union Type for the specific icon names you use
-export type IconName = 'Dashboard' | 'Management' | 'Store Management' | 'Admin Management' | 'Activity logs' | 'Product Management' | 'POS Management' | 'Stock Management' | 'Categories Management' | 'Brand Management' | 'non_icon'; // Add all valid icon keys here!
+export type IconName = 'Dashboard' | 'Management' | 'Store Management' | 'Admin Management' | 'Activity logs' | 'Product Management' | 'POS Management' | 'Stock Management' | 'Categories Management' | 'Brand Management' | 'Permission' |'non_icon'; // Add all valid icon keys here!
 // Make sure this matches the keys in your iconComponents object in the sidebar component.
 
 export const routes: AppRouteRecordRaw[] = [
@@ -33,10 +35,11 @@ export const routes: AppRouteRecordRaw[] = [
         {name: 'Product Management' ,path: '/management/product' , component: ProductView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Product Management' } },
         {name: 'Stock Management' ,path: '/management/stock' , component: StockItemView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Stock Management' } },
         {name: 'POS Management' ,path: '/management/pos' , component: POSView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'POS Management' } },
-        {name: 'Categories Management' ,path: '/management/categories' , component: CategoriesView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Categories Management' } },
+        {name: 'Category Management' ,path: '/management/categories' , component: CategoriesView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Categories Management' } },
         {name: 'Brand Management' ,path: '/management/brand' , component: BrandView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Brand Management' } },
     ] },
     { name: 'Admin Management', path: '/admins', component: AdminManageView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Admin Management' } },
+    { name: 'Permission', path: '/permission', component: PermissionView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Permission' } },
     { name: 'Activity Logs', path: '/activitylogs', component: ActivityLogView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Activity logs' } },
 
 ]

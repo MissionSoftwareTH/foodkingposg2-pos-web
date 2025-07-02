@@ -112,8 +112,6 @@ const updateCategoriesMutation = useMutation<baseResponse<void> , AxiosError<bas
     }
 })
 
-
-
 const closeModal = () => {
   myModalRef.value?.close();
   resetForm();

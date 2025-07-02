@@ -1,13 +1,15 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { stockCardPayload } from '../../constants/form';
+import { stockCardPayload, StockCardPayloadDataForm } from '../../constants/form';
 import apiClient from '../../services/api/apiService';
-import type { baseResponse, BranchList, Data } from '../../types';
+import type { baseResponse, BranchList, Data, ProductList } from '../../types';
 import type { AxiosError, AxiosResponse } from 'axios';
-import { useQuery } from '@tanstack/vue-query';
-import { IconPlus, IconX } from '@tabler/icons-vue';
-import type { StockCardPayloadData } from '../../types/stock';
-
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { IconPlus, IconTrash, IconX } from '@tabler/icons-vue';
+import type { StockCardPayload, StockCardPayloadData } from '../../types/stock';
+import { useDialogStore } from '../../store/dialogStore';
+import { useProgressBarStore } from '../../store/progressBarStore';
+import { useToastStore } from '../../store/toastStore';
 
 defineProps({
   isOpen: {
@@ -17,16 +19,16 @@ defineProps({
 })
 
 const myModalRef = ref<HTMLDialogElement | null>(null);
-
+const dialogStore = useDialogStore();
+const progress = useProgressBarStore();
+const toast = useToastStore();
 const form = ref({...stockCardPayload});
-const productForm = ref<StockCardPayloadData>({
-  NumberOfProduct: 0,
-  ProductInfoId: 0,
-  ProductCost: 0
-});
+const productForm = ref({...StockCardPayloadDataForm});
+const queryClient = useQueryClient();
 
 const resetForm = () => {
   form.value = {...stockCardPayload};
+  addList.value = [];
 }
 
 const CloseModal = () => {
@@ -36,14 +38,41 @@ const CloseModal = () => {
 
 const handleSubmit = () => {
   console.log('submitted');
-}  
+  console.log(addList.value);
+  console.log('form',form.value)
+  handleCreateStockCard();
+}
 
-// const fetchProductList = async () => {
-//   const apiUrl = '/product/status/list';
-//   const res = await apiClient.get(apiUrl);
-// }
+interface addList {
+  id: number;
+  data: StockCardPayloadData;
+}
+const addList = ref<addList[]>([]);
+const handleAddItem = () => {
+  addList.value.push({
+    id: addList.value.length + 1,
+    data: {...productForm.value}
+  });
+  productForm.value = {...StockCardPayloadDataForm};
+}
 
-// fetch BranchList
+const handleremoveThisItem = (index: number) => {
+  addList.value.splice(index, 1);
+}
+
+// fetch Product List
+const fetchProductList = async ():Promise<ProductList[]> => {
+  const apiUrl = '/dropdown/products';
+  const res:AxiosResponse<baseResponse<Data<ProductList[]>>> = await apiClient.get(apiUrl);
+  return res.data.res_data.data
+}
+
+const {data: productList , isPending: isProductPending } = useQuery<ProductList[] ,AxiosError<baseResponse<void>>>({
+  queryKey: ['productList'],
+  queryFn: fetchProductList,
+})
+
+// fetch Branch List
 const fetchBranchList = async ():Promise<BranchList[]> => {
     const apiUrl = '/dropdown/branchs';
     const params = {
@@ -58,214 +87,141 @@ const {data: branchList , isPending: isBranchPending } = useQuery<BranchList[] ,
   queryFn: fetchBranchList,
 })
 
+// handle create stock card
+const handleCreateStockCard = async () => {
+  if (!form.value.BranchId) {
+    toast.showToast('ไม่ได้เลือกสาขาง', 'warning');
+    return;
+  }
+  if (addList.value.length === 0) {
+    toast.showToast('ไม่มีข้อมูลที่จะส่ง', 'warning');
+    return;
+  }
+
+  const payload: StockCardPayload = {
+    AdminRoleId: 1,
+    BranchId: form.value.BranchId,
+    data: addList.value.map(item => item.data)
+  };
+
+  createStockCardMutation.mutate(payload);
+}
+
+// create Stock Card
+const createStockCard = async (payload:StockCardPayload) => {
+  const apiUrl = 'product/incoming/insert';
+  const res:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl, payload);
+  return res.data;
+}
+
+const createStockCardMutation = useMutation<baseResponse<void> ,AxiosError<baseResponse<void>>, StockCardPayload >({
+  mutationFn: createStockCard,
+  onSuccess: (data) => {
+    dialogStore.openDialog( data?.res_message || 'unknown response' , { status: 'success' });
+    queryClient.invalidateQueries({ queryKey: ['stockListAxios'] });
+    queryClient.invalidateQueries({ queryKey: ['stockCardListAxios'] });
+    CloseModal();
+  },
+  onError: (error) => {
+    console.error('Error creating stock card:', error);
+    dialogStore.openDialog( error.response?.data.res_message || error.message , { status: 'error' });
+  },
+  onMutate: () => {
+    progress.loadingStart();
+  },
+  onSettled: () => {
+    progress.loadingStop();
+  }
+});
 
 </script>
 <template>
     <dialog ref="myModalRef" className="modal">
-        <div className="modal-box min-w-2/3">
+        <div className="modal-box min-w-2/3 overflow-hidden max-h-9/10">
             <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="CloseModal"><IconX class="text-error-content"/></button>
             <div className="modal-action">
-              <form @submit.prevent="handleSubmit" class="text-base mx-auto">
-                <div class="flex justify-between items-start mb-4">
-                  <h3 className="font-semibold text-xl">Add New Product</h3>
+              <form @submit.prevent="handleSubmit" class="text-base mx-auto w-full p-4">
+                <div class="flex items-start mb-4 ">
+                  <h3 className="font-semibold text-2xl text-nowrap">Add Stock</h3>
+                  <div class="w-full"></div>
+                  <div class="flex gap-2 items-center">
+                    <span class="label-text">Branch</span>
+                    <select class="select select-bordered select-sm max-w-xs min-w-[150px] rounded-lg mx-2" v-model="form.BranchId">
+                      <option :value="undefined" disabled ><span v-if="isBranchPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
+                      <option v-for="(b,index) in branchList" :key="`product-${index}`" :value="b.BranchId">{{ b.BranchName }}</option>
+                    </select>
+                  </div>
                   <button class="btn btn-info btn-sm">Submit</button>
                 </div>
-                <div class="flex items-end gap-4">
-                  <label class="form-control w-full">
-                    <div class="label">
-                      <span class="label-text">Product</span>
-                    </div>
-                    <select class="select select-bordered w-full rounded-lg">
-                      <option :value="undefined" disabled ><span v-if="isBranchPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
-                      <option v-for="(b,index) in branchList" :key="`product-${index}`" :value="b.BranchId">{{ b.BranchName }}</option>
-                    </select>
-                  </label>
-                  <label class="form-control w-full">
-                    <div class="label">
-                      <span class="label-text">Branch</span>
-                    </div>
-                    <select class="select select-bordered w-full rounded-lg">
-                      <option :value="undefined" disabled ><span v-if="isBranchPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
-                      <option v-for="(b,index) in branchList" :key="`product-${index}`" :value="b.BranchId">{{ b.BranchName }}</option>
-                    </select>
-                  </label>
-                  <label class="form-control w-full">
-                    <div class="label">
-                      <span class="label-text">Amount</span>
-                      <!-- <span class="label-text text-error">*</span> -->
-                    </div>                  
-                    <input type="number" v-model="productForm.NumberOfProduct" class="input text-center appearance-none">
-                  </label>
-                  <button class="btn btn-success"><IconPlus/></button>
-                </div>
-                <!-- <div class="form-control w-full mb-6 flex flex-col">
-                  <div class="label">
-                    <span class="label-text">Product Description</span>
+                <div class="border-2 p-6 rounded-box mb-4">
+                  <div class="flex items-end gap-4 ">
+                    <label class="form-control w-full">
+                      <div class="label">
+                        <span class="label-text">Product</span>
+                      </div>
+                      <select class="select select-bordered w-full rounded-lg" v-model="productForm.ProductInfoId">
+                        <option :value="undefined" disabled ><span v-if="isBranchPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
+                        <option v-for="(p,index) in productList" :key="`product-${index}`" :value="p.ProductInfoId">{{ p.ProductName }}</option>
+                      </select>
+                    </label>
+                    <label class="form-control w-full">
+                      <div class="label">
+                        <span class="label-text">Amount</span>
+                        <!-- <span class="label-text text-error">*</span> -->
+                      </div>                  
+                      <input type="number" v-model="productForm.NumberOfProducts" class="input appearance-none">
+                    </label>
+                    <label class="form-control w-full">
+                      <div class="label">
+                        <span class="label-text">Cost</span>
+                        <!-- <span class="label-text text-error">*</span> -->
+                      </div>                  
+                      <input type="number" v-model="productForm.ProductCost" class="input appearance-none">
+                    </label>
+                    <button type="button" class="btn btn-success" @click="handleAddItem"><IconPlus/></button>
                   </div>
-                  <textarea
-                    v-model="form."
-                    class="textarea textarea-bordered h-24 w-full rounded-lg"
-                    placeholder="Enter product ProductDescription here..."
-                  ></textarea>
-                </div> -->
+                  <!-- <div class="form-control w-full mb-6 flex flex-col">
+                    <div class="label">
+                      <span class="label-text">Product Description</span>
+                    </div>
+                    <textarea
+                      v-model="form."
+                      class="textarea textarea-bordered h-24 w-full rounded-lg"
+                      placeholder="Enter product ProductDescription here..."
+                    ></textarea>
+                  </div> -->
+                </div>
+                <div v-if="addList && addList.length > 0" class="w-full overflow-y-auto max-h-[400px]">
+                  <div v-for="(list, index) in addList" :key="list.data.ProductInfoId" class="flex items-end gap-4 p-4 rounded-box bg-base-300 mb-4 shadow-lg">
+                    <div class="flex items-end gap-4 w-full">
+                      <label class="form-control w-full">
+                        <div class="label">
+                          <span class="label-text">Product</span>
+                        </div>
+                        <select class="select select-bordered w-full rounded-lg " v-model="list.data.ProductInfoId">
+                          <option :value="undefined" disabled ><span v-if="isBranchPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
+                          <option v-for="(p,index) in productList" :key="`product-${index}`" :value="p.ProductInfoId">{{ p.ProductName }}</option>
+                        </select>
+                      </label>
+                      <label class="form-control w-full">
+                        <div class="label">
+                          <span class="label-text">Amount</span>
+                        </div>
+                        <input type="number" v-model="list.data.NumberOfProducts" class="input appearance-none ">
+                      </label>
+                      <label class="form-control w-full">
+                        <div class="label">
+                          <span class="label-text">Cost</span>
+                        </div>
+                        <input type="number" v-model="list.data.ProductCost" class="input appearance-none ">
+                      </label>
+                    <button type="button" class="btn btn-error btn-sm" @click="handleremoveThisItem(index)"><IconTrash/></button>
+                  </div>
+                  </div>
+                </div>
               </form>
-              <!-- <form @submit.prevent="handleSubmit" class="text-base mx-auto">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <label class="form-control w-full">
-                    <div class="label">
-                      <span class="label-text">Product Code</span>
-                      <span class="label-text text-error">*</span>
-                    </div>
-                    <input
-                      type="text"
-                      required
-                      v-model="form.ProductCode"
-                      placeholder="e.g., P001"
-                      class="input input-bordered w-full validator rounded-lg"
-                    />
-                  </label>
-                  <label class="form-control w-full">
-                    <div class="label">
-                      <span class="label-text">Product Name</span>
-                      <span class="label-text text-error">*</span>
-                    </div>
-                    <input
-                      type="text"
-                      required
-                      v-model="form.ProductName"
-                      placeholder="e.g., Fried Chicken"
-                      class="input input-bordered w-full validator rounded-lg"
-                    />
-                  </label>
-                </div>
-
-                <div class="form-control w-full mb-4">
-                  <div class="label">
-                    <span class="label-text">Product Image</span>
-                  </div>
-                  <input
-                    type="file"
-                    @change="handleImageUpload"
-                    class="file-input file-input-bordered w-full"
-                    accept="image/*"
-                  />
-                  <div v-if="form.ProductImagePath" class="text-base text-gray-500 mt-2">
-                    Selected: {{ form.ProductImagePath }}
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                  <label class="form-control w-full">
-                    <div class="label">
-                      <span class="label-text">Brand</span>
-                    </div>
-                    <select v-model="form.ProductBrandId" class="select select-bordered w-full rounded-lg">
-                      <option :value="undefined" disabled ><span v-if="isBrandPending" class=" loading-spinner"></span><span v-else>Select Brand</span></option>
-                      <option v-for="(brand,index) in brandList" :key="`brand-${index}`" :value="brand.ProductBrandId">{{ brand.ProductBrandName }}</option>
-                    </select>
-                  </label>
-
-                  <label class="form-control w-full">
-                    <div class="label">
-                      <span class="label-text">Category</span>
-                    </div>
-                    <select v-model="form.ProductCategoryId" class="select select-bordered w-full rounded-lg">
-                      <option :value="undefined" disabled ><span v-if="isCatPending" class=" loading-spinner"></span><span v-else>Select Category</span></option>
-                      <option v-for="(cat,index) in categoryList" :key="`cat-${index}`" :value="cat.ProductCategoryId">{{ cat.ProductCategoryName }}</option>
-                    </select>
-                  </label>
-
-                  <label class="form-control w-full">
-                    <div class="label">
-                      <span class="label-text">Status</span>
-                    </div>
-                    <select v-model="form.ProductStatusId" class="select select-bordered w-full rounded-lg">
-                      <option :value="undefined" disabled ><span v-if="isProductStatusPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
-                      <option v-for="(status,index) in productStatusList" :key="`status-${index}`" :value="status.ProductStatusId">{{ status.ProductStatusName }}</option>
-                    </select>
-                  </label>
-
-                  <label class="form-control w-full">
-                    <div class="label">
-                      <span class="label-text">VAT Type</span>
-                    </div>
-                    <select v-model="form.ProductTaxTypeId" class="select select-bordered w-full rounded-lg">
-                      <option :value="undefined" disabled ><span v-if="isTaxTypePending" class=" loading-spinner"></span><span v-else>Select VAT Type</span></option>
-                      <option v-for="(vat,index) in productTaxTypeList" :key="`vat-${index}`" :value="vat.ProductTaxTypeId">{{ vat.ProductTaxTypeName }}</option>
-                    </select>
-                  </label>
-                </div>
-
-                <div class="form-control w-full mb-4">
-                  <div class="label">
-                    <span class="label-text">Barcode</span>
-                  </div>
-                  <input
-                    type="text"
-                    v-model="form.ProductBarcode"
-                    placeholder="e.g., 1234567890"
-                    class="input input-bordered w-full rounded-lg"
-                  />
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <label class="form-control w-full">
-                    <div class="label">
-                      <span class="label-text">Product Price</span>
-                    </div>
-                    <CurrencyInput v-model="form.ProductPrice"/>
-                  </label>
-                </div>
-
-                <div class="flex items-center gap-4 mb-4">
-                  <label class="form-control flex-1">
-                    <div class="label cursor-pointer">
-                      <input
-                        type="checkbox"
-                        v-model="enableDiscountPercentComputed"
-                        class="checkbox checkbox-primary mr-2"
-                      />
-                      <span class="label-text">Percent Discount</span>
-                    </div>
-                  </label>
-                  <div class="flex-3">
-                    <CurrencyInput v-model="form.ProductDiscountPercent" symbol-value="%" class="max-w-xs" :disabled="!form.ProductEnableDiscountPercent"/>
-                  </div>
-                </div>
-
-                <div class="flex items-center gap-4 mb-4">
-                  <label class="form-control flex-1">
-                    <div class="label cursor-pointer">
-                      <input
-                        type="checkbox"
-                        v-model="enableDiscountAmountComputed"
-                        class="checkbox checkbox-primary mr-2 "
-                      />
-                      <span class="label-text">Amount Discount</span>
-                    </div>
-                  </label>
-                  <div class="flex-3">
-                    <CurrencyInput v-model="form.ProductDiscountAmount" class="max-w-xs" :disabled="!form.ProductEnableDiscountAmount"/>
-                  </div>
-                </div>
-
-                <div class="form-control w-full mb-6 flex flex-col">
-                  <div class="label">
-                    <span class="label-text">Product Description</span>
-                  </div>
-                  <textarea
-                    v-model="form.ProductDescription"
-                    class="textarea textarea-bordered h-24 w-full rounded-lg"
-                    placeholder="Enter product ProductDescription here..."
-                  ></textarea>
-                </div>
-
-                <div class="flex justify-center">
-                  <button type="submit" class="btn btn-primary px-8" :disabled="createProductMutation.isPending.value || updateProductMutation.isPending.value">Submit<span v-if="createProductMutation.isPending.value || updateProductMutation.isPending.value" className="loading loading-spinner loading-xs ml-2"></span></button>
-                </div>
-              </form> -->
             </div>
         </div>
     </dialog>
-    <button class="modal-button btn btn-soft btn-primary" @click="myModalRef?.showModal()">open</button>
+    <button class="modal-button btn btn-soft btn-primary" @click="myModalRef?.showModal()"><IconPlus/>Add Stock</button>
 </template>

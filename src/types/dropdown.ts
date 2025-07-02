@@ -24,3 +24,8 @@ export interface BranchList {
     BranchName: string;
     BranchKey: string;
 }
+
+export interface ProductList {
+    ProductInfoId: number;
+    ProductName: string;
+}

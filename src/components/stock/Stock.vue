@@ -18,6 +18,7 @@ const emit = defineEmits<{
 }>();
 
 const handleEmit = (emitValue:StockTable) => {
+    // console.log(emitValue);
     emit('selectStock', emitValue);
 }
 
@@ -35,9 +36,15 @@ const fetchStock = async ():Promise<StockTable[]> => {
         }
         const res:AxiosResponse<baseResponse<DataBaseResponse<StockResponse[]>>> = await apiClient.get(apiUrl , {params} );
         const stockList:StockTable[] = res.data.res_data.ConstructData?.map((item) => ({
-            ProductName: item.ProductName,
-            BranchName: item.BranchName,
-            CurrectStock: item.CurrectStock,
+            ProductInfo: {
+                ProductInfoId: item.ProductInfoId,
+                ProductName: item.ProductName
+            },
+            BranchInfo: {
+                BranchId: item.BranchId,
+                BranchName: item.BranchName
+            },
+            CurrentStock: item.CurrentStock,
         })) || [];
         pageOptionStore.stock = extractPageOption(res.data.res_data , pageOptionStore.stock);
         console.log(res.data.res_data.ConstructData)
@@ -103,6 +110,12 @@ watch(() => pageOptionStore.stock.PageSize ,() => {
           :total-items="pageOptionStore.stock.TotalRecords"
           @page-changed="handlePageEmit"
         >
+            <template #ProductName="stock">
+                {{ stock.item.ProductInfo.ProductName }}
+            </template>
+            <template #BranchName="stock">
+                {{ stock.item.BranchInfo.BranchName }}
+            </template>
             <template #actions="stock">
                 <button class="btn btn-circle btn-soft btn-xs bg-info text-info-content mr-2" @click="handleEmit(stock.item)"><IconEye class="size-4"/></button>
             </template>

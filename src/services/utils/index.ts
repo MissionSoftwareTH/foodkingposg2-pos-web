@@ -16,14 +16,14 @@ const removelistItem = () => {
     Cookies.remove('x-access-token');
     
     removelist.forEach(item => {
-        localStorage.removeItem(item)
+        localStorage.removeItem(item);
     });
 }
 
-export const logout = () => {
+export const logout = async () => {
     removelistItem();
+    await logoutAPI();
     window.location.href = '/';
-    console.log('Logout...');
 };
 
 export const fetchUserInfo = async ():Promise<User_Data> => {
@@ -61,4 +61,11 @@ export function formatDateTime(
   const mergedOptions = { ...defaultOptions, ...options };
 
   return new Intl.DateTimeFormat(locale, mergedOptions).format(date);
+}
+
+export const logoutAPI = async () => {
+  const apiUrl = 'token/logout';
+  const res = await apiClient.get(apiUrl);
+  console.log('Logout...');
+  return res;
 }

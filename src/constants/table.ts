@@ -119,46 +119,6 @@ export const posTableHeaders:HeadersTable[] = [
     }
 ];
 
-export const testHeaders:HeadersTable[] = [
-    {
-        key: 'BranchId',
-        title: 'Store Id',
-    },
-    {
-        key: 'BranchName',
-        title: 'Store Name',
-    },
-    {
-        key: 'ContactPhone',
-        title: 'Contact Phone',
-    },
-    {
-        key: 'ContactEmail',
-        title: 'Contact Email',
-    },
-    {
-        key: 'NumberOfPos',
-        title: 'number of POS',
-    },
-    {
-        key: 'CreatedAt',
-        title: 'Created At',
-    },
-    {
-        key: 'UpdatedAt',
-        title: 'Updated At',
-    },
-    {
-        key: 'Status',
-        title: 'Status',
-    },
-    {
-        key: 'actions',
-        title: 'Actions',
-        type: 'actions',
-    }
-];
-
 export const brandTableHeaders:HeadersTable[] = [
     {
       key: 'ProductBrandId',
@@ -197,13 +157,15 @@ export const stockTableHeaders:HeadersTable[] = [
     {
         key: 'ProductName',
         title: 'Product Name',
+        type: 'custom',
     },
     {
         key: 'BranchName',
         title: 'Branch Name',
+        type: 'custom',
     },
     {
-        key: 'CurrectStock',
+        key: 'CurrentStock',
         title: 'In Stock',
     },
     {
@@ -216,10 +178,10 @@ export const stockTableHeaders:HeadersTable[] = [
         type: 'actions',
     }
 ]
-
+ 
 export const stockCardTableHeaders:HeadersTable[] = [
     {
-        key: 'StockCardId',
+        key: 'StockId',
         title: 'Stock Card Id',
     },
     {
@@ -235,7 +197,7 @@ export const stockCardTableHeaders:HeadersTable[] = [
         title: 'Status',
     },
     {
-        key: 'InStock',
+        key: 'CurrentStock',
         title: 'In Stock',
     },
     {
@@ -247,7 +209,7 @@ export const stockCardTableHeaders:HeadersTable[] = [
         title: 'Amount',
     },
     {
-        key: 'DateRecorded',
+        key: 'CreatedAt',
         title: 'Date Recorded',
     },
     {
@@ -259,16 +221,8 @@ export const stockCardTableHeaders:HeadersTable[] = [
         title: 'Price',
     },
     {
-        key: 'Vat',
-        title: 'Vat',
-    },
-    {
         key: 'VatType',
         title: 'Vat Type',
-    },
-    {
-        key: 'Note',
-        title: 'Note',
     },
     {
         key: 'actions',

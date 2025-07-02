@@ -1,48 +1,66 @@
 export interface StockResponse {
+    ProductInfoId: number;
     ProductName: string;
+    BranchId: number;
     BranchName: string;
-    CurrectStock: number;
+    CurrentStock: number;
     Status?: string;
     CreatedAt: string;
     UpdatedAt: string;
 }
 
 export interface StockTable {
-    ProductName: string;
-    BranchName: string;
-    CurrectStock: number;
+    ProductInfo: ProductInfo;
+    BranchInfo: BranchInfo;
+    CurrentStock: number;
     Status?: string;
 }
 
+export interface ProductInfo {
+    ProductInfoId: number;
+    ProductName: string;
+}
+
+export interface BranchInfo {
+    BranchId: number;
+    BranchName: string;
+}
+
 export interface StockCardPayload {
-    ProductPoNumber: string;
+    ProductPoNumber?: string;
     AdminRoleId: number;
     BranchId: number;
     data: StockCardPayloadData[];
 }
 
 export interface StockCardPayloadData {
-    NumberOfProduct: number;
+    NumberOfProducts: number;
     ProductInfoId: number;
     ProductCost: number;
 }
 
 export interface StockCardResponse {
-    
+    StockId: number;
+    Amount: number;
+    BranchName: string;
+    CreatedAt: string;
+    Cost: number;
+    Price: number;
+    ProductName: string;
+    CurrentStock: number;
+    Type: string;
+    VatType: string;
 }
 
 export interface StockCardTable {
-    StockCardId: number;
-    ProductName: string;
-    BranchName: string;
-    Status: string;
-    InStock: number;
-    Type: string;
+    StockId: number;
     Amount: number;
-    DateRecorded: string;
+    BranchName: string;
+    CreatedAt: string;
     Cost: number;
     Price: number;
-    Vat: number;
+    ProductName: string;
+    CurrentStock: number;
+    Type: string;
     VatType: string;
-    Note: string;
 }

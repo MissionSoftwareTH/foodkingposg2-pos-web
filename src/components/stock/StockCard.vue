@@ -12,14 +12,16 @@ import TableSort from '../TableSort.vue';
 import { IconFilter2, IconSortAscendingLetters } from '@tabler/icons-vue';
 import { watch } from 'vue';
 import { extractPageOption } from '../../services/utils/dataExtract';
+import { formatDateTime } from '../../services/utils';
 
 
 interface Props {
     productId?: number;
+    BranchId?: number;
 }
 const props = defineProps<Props>()
 
-const emit = defineEmits<{
+defineEmits<{
   (e: 'openInsertDialog', open: boolean): void;
 }>();
 
@@ -29,13 +31,21 @@ const pageOptionStore = usePageOptionStore();
 const queryClient = useQueryClient();
 
 const fetchStockCard = async () => {
-    const apiUrl = '/product/inventory/card/list';
-    const {SortColumn , SortOrder} = pageOptionStore.stock;
+    const apiUrl = '/product/stock/record';
+    // const {SortColumn , SortOrder} = pageOptionStore.stock;
     const params = {
-      SortColumn ,SortOrder , PageSize:pageOptionStore.stock.PageSize , Page: pageOptionStore.stock.CurrentPage,
+    //   SortColumn ,
+    //   SortOrder , 
+    //   PageSize:pageOptionStore.stock.PageSize , 
+    //   Page: pageOptionStore.stock.CurrentPage,
+      ProductInfoId: props.productId,
+      BranchId: props.BranchId,
     }
-    const res:AxiosResponse<baseResponse<DataBaseResponse<StockCardResponse[]>>> = await apiClient.get(apiUrl);
-    const stockCardList:StockCardTable[] = res.data.res_data.ConstructData;
+    const res:AxiosResponse<baseResponse<DataBaseResponse<StockCardResponse[]>>> = await apiClient.get(apiUrl ,{params});
+    const stockCardList:StockCardTable[] = res?.data?.res_data?.ConstructData || []; 
+    stockCardList.map((list) => {
+        list.CreatedAt = formatDateTime(list.CreatedAt);
+    })
     pageOptionStore.stockCard = extractPageOption(res.data.res_data , pageOptionStore.stockCard);
     return stockCardList;
 }
