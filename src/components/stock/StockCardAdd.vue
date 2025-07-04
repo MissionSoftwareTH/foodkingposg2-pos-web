@@ -67,7 +67,7 @@ const fetchProductList = async ():Promise<ProductList[]> => {
   return res.data.res_data.data
 }
 
-const {data: productList , isPending: isProductPending } = useQuery<ProductList[] ,AxiosError<baseResponse<void>>>({
+const {data: productList } = useQuery<ProductList[] ,AxiosError<baseResponse<void>>>({
   queryKey: ['productList'],
   queryFn: fetchProductList,
 })

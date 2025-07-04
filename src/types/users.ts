@@ -5,12 +5,8 @@ export interface User_Data {
     FirstName?: string;
     LastName?: string;
     Permission?: getPermission[];
-    Roles?: getAbility[];
-}
-
-export interface getAbility {
-    RoleName: string;
-    RoleDescription: string;
+    RoleDescription?: string;
+    RoleName?: string;
 }
 
 export interface getPermission {

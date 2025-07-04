@@ -28,9 +28,9 @@ export interface BranchInfo {
 
 export interface StockCardPayload {
     ProductPoNumber?: string;
-    AdminRoleId: number;
-    BranchId: number;
-    data: StockCardPayloadData[];
+    AdminRoleId: number | undefined;
+    BranchId: number | undefined;
+    data: StockCardPayloadData[] | undefined;
 }
 
 export interface StockCardPayloadData {

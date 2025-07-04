@@ -1,5 +1,4 @@
 import type { baseResponse, extendTime } from "../../types";
-import { getApiHeaders } from "../api/apiHeader"
 import apiClient from "../api/apiService";
 
 export const getExtendCookies = async () => {

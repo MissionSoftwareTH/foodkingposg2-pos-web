@@ -4,7 +4,7 @@ import type { IconName } from '../../router/routePath';
 import { useAppSetupStore } from '../../store/appSetupStore';
 import type { AppRouteRecordRaw, User_Data } from '../../types';
 import SidebarMenu from './components/SidebarMenu.vue';
-import { IconLock, IconLockOpen } from '@tabler/icons-vue';
+import { IconLock, IconLockOpen, IconSettings } from '@tabler/icons-vue';
 import { useQuery } from '@tanstack/vue-query';
 import { fetchUserInfo } from '../../services/utils';
 import { computed, ref, watch } from 'vue'; // เพิ่ม ref และ watch
@@ -21,6 +21,8 @@ const { data: userData } = useQuery<User_Data>({
     queryFn: fetchUserInfo,
     enabled: !!isLogin,
 });
+
+const isSettingPage = ref(false);
 
 // Watch สำหรับสร้าง permissionMap เมื่อ userData.value.Permission พร้อมใช้งาน
 watch(userData, (newUserData) => {
@@ -68,12 +70,10 @@ const navLinks = computed(() => {
                 // ให้ลบ children ออกจาก newRoute
                 delete newRoute.children;
             }
-            
             // เพิ่ม route ที่ผ่านการกรองและปรับปรุงแล้ว
             filteredAndTransformedRoutes.push(newRoute);
         }
     });
-
     return filteredAndTransformedRoutes.map(route => {
         // ให้แน่ใจว่า meta มี type ที่ถูกต้อง
         return {
@@ -83,19 +83,38 @@ const navLinks = computed(() => {
     });
 });
 
+const settingRoute = router.getRoutes().find((r) => r.name === 'Settings' );
 const handleSidebarToggle = (value: boolean) => {
     appSetupStore.setSidebarExpand(value);
 };
-</script>
 
+watch(() => router.currentRoute.value.path, (newPath) => {
+    console.log(newPath)
+    if(newPath.includes('setting'))return isSettingPage.value = true;
+    isSettingPage.value = false;
+}, { immediate: true });
+
+</script>
 <template>
     <aside class="group h-full bg-base-100 rounded-xl p-4 overflow-hidden text-nowrap shadow-lg relative">
         <ul class="flex flex-col gap-4">
             <SidebarMenu v-for="link in navLinks" :item="link" :key="link.name || link.path" />
-            </ul>
+            <!-- setting link -->
+            <li v-if="settingRoute">
+                <RouterLink
+                    to="/setting/account/info"
+                    :class="isSettingPage && 'bg-primary text-primary-content stroke-primary-content'"
+                    class="flex items-center px-2 py-2 bg-base-100 rounded-xl hover:bg-primary/80 hover:text-primary-content hover:stroke-primary-content transition-all duration-500 ease-in-out">
+                    <IconSettings class="size-8"/>
+                        <h1
+                        :class="appSetupStore.isSideBarExpanded ? 'px-4' : 'opacity-0 max-w-0 group-hover:px-4 group-hover:opacity-100 group-hover:max-w-xs'"
+                        class="overflow-hidden font-semibold whitespace-nowrap transition-all duration-500 ease-in-out">{{ settingRoute.name }}</h1>
+                </RouterLink>
+            </li>
+        </ul>
         <button 
             @click="handleSidebarToggle(!appSetupStore.isSideBarExpanded)"
-            :class="appSetupStore.isSideBarExpanded ? `` : `invisible opacity-0 group-hover:opacity-100 group-hover:visible`"
+            :class="!appSetupStore.isSideBarExpanded && 'invisible opacity-0 group-hover:opacity-100 group-hover:visible'"
             class="btn btn-ghost btn-sm btn-circle absolute bottom-2 right-2 transition-all duration-500 ">
             <IconLock v-if="appSetupStore.isSideBarExpanded"/>
             <IconLockOpen v-else />

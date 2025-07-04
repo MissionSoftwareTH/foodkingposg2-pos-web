@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { RouterLink } from 'vue-router';
 import { onMounted, onUnmounted } from 'vue';
-import { IconLogout, IconSettings } from '@tabler/icons-vue';
+import { IconLogout } from '@tabler/icons-vue';
 import { fetchUserInfo, logout } from '../services/utils';
 import { useQuery } from '@tanstack/vue-query';
 import type { User_Data } from '../types';
@@ -31,41 +30,48 @@ const handleOutsideClick = (event: MouseEvent) => {
         isOpen.value = false;
     }
 };
+
 </script>
 <template>
-    <div v-if="isLogin" class="relative inline-block text-left">
-        <div class=" loading loading-spinner size-12 p-2" v-if="isPending"></div>
+    <div v-if="isLogin" class="relative inline-block text-left h-12">
+        <div class=" loading loading-spinner size-12 p-2 h-full" v-if="isPending"></div>
         <button
             v-else
             @click="isOpen = !isOpen"
             type="button"
-            class="group hover:bg-base-300 focus:bg-base-300 transition-all duration-300 p-2 rounded-full flex flex-row items-center w-fit h-fit"
+            class="group hover:bg-base-100 focus:bg-base-100 transition-all duration-300 rounded-full flex flex-row items-center w-fit h-fit overflow-hidden"
+            
             id="menu-button"
             aria-expanded="false"
             aria-haspopup="true"
         >
-            <div class="size-12 rounded-full overflow-hidden relative bg-primary text-primary-content flex justify-center items-center ">
+            <div class="size-12 rounded-full overflow-hidden relative bg-primary text-primary-content flex gap-2 justify-center items-center ">
                 <img class="w-full h-full object-fill" src="/assets/images/profile-mock.png" alt="myimage">
             </div>
-            <div class="text-start overflow-hidden font-semibold whitespace-nowrap opacity-0 max-w-0 group-focus:opacity-100 group-focus:px-4 group-focus:max-w-xs transition-all duration-500 ease-in-out">
-                <h1 class="text-base font-semibold space-x-1">{{ isError ? 'unknown' : userData?.FirstName }} {{ isError ? 'unknown' : userData?.LastName}}</h1>
-                <h2 class="text-sm text-base-content/70">{{ isError ? 'unknown' : userData?.Email }}</h2>
+            <div 
+                class="text-start relative overflow-hidden font-semibold flex whitespace-nowrap opacity-0 max-w-0 transition-all duration-500 ease-in-out"
+                :class="isOpen && 'opacity-100 pl-4 pr-8 max-w-xs'"
+            >
+                <div class="">
+                    <h1 class="text-base font-semibold space-x-1">{{ isError ? 'unknown' : userData?.FirstName }} {{ isError ? 'unknown' : userData?.LastName}}</h1>
+                    <h2 class="text-sm text-base-content/70">{{ isError ? 'unknown' : userData?.Email }}</h2>
+                </div>
             </div>
-        </button>
-        <div
+            <button
             v-if="isOpen"
-            class="origin-top-right absolute right-0 mt-2 w-32 rounded-md shadow-lg bg-base-300 ring-opacity-5 focus:outline-none z-50"
-            role="menu"
-            aria-orientation="vertical"
-            aria-labelledby="menu-button"
-            tabindex="-1"
-        >
-            <div class="py-1 text-base" role="none">
-                <RouterLink to="/setting/account/info" class="block px-4 py-2 hover:bg-base-100" role="menuitem" tabindex="-1" id="menu-item-0"><span class="flex gap-2"><IconSettings/>Setting</span></RouterLink>
-                <button @click="logout" type="button" class="block w-full text-left px-4 py-2 hover:bg-error hover:text-error-content" role="menuitem" tabindex="-1" id="menu-item-1">
-                    <span class="flex gap-2"><IconLogout/>Logout</span>
-                </button>
-            </div>
-        </div>
+            class="group/logout flex items-center justify-center absolute right-0 top-0 h-full bg-error/30 rounded-r-full px-2"
+            :class="isOpen && 'opacity-100 hover:max-w-xs hover:bg-error transition-all duration-500 ease-in-out'"
+            type="button"
+            @click="logout"
+            >
+            <span
+            class="max-w-0 opacity-0 transition-all duration-500 ease-in-out flex items-center justify-center gap-1"
+            :class="isOpen && 'group-hover/logout:max-w-xs group-hover/logout:opacity-100'"
+            >
+                <IconLogout class="transition-all duration-200 ease-in-out"/>
+                Logout
+            </span>
+            </button>
+        </button>
     </div>
 </template>

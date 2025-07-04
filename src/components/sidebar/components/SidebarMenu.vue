@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, useRouter } from 'vue-router';
 import { ref, shallowRef, watch } from 'vue';
-import { IconBuildings, IconBuildingStore, IconCategory, IconChevronsDown, IconDeviceDesktop, IconExclamationCircle, IconFileSettings, IconHome, IconLayoutDashboard, IconLogs, IconPackage, IconShoppingCart, IconUsers } from '@tabler/icons-vue'; // Import all icons you use
+import { IconBuildings, IconBuildingStore, IconCategory, IconChevronsDown, IconDeviceDesktop, IconExclamationCircle, IconFileSettings, IconHome, IconLicense, IconLogs, IconPackage, IconShoppingCart, IconUsers } from '@tabler/icons-vue'; // Import all icons you use
 import type { IconName } from '../../../router/routePath';
 import type { AppRouteRecordRaw } from '../../../types';
 import { useAppSetupStore } from '../../../store/appSetupStore';
@@ -17,6 +17,7 @@ const iconComponents = shallowRef<Record<IconName, any>>({
     'Categories Management': IconCategory,
     'Brand Management': IconBuildings,
     'Activity logs': IconLogs,
+    'Permission': IconLicense,
     'non_icon': IconExclamationCircle,
 });
 
@@ -56,7 +57,7 @@ watch(() => router.currentRoute.value.path, (newPath) => {
         :class="isExpanded ? `text-primary-content stroke-primary-content bg-primary` : ``"
         class="collapse-title flex items-center px-2 py-2 bg-base-100 rounded-xl hover:bg-primary/80 hover:text-primary-content hover:stroke-primary-content transition-all duration-500 ease-in-out">
         <component 
-        v-if="item?.meta?.icon && iconComponents[item.meta.icon]" 
+        v-if="item?.meta?.icon && iconComponents[item.meta.icon]"
         :is="iconComponents[item.meta.icon]"
         class="size-8"
         />

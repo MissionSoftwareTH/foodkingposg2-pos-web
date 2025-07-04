@@ -32,7 +32,7 @@ export const fetchUserInfo = async ():Promise<User_Data> => {
     const res:AxiosResponse<baseResponse<User_Data>> = await apiClient.get(apiUrl );
     const user_data = res.data.res_data;
     appSetupStore.setUserData(user_data);
-    updateAbility(user_data.Roles || []);
+    updateAbility(user_data.RoleName || '');
     return res?.data?.res_data;
 }
 

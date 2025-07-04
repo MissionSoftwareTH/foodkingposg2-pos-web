@@ -6,7 +6,7 @@ import TableSort from '../TableSort.vue';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import { stockTableHeaders } from '../../constants/table';
 import { SortOrderOption, stockSortColumnOption } from '../../constants/page_option';
-import type { StockCardTable, StockResponse, StockTable } from '../../types/stock';
+import type { StockResponse, StockTable } from '../../types/stock';
 import type { AxiosError, AxiosResponse } from 'axios';
 import type { baseResponse, DataBaseResponse } from '../../types';
 import apiClient from '../../services/api/apiService';

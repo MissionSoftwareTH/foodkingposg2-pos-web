@@ -54,7 +54,10 @@ export const categoriesPayloadForm:CategoriesPayload = {
 }
 
 export const stockCardPayload:StockCardPayload = {
-    
+    ProductPoNumber: '',
+    AdminRoleId: undefined,
+    BranchId: undefined,
+    data: undefined,
 }
 
 export const StockCardPayloadDataForm:StockCardPayloadData = {

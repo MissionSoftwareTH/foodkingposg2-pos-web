@@ -17,14 +17,14 @@ import PermissionView from '../pages/PermissionView.vue';
 
 
 // Define a Union Type for the specific icon names you use
-export type IconName = 'Dashboard' | 'Management' | 'Store Management' | 'Admin Management' | 'Activity logs' | 'Product Management' | 'POS Management' | 'Stock Management' | 'Categories Management' | 'Brand Management' | 'Permission' |'non_icon'; // Add all valid icon keys here!
+export type IconName = 'Dashboard' | 'Management' | 'Store Management' | 'Admin Management' | 'Activity logs' | 'Product Management' | 'POS Management' | 'Stock Management' | 'Categories Management' | 'Brand Management' | 'Permission' | 'non_icon'; // Add all valid icon keys here!
 // Make sure this matches the keys in your iconComponents object in the sidebar component.
 
 export const routes: AppRouteRecordRaw[] = [
     { name: 'Login', path: '/', component: LoginView, meta: { requiresAuth: false, layout: 'BlankLayout' ,icon: 'non_icon'} },
     { name: 'Not found', path: '/not-found', component: Error404, meta: { requiresAuth: false, layout: 'BlankLayout' ,icon: 'non_icon' } },
-    { name: 'Settings', path: '/setting', component: SettingView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'non_icon' } , children: [
-        {name: 'Account' ,path: 'account' , redirect: '/setting/account/info', children: [
+    { name: 'Settings', path: '/setting', redirect: '/setting/account/info', component: SettingView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'non_icon' } , children: [
+        {name: 'Account' ,path: 'account' , children: [
             {name: 'Personal info', path: 'info' , component: Personal_Info},
             {name: 'Change password', path: 'Change-password' , component: ChangePassword},
         ]},

@@ -154,6 +154,7 @@ const createProductMutation = useMutation<baseResponse<void>,AxiosError,ProductP
     closeModal();
     dialogStore.openDialog(data.res_message , {status: 'success'});
     queryClient.invalidateQueries({queryKey: ['productListAxios']});
+    queryClient.invalidateQueries({queryKey: ['productList']});
   },
   onError: (error) => {
     dialogStore.openDialog(error.message , {status: 'error'});

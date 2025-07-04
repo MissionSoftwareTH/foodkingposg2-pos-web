@@ -126,7 +126,7 @@ const handleSubmit = () => {
 //update data
 const updateBranch = async (payload:BranchPayload) => {
     const apiUrl = '/branchs/update';
-    const response:AxiosResponse<baseResponse<void>> = await apiClient.post(apiUrl , payload );
+    const response:AxiosResponse<baseResponse<void>> = await apiClient.patch(apiUrl , payload );
     return response.data;
 }
 

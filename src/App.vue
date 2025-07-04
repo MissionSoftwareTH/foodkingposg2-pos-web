@@ -10,7 +10,7 @@ import appController from './services/utils/appController';
 import ConfirmDialog from './components/dialogs/ConfirmDialog.vue';
 import ProgressBar from './components/ProgressBar.vue';
 import NotificationToast from './components/NotificationToast.vue';
-import { VueQueryDevtools } from '@tanstack/vue-query-devtools';
+// import { VueQueryDevtools } from '@tanstack/vue-query-devtools';
 
 // setup layout router
 const layouts: Layouts = {

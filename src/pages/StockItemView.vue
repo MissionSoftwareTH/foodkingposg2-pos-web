@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import TitleBarCard from '../components/TitleBarCard.vue';
+// import TitleBarCard from '../components/TitleBarCard.vue';
 import Stock from '../components/stock/Stock.vue';
 import StockCard from '../components/stock/StockCard.vue';
 import type { StockTable } from '../types/stock';
-import { usePageOptionStore } from '../store/sortingStore';
+// import { usePageOptionStore } from '../store/sortingStore';
 import StockCardAdd from '../components/stock/StockCardAdd.vue';
 import { useQueryClient } from '@tanstack/vue-query';
 
@@ -20,7 +20,7 @@ const defaultStockCardData = {
 
 const queryClient = useQueryClient();
 const stockCardData = ref<Props>({...defaultStockCardData});
-const pageOptionStore = usePageOptionStore();
+// const pageOptionStore = usePageOptionStore();
 const handleSelectedEmit = (value:StockTable) => {
   isSelected.value = true;
   stockCardData.value.BranchId = value.BranchInfo.BranchId;
