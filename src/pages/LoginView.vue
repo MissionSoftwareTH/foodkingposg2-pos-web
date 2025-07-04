@@ -28,7 +28,6 @@ const handleSubmit = () => {
 }
 
 const PostIdentityLogin = async (payload:Payload) => {
-    
     const api = '/token/login';
     const res:AxiosResponse<baseResponse<void>> = await apiClient.post(api , payload );
     return res.data;
@@ -38,7 +37,6 @@ const PostIdentityLoginMutation = useMutation<baseResponse<void>,AxiosError<base
     mutationFn: PostIdentityLogin,
     onSuccess: () => {
         sendEmailOTPMutation.mutate();
-        authCompleted.value = true;
     },
     onError: (error) => {
         console.error(error.response?.data.res_message || error.message);
@@ -98,6 +96,9 @@ const sendEmailOTPMutation = useMutation<baseResponse<OTP_Response>,AxiosError<b
         console.error(error.response?.data.res_message || error.message);
         dialogStore.openDialog( error.response?.data.res_message || error.message , {status: 'error'});
     },
+    onSettled: () => {
+        authCompleted.value = true;
+    }
 })
 
 //fill OTP completed
@@ -142,7 +143,7 @@ const setupLoginSuccess = async (res:extendTime) => {
                             </label>
                         </div>
                         <div class="form-control mt-6">
-                            <button type="submit" class="btn btn-primary w-full" :disabled="PostIdentityLoginMutation.isPending.value">Login<span v-if="PostIdentityLoginMutation.isPending.value" className="loading loading-spinner loading-xs ml-2"></span></button>
+                            <button type="submit" class="btn btn-primary w-full" :disabled="PostIdentityLoginMutation.isPending.value || sendEmailOTPMutation.isPending.value">Login<span v-if="PostIdentityLoginMutation.isPending.value || sendEmailOTPMutation.isPending.value" className="loading loading-spinner loading-xs ml-2"></span></button>
                         </div>
                     </form>
                     <!-- OTP Form -->
