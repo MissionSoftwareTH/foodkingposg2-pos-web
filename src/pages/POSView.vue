@@ -109,7 +109,8 @@ const postPOSMutation = useMutation<baseResponse<void> , AxiosError<baseResponse
   mutationFn:PostPOS,
   onSuccess: (data) => {
     dialogStore.openDialog(data?.res_message, {status: 'success'});
-    queryClient.invalidateQueries({queryKey: ['branchListAxios','POSList']});
+    queryClient.invalidateQueries({queryKey: ['branchListAxios']});
+    queryClient.invalidateQueries({queryKey: ['POSList']});
     closeModal();
   },
   onError: (error) => {

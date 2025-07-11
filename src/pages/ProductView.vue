@@ -153,7 +153,8 @@ const createProductMutation = useMutation<baseResponse<void>,AxiosError,ProductP
   onSuccess: (data) => {
     closeModal();
     dialogStore.openDialog(data.res_message , {status: 'success'});
-    queryClient.invalidateQueries({queryKey: ['productListAxios', 'productList']});
+    queryClient.invalidateQueries({queryKey: ['productListAxios']});
+    queryClient.invalidateQueries({queryKey: ['productList']});
   },
   onError: (error) => {
     dialogStore.openDialog(error.message , {status: 'error'});
@@ -191,7 +192,8 @@ const updateProductMutation = useMutation<baseResponse<void>,AxiosError,ProductP
   mutationFn: updateProduct,
   onSuccess: (data) => {
     toastStore.showToast(data.res_message , 'success');
-    queryClient.invalidateQueries({queryKey: ['productListAxios' ,'stockListAxios']});
+    queryClient.invalidateQueries({queryKey: ['productListAxios']});
+    queryClient.invalidateQueries({queryKey: ['stockListAxios']});
     closeModal();
   },
   onError: (error) => {

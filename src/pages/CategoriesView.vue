@@ -56,7 +56,9 @@ const createCategoriesMutation = useMutation<baseResponse<void>,AxiosError<baseR
     mutationFn: createBranch,
     onSuccess: (data) => {
         toastStore.showToast(data.res_message , 'success');
-        queryClient.invalidateQueries({ queryKey: ['categoriesListAxios','categoriesList']});
+        queryClient.invalidateQueries({ queryKey: ['categoriesListAxios']});
+        queryClient.invalidateQueries({ queryKey: ['categoriesList']});
+
         closeModal();
     },
     onError: (error) => {
@@ -92,7 +94,8 @@ const updateCategoriesMutation = useMutation<baseResponse<void> , AxiosError<bas
     mutationFn: updateCategories,
     onSuccess: (data) => {
         toastStore.showToast(data.res_message , 'success');
-        queryClient.invalidateQueries({queryKey: ['categoriesListAxios','productListAxios']});
+        queryClient.invalidateQueries({queryKey: ['categoriesListAxios']});
+        queryClient.invalidateQueries({queryKey: ['productListAxios']});
         closeModal();
     },
     onError: (error) => {

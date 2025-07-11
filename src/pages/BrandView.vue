@@ -91,7 +91,9 @@ const updateBrandMutation = useMutation<baseResponse<void> , AxiosError<baseResp
     mutationFn: updateBrand,
     onSuccess: (data) => {
         toastStore.showToast(data.res_message , 'success');
-        queryClient.invalidateQueries({queryKey: ['brandListAxios','productListAxios']});
+        queryClient.invalidateQueries({queryKey: ['brandListAxios']});
+        queryClient.invalidateQueries({queryKey: ['productListAxios']});
+
         closeModal();
     },
     onError: (error) => {

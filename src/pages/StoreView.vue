@@ -81,7 +81,8 @@ const createBranchMutation = useMutation<baseResponse<void>,AxiosError<baseRespo
     onSuccess: (data) => {
         dialogStore.form = false;
         dialogStore.openDialog(data.res_message , {status: 'success'});
-        queryClient.invalidateQueries({ queryKey: ['branchListAxios','branchList']});
+        queryClient.invalidateQueries({ queryKey: ['branchListAxios']});
+        queryClient.invalidateQueries({ queryKey: ['branchList']});
         //ล้างฟอร์ม
         closeModal();
     },
@@ -133,7 +134,8 @@ const updateBranchMutation = useMutation<baseResponse<void> , AxiosError<baseRes
     mutationFn: updateBranch,
     onSuccess: (data) => {
         toastStore.showToast(data.res_message , 'success');
-        queryClient.invalidateQueries({queryKey: ['branchListAxios','stockListAxios']});
+        queryClient.invalidateQueries({queryKey: ['branchListAxios']});
+        queryClient.invalidateQueries({queryKey: ['stockListAxios']});
         closeModal();
     },
     onError: (error) => {
