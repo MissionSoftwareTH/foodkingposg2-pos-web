@@ -6,7 +6,7 @@ import { IconFilter2, IconPencil, IconPlus, IconSortAscendingLetters, IconTrash,
 import apiClient from '../services/api/apiService';
 import type { AxiosResponse } from 'axios';
 import { useDialogStore } from '../store/dialogStore';
-import FormDialog from '../components/dialogs/formDialog.vue';
+import FormDialog from '../components/dialogs/FormDialog.vue';
 
 const headers:HeadersTable[] = [
     {

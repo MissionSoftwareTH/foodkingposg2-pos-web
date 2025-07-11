@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { IconPlugConnectedX, IconPlus } from '@tabler/icons-vue';
+import { IconPlus } from '@tabler/icons-vue';
 import apiClient from '../services/api/apiService';
 import type { baseResponse } from '../types';
-import type { RoleListPayload, RoleListResponse, RoleListTable } from '../types/role';
+import type { RoleListPayload, RoleListResponse } from '../types/role';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { useDialogStore } from '../store/dialogStore';
 import { useProgressBarStore } from '../store/progressBarStore';
@@ -36,7 +36,7 @@ const {data: roleList , isPending , isError } = useQuery({
 })
 
 const handleSubmit = () => {
-    const {RoleName , Description} = form.value;
+    const { RoleName } = form.value;
     if(!RoleName) return dialogStore.openDialog('กรุณากรอก Role Name',{status: 'warning'});
     createRoleMutation.mutate(form.value);
 }

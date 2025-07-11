@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import type { IconName } from '../../router/routePath';
-import { useAppSetupStore } from '../../store/appSetupStore';
 import type { AppRouteRecordRaw, User_Data } from '../../types';
 import SidebarMenu from './components/SidebarMenu.vue';
-import { IconLayoutSidebarLeftCollapse, IconLock, IconLockOpen, IconSettings } from '@tabler/icons-vue';
+import { IconLayoutSidebarLeftCollapse, IconSettings } from '@tabler/icons-vue';
 import { useQuery } from '@tanstack/vue-query';
 import { fetchUserInfo } from '../../services/utils';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'; // เพิ่ม ref และ watch
@@ -13,7 +12,6 @@ import { debounce } from '../../services/utils/debounce';
 
 const isLogin = localStorage.getItem('isLoggedIn');
 const router = useRouter();
-const appSetupStore = useAppSetupStore();
 const toggle = useToggleStore();
 
 // ใช้ ref เพื่อเก็บ Map ที่จะถูกอัปเดตเมื่อ userData เปลี่ยนแปลง

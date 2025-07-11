@@ -33,10 +33,8 @@
 import { ref, watch } from 'vue';
 import { useConfirmDialogStore } from '../../store/confirmDialogStore';
 import { IconAlertTriangle } from '@tabler/icons-vue';
-import { useDialogStore } from '../../store/dialogStore';
 
 const store = useConfirmDialogStore();
-const dialogStore = useDialogStore();
 const dialogRef = ref<HTMLDialogElement | null>(null);
 
 // Watch for changes in store.isOpen to control the dialog element

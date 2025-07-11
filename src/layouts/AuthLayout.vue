@@ -16,7 +16,5 @@
 import { RouterView } from 'vue-router';
 import Sidebar from '../components/sidebar/Sidebar.vue';
 import Navbar from '../components/Navbar.vue';
-import { useToggleStore } from '../store/toggleStore';
 import OverlaySidebar from '../components/sidebar/OverlaySidebar.vue';
-const toggle = useToggleStore();
 </script>

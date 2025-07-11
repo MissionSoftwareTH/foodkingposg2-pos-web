@@ -12,7 +12,7 @@ import { useDialogStore } from '../store/dialogStore';
 import { useProgressBarStore } from '../store/progressBarStore';
 import type { AxiosError, AxiosResponse } from 'axios';
 import type { baseResponse, Data } from '../types';
-import type { AdminListPayload, AdminListResponse, AdminListTable } from '../types/admin';
+import type { AdminListPayload, AdminListResponse } from '../types/admin';
 import apiClient from '../services/api/apiService';
 import { useMutation, useQuery } from '@tanstack/vue-query';
 
@@ -125,6 +125,7 @@ const handleEmit = () => {
             >
 
             </Table>
+            <button @click="handleSubmit"></button>
         </div>
     </div>
 </template>

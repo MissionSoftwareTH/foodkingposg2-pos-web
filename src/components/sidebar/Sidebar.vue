@@ -8,7 +8,6 @@ import { IconLock, IconLockOpen, IconSettings } from '@tabler/icons-vue';
 import { useQuery } from '@tanstack/vue-query';
 import { fetchUserInfo } from '../../services/utils';
 import { computed, ref, watch } from 'vue'; // เพิ่ม ref และ watch
-import { useToggleStore } from '../../store/toggleStore';
 
 const isLogin = localStorage.getItem('isLoggedIn');
 const router = useRouter();

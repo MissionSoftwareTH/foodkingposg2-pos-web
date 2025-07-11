@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Chart as ChartJS , CategoryScale, Legend, LinearScale, Title, Tooltip, type ChartData, type ChartOptions, LineElement, PointElement, PieController, ArcElement } from 'chart.js';
+import { Chart as ChartJS , CategoryScale, Legend, LinearScale, Title, Tooltip, type ChartData, type ChartOptions, PieController, ArcElement } from 'chart.js';
 import { Pie } from 'vue-chartjs'
 
 interface ChartPieProps {
