@@ -18,6 +18,7 @@ import { SortOrderOption, storeSortColumnOption } from '../constants/page_option
 import { extractPageOption } from '../services/utils/dataExtract';
 import { usePageOptionStore } from '../store/sortingStore';
 import TitleBarCard from '../components/TitleBarCard.vue';
+import FormDialog from '../components/dialogs/FormDialog.vue';
 
 const confirmStore = useConfirmDialogStore();
 const dialogStore = useDialogStore();
@@ -25,7 +26,6 @@ const toastStore = useToastStore();
 const queryClient = useQueryClient();
 const progressBarStore = useProgressBarStore();
 const mode = ref<number>(1);
-const myModalRef = ref<HTMLDialogElement | null>(null);
 const form = ref({...storeForm});
 const headers = storeTableHeaders;
 const sortColumnOption = storeSortColumnOption;
@@ -40,11 +40,11 @@ const openModal = (data?:BranchTable) => {
             BranchEmail: data.ContactEmail,
             BranchPhone: data.ContactPhone,
         };
-        return myModalRef?.value?.showModal();
+        return dialogStore.form = true;
     }
     mode.value = 1;
     console.log(form.value)
-    myModalRef?.value?.showModal();
+    dialogStore.form = true;
 };
 
 // fetch data
@@ -79,10 +79,9 @@ const createBranch = async (payload:BranchPayload) => {
 const createBranchMutation = useMutation<baseResponse<void>,AxiosError<baseResponse<void>>,BranchPayload>({
     mutationFn: createBranch,
     onSuccess: (data) => {
-        myModalRef.value?.close();
+        dialogStore.form = false;
         dialogStore.openDialog(data.res_message , {status: 'success'});
-        queryClient.invalidateQueries({ queryKey: ['branchListAxios']});
-        queryClient.invalidateQueries({ queryKey: ['branchList']});
+        queryClient.invalidateQueries({ queryKey: ['branchListAxios','branchList']});
         //ล้างฟอร์ม
         closeModal();
     },
@@ -134,7 +133,7 @@ const updateBranchMutation = useMutation<baseResponse<void> , AxiosError<baseRes
     mutationFn: updateBranch,
     onSuccess: (data) => {
         toastStore.showToast(data.res_message , 'success');
-        queryClient.invalidateQueries({queryKey: ['branchListAxios']});
+        queryClient.invalidateQueries({queryKey: ['branchListAxios','stockListAxios']});
         closeModal();
     },
     onError: (error) => {
@@ -151,7 +150,7 @@ const updateBranchMutation = useMutation<baseResponse<void> , AxiosError<baseRes
 })
 
 const closeModal = () => {
-  myModalRef.value?.close();
+  dialogStore.form = false;
   resetForm();
 }
 
@@ -237,12 +236,13 @@ const mostPOS = computed(() => {
     </div>
 
     <!-- add merchant dialog -->
-    <dialog ref="myModalRef" className="modal">
-        <div className="modal-box">
-            <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal"><IconX class="text-error-content"/></button>
-            <h3 v-if="mode === 1" className="font-semibold text-xl">Add New Store</h3>
-            <h3 v-else-if="mode === 2" className="font-semibold text-xl">Update Store</h3>
-            <div className="modal-action">
+    <FormDialog>
+        <template #form>
+            <div className="bg-base-100 text-base-content rounded-box px-6 py-8 relative">
+                <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal"><IconX class="text-error-content"/></button>
+                <h3 v-if="mode === 1" className="font-semibold text-xl">Add New Store</h3>
+                <h3 v-else-if="mode === 2" className="font-semibold text-xl">Update Store</h3>
+            <div className="">
                 <form class="card-body" @submit.prevent="handleSubmit">
                     <div class="form-control flex">
                         <label class="label text-base-content flex-1">
@@ -268,6 +268,7 @@ const mostPOS = computed(() => {
                 </form>
             </div>
         </div>
-    </dialog>
+        </template>
+    </FormDialog>
 </div>
 </template>

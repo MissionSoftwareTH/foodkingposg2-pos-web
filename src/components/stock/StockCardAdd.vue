@@ -10,6 +10,7 @@ import type { StockCardPayload, StockCardPayloadData } from '../../types/stock';
 import { useDialogStore } from '../../store/dialogStore';
 import { useProgressBarStore } from '../../store/progressBarStore';
 import { useToastStore } from '../../store/toastStore';
+import FormDialog from '../dialogs/FormDialog.vue';
 
 defineProps({
   isOpen: {
@@ -18,7 +19,6 @@ defineProps({
   }
 })
 
-const myModalRef = ref<HTMLDialogElement | null>(null);
 const dialogStore = useDialogStore();
 const progress = useProgressBarStore();
 const toast = useToastStore();
@@ -32,7 +32,7 @@ const resetForm = () => {
 }
 
 const CloseModal = () => {
-  myModalRef.value?.close();
+  dialogStore.form = false;
   resetForm();
 }
 
@@ -90,7 +90,7 @@ const {data: branchList , isPending: isBranchPending } = useQuery<BranchList[] ,
 // handle create stock card
 const handleCreateStockCard = async () => {
   if (!form.value.BranchId) {
-    toast.showToast('ไม่ได้เลือกสาขาง', 'warning');
+    toast.showToast('ไม่ได้เลือกสาขา', 'warning');
     return;
   }
   if (addList.value.length === 0) {
@@ -118,8 +118,7 @@ const createStockCardMutation = useMutation<baseResponse<void> ,AxiosError<baseR
   mutationFn: createStockCard,
   onSuccess: (data) => {
     dialogStore.openDialog( data?.res_message || 'unknown response' , { status: 'success' });
-    queryClient.invalidateQueries({ queryKey: ['stockListAxios'] });
-    queryClient.invalidateQueries({ queryKey: ['stockCardListAxios'] });
+    queryClient.invalidateQueries({ queryKey: ['stockListAxios','stockCardListAxios'] });
     CloseModal();
   },
   onError: (error) => {
@@ -136,36 +135,37 @@ const createStockCardMutation = useMutation<baseResponse<void> ,AxiosError<baseR
 
 </script>
 <template>
-    <dialog ref="myModalRef" className="modal">
-        <div className="modal-box min-w-2/3 overflow-hidden max-h-9/10">
-            <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="CloseModal"><IconX class="text-error-content"/></button>
-            <div className="modal-action">
-              <form @submit.prevent="handleSubmit" class="text-base mx-auto w-full p-4">
-                <div class="flex items-start mb-4 ">
-                  <h3 className="font-semibold text-2xl text-nowrap">Add Stock</h3>
-                  <div class="w-full"></div>
-                  <div class="flex gap-2 items-center">
-                    <span class="label-text">Branch</span>
-                    <select class="select select-bordered select-sm max-w-xs min-w-[150px] rounded-lg mx-2" v-model="form.BranchId">
-                      <option :value="undefined" disabled ><span v-if="isBranchPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
-                      <option v-for="(b,index) in branchList" :key="`product-${index}`" :value="b.BranchId">{{ b.BranchName }}</option>
-                    </select>
-                  </div>
-                  <button class="btn btn-info btn-sm">Submit</button>
+    <FormDialog>
+      <template #form>
+        <div className="bg-base-100 rounded-box text-base-content min-w-2/3 overflow-hidden max-h-9/10 relative px-6 py-8">
+          <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="CloseModal"><IconX class="text-error-content"/></button>
+          <div className="">
+            <form @submit.prevent="handleSubmit" class="text-base mx-auto w-full p-4">
+              <div class="flex items-start mb-4 ">
+                <h3 className="font-semibold text-2xl text-nowrap">Add Stock</h3>
+                <div class="w-full"></div>
+                <div class="flex gap-2 items-center">
+                  <span class="label-text">Branch</span>
+                  <select class="select select-bordered select-sm max-w-xs min-w-[150px] rounded-lg mx-2" v-model="form.BranchId">
+                    <option :value="undefined" disabled ><span v-if="isBranchPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
+                    <option v-for="(b,index) in branchList" :key="`product-${index}`" :value="b.BranchId">{{ b.BranchName }}</option>
+                  </select>
                 </div>
-                <div class="border-2 p-6 rounded-box mb-4">
-                  <div class="flex items-end gap-4 ">
-                    <label class="form-control w-full">
-                      <div class="label">
-                        <span class="label-text">Product</span>
-                      </div>
-                      <select class="select select-bordered w-full rounded-lg" v-model="productForm.ProductInfoId">
-                        <option :value="undefined" disabled ><span v-if="isBranchPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
-                        <option v-for="(p,index) in productList" :key="`product-${index}`" :value="p.ProductInfoId">{{ p.ProductName }}</option>
-                      </select>
-                    </label>
-                    <label class="form-control w-full">
-                      <div class="label">
+                <button class="btn btn-info btn-sm">Submit</button>
+              </div>
+              <div class="border-2 p-6 rounded-box mb-4">
+                <div class="flex items-end gap-4 ">
+                  <label class="form-control w-full">
+                    <div class="label">
+                      <span class="label-text">Product</span>
+                    </div>
+                    <select class="select select-bordered w-full rounded-lg" v-model="productForm.ProductInfoId">
+                      <option :value="undefined" disabled ><span v-if="isBranchPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
+                      <option v-for="(p,index) in productList" :key="`product-${index}`" :value="p.ProductInfoId">{{ p.ProductName }}</option>
+                    </select>
+                  </label>
+                  <label class="form-control w-full">
+                    <div class="label">
                         <span class="label-text">Amount</span>
                         <!-- <span class="label-text text-error">*</span> -->
                       </div>                  
@@ -185,9 +185,9 @@ const createStockCardMutation = useMutation<baseResponse<void> ,AxiosError<baseR
                       <span class="label-text">Product Description</span>
                     </div>
                     <textarea
-                      v-model="form."
-                      class="textarea textarea-bordered h-24 w-full rounded-lg"
-                      placeholder="Enter product ProductDescription here..."
+                    v-model="form."
+                    class="textarea textarea-bordered h-24 w-full rounded-lg"
+                    placeholder="Enter product ProductDescription here..."
                     ></textarea>
                   </div> -->
                 </div>
@@ -215,13 +215,14 @@ const createStockCardMutation = useMutation<baseResponse<void> ,AxiosError<baseR
                         </div>
                         <input type="number" v-model="list.data.ProductCost" class="input appearance-none ">
                       </label>
-                    <button type="button" class="btn btn-error btn-sm" @click="handleremoveThisItem(index)"><IconTrash/></button>
-                  </div>
+                      <button type="button" class="btn btn-error btn-sm" @click="handleremoveThisItem(index)"><IconTrash/></button>
+                    </div>
                   </div>
                 </div>
               </form>
             </div>
-        </div>
-    </dialog>
-    <button class="modal-button btn btn-soft btn-primary" @click="myModalRef?.showModal()"><IconPlus/>Add Stock</button>
-</template>
+          </div>
+        </template>
+        </FormDialog>
+        <button class="modal-button btn btn-soft btn-primary" @click="() => dialogStore.form = true"><IconPlus/>Add Stock</button>
+      </template>

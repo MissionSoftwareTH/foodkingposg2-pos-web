@@ -6,6 +6,7 @@ import { IconFilter2, IconPencil, IconPlus, IconSortAscendingLetters, IconTrash,
 import apiClient from '../services/api/apiService';
 import type { AxiosResponse } from 'axios';
 import { useDialogStore } from '../store/dialogStore';
+import FormDialog from '../components/dialogs/formDialog.vue';
 
 const headers:HeadersTable[] = [
     {
@@ -44,7 +45,6 @@ const headers:HeadersTable[] = [
 ];
 
 const dialogStore = useDialogStore();
-const myModalRef = ref<HTMLDialogElement | null>(null);
 const isLoading = ref<boolean>(false);
 const form = ref<Payload>({
     MerchantName: '',
@@ -54,9 +54,7 @@ const form = ref<Payload>({
 const items = ref<MerchantData[]>([]);
 
 const openModal = () => {
-  if (myModalRef.value) {
-    myModalRef.value.showModal();
-  }
+  dialogStore.form = true;
 };
 
 const selectedOption = ref<string | number>(5);
@@ -92,7 +90,7 @@ const addMerchant = async () => {
         dialogStore.openDialog(error?.res?.data?.res_message || 'unknown message', {status: 'success'});
     } finally {
         isLoading.value = false;
-        myModalRef.value?.close();
+        dialogStore.form = false
     }
 }
 
@@ -154,15 +152,16 @@ onMounted(() => {
     </div>
 
     <!-- add merchant dialog -->
-    <dialog ref="myModalRef" className="modal">
-        <div className="modal-box">
-            <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="() => myModalRef?.close()"><IconX class="text-error-content"/></button>
-            <h3 className="font-semibold text-xl">Add New Merchant</h3>
-            <div className="modal-action">
-                <form class="card-body" @submit.prevent="addMerchant">
-                    <div class="form-control flex">
-                        <label class="label text-base-content flex-1">
-                            <span class="label-text">MerchantName</span>
+    <FormDialog>
+        <template #form>
+            <div className="">
+                <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="() => dialogStore.form = false"><IconX class="text-error-content"/></button>
+                <h3 className="font-semibold text-xl">Add New Merchant</h3>
+                <div className="">
+                    <form class="card-body" @submit.prevent="addMerchant">
+                        <div class="form-control flex">
+                            <label class="label text-base-content flex-1">
+                                <span class="label-text">MerchantName</span>
                         </label>
                         <input type="text" placeholder="MerchantName" class="input input-bordered flex-2" required v-model="form.MerchantName"/>
                     </div>
@@ -184,6 +183,7 @@ onMounted(() => {
                 </form>
             </div>
         </div>
-    </dialog>
+        </template>
+    </FormDialog>
 </div>
 </template>

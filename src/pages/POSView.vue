@@ -18,10 +18,10 @@ import TableSort from '../components/TableSort.vue';
 import { extractPageOption } from '../services/utils/dataExtract';
 import { usePageOptionStore } from '../store/sortingStore';
 import TitleBarCard from '../components/TitleBarCard.vue';
+import FormDialog from '../components/dialogs/FormDialog.vue';
 
 const headers = posTableHeaders;
 const dialogStore = useDialogStore();
-const myModalRef = ref<HTMLDialogElement | null>(null);
 const mode = ref<number>(1);
 const progressBarStore = useProgressBarStore();
 const queryClient = useQueryClient();
@@ -38,7 +38,7 @@ const resetForm = () => {
 
 const closeModal = () => {
   resetForm();
-  myModalRef?.value?.close();
+  dialogStore.form = false;
 }
 
 const openModal = (data?:POSTable) => {
@@ -49,10 +49,10 @@ const openModal = (data?:POSTable) => {
             PosName: data.PosSystemName,
             PosKey: data.PosSystemKey,
         };
-        return myModalRef?.value?.showModal();
+        return dialogStore.form = true;
     }
     mode.value = 1;
-    myModalRef?.value?.showModal();
+    dialogStore.form = true;
 };
 
 //fetch POS
@@ -109,8 +109,7 @@ const postPOSMutation = useMutation<baseResponse<void> , AxiosError<baseResponse
   mutationFn:PostPOS,
   onSuccess: (data) => {
     dialogStore.openDialog(data?.res_message, {status: 'success'});
-    queryClient.invalidateQueries({queryKey: ['branchListAxios']});
-    queryClient.invalidateQueries({queryKey: ['POSList']});
+    queryClient.invalidateQueries({queryKey: ['branchListAxios','POSList']});
     closeModal();
   },
   onError: (error) => {
@@ -248,12 +247,13 @@ watch(() => pageOptionStore.pos.PageSize ,() => {
         </Table>
     </div>
     <!-- add product dialog -->
-    <dialog ref="myModalRef" className="modal">
-        <div className="modal-box min-w-1/2">
-            <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal()"><IconX class="text-error-content"/></button>
-            <h3 v-if="mode === 1" className="font-semibold text-xl">Add New POS</h3>
-            <h3 v-else-if="mode === 2" className="font-semibold text-xl">Update POS</h3>
-            <div className="modal-action">
+    <FormDialog>
+      <template #form>
+        <div className="bg-base-100 text-base-content rounded-box relative px-6 py-8 min-w-1/2">
+          <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal()"><IconX class="text-error-content"/></button>
+          <h3 v-if="mode === 1" className="font-semibold text-xl">Add New POS</h3>
+          <h3 v-else-if="mode === 2" className="font-semibold text-xl">Update POS</h3>
+            <div className="">
               <form @submit.prevent="handleSubmit" class="text-base mx-auto">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <label class="form-control w-full" v-if="mode === 1">
@@ -270,11 +270,11 @@ watch(() => pageOptionStore.pos.PageSize ,() => {
                       <span class="label-text">POS Name</span>
                     </div>
                     <input
-                      type="text"
-                      required
-                      v-model="form.PosName"
-                      placeholder="e.g., Kitchen"
-                      class="input input-bordered w-full validator rounded-lg"
+                    type="text"
+                    required
+                    v-model="form.PosName"
+                    placeholder="e.g., Kitchen"
+                    class="input input-bordered w-full validator rounded-lg"
                     />
                   </label>
                   <label class="form-control w-full">
@@ -282,11 +282,11 @@ watch(() => pageOptionStore.pos.PageSize ,() => {
                       <span class="label-text">POS Key</span>
                     </div>
                     <input
-                      type="text"
-                      required
-                      v-model="form.PosKey"
-                      placeholder="e.g., ABC123"
-                      class="input input-bordered w-full validator rounded-lg"
+                    type="text"
+                    required
+                    v-model="form.PosKey"
+                    placeholder="e.g., ABC123"
+                    class="input input-bordered w-full validator rounded-lg"
                     />
                   </label>
                 </div>
@@ -295,7 +295,8 @@ watch(() => pageOptionStore.pos.PageSize ,() => {
                 </div>
               </form>
             </div>
-        </div>
-    </dialog>
-</div>
-</template>
+          </div>
+        </template>
+        </FormDialog>
+      </div>
+    </template>

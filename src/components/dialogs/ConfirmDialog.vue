@@ -1,5 +1,5 @@
 <template>
-  <dialog ref="dialogRef" class="modal" :open="store.isOpen" @click="handleBackdropClick">
+  <dialog ref="dialogRef" class="modal z-60" :open="store.isOpen" @click="handleBackdropClick">
     <div class="modal-box" @click.stop>
         <div class="flex gap-2 items-center text-warning">
             <IconAlertTriangle class="size-10"/>
@@ -33,8 +33,10 @@
 import { ref, watch } from 'vue';
 import { useConfirmDialogStore } from '../../store/confirmDialogStore';
 import { IconAlertTriangle } from '@tabler/icons-vue';
+import { useDialogStore } from '../../store/dialogStore';
 
 const store = useConfirmDialogStore();
+const dialogStore = useDialogStore();
 const dialogRef = ref<HTMLDialogElement | null>(null);
 
 // Watch for changes in store.isOpen to control the dialog element

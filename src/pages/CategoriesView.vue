@@ -21,7 +21,6 @@ const dialogStore = useDialogStore();
 const toastStore = useToastStore();
 const queryClient = useQueryClient();
 const progressBarStore = useProgressBarStore();
-const myModalRef = ref<HTMLDialogElement | null>(null);
 const form = ref({...categoriesPayloadForm});
 const updateForm = ref({...categoriesPayloadForm});
 const headers = categoriesTableHeaders;
@@ -57,8 +56,7 @@ const createCategoriesMutation = useMutation<baseResponse<void>,AxiosError<baseR
     mutationFn: createBranch,
     onSuccess: (data) => {
         toastStore.showToast(data.res_message , 'success');
-        queryClient.invalidateQueries({ queryKey: ['categoriesListAxios']});
-        queryClient.invalidateQueries({ queryKey: ['categoriesList']});
+        queryClient.invalidateQueries({ queryKey: ['categoriesListAxios','categoriesList']});
         closeModal();
     },
     onError: (error) => {
@@ -94,8 +92,7 @@ const updateCategoriesMutation = useMutation<baseResponse<void> , AxiosError<bas
     mutationFn: updateCategories,
     onSuccess: (data) => {
         toastStore.showToast(data.res_message , 'success');
-        queryClient.invalidateQueries({queryKey: ['categoriesListAxios']});
-        queryClient.invalidateQueries({queryKey: ['productListAxios']});
+        queryClient.invalidateQueries({queryKey: ['categoriesListAxios','productListAxios']});
         closeModal();
     },
     onError: (error) => {
@@ -113,7 +110,6 @@ const updateCategoriesMutation = useMutation<baseResponse<void> , AxiosError<bas
 })
 
 const closeModal = () => {
-  myModalRef.value?.close();
   resetForm();
 }
 

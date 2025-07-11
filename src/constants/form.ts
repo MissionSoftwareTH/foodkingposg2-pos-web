@@ -1,4 +1,6 @@
 import type { BranchPayload, BrandPayload, CategoriesPayload, formData, OTP_Response, POSPayload, ProductPayload } from "../types";
+import type { AdminListPayload } from "../types/admin";
+import type { RoleListPayload } from "../types/role";
 import type { StockCardPayload, StockCardPayloadData } from "../types/stock";
 
 export const OTPdataForm:OTP_Response = {
@@ -64,4 +66,19 @@ export const StockCardPayloadDataForm:StockCardPayloadData = {
   NumberOfProducts: 0,
   ProductInfoId: 0,
   ProductCost: 0
+}
+
+export const RolePayloadForm:RoleListPayload = {
+    RoleName: '',
+    Description: '',
+}
+
+export const AdminListPayloadForm:AdminListPayload = {
+    Email: '',
+    Password: '',
+    FirstName: '',
+    LastName: '',
+    BranchId: undefined,
+    MerchantId: undefined,
+    RoleId: undefined,
 }

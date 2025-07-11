@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { RouterLink, useRouter } from 'vue-router';
 import { ref, shallowRef, watch } from 'vue';
-import { IconBuildings, IconBuildingStore, IconCategory, IconChevronsDown, IconDeviceDesktop, IconExclamationCircle, IconFileSettings, IconHome, IconLicense, IconLogs, IconPackage, IconShoppingCart, IconUsers } from '@tabler/icons-vue'; // Import all icons you use
+import { IconBuildings, IconBuildingStore, IconCategory, IconChevronsDown, IconDeviceDesktop, IconExclamationCircle, IconFileSettings, IconHome, IconLicense, IconLogs, IconPackage, IconShoppingCart, IconUserCircle, IconUsers } from '@tabler/icons-vue'; // Import all icons you use
 import type { IconName } from '../../../router/routePath';
 import type { AppRouteRecordRaw } from '../../../types';
 import { useAppSetupStore } from '../../../store/appSetupStore';
+import { useToggleStore } from '../../../store/toggleStore';
 
 const iconComponents = shallowRef<Record<IconName, any>>({
     'Dashboard': IconHome,
@@ -18,6 +19,7 @@ const iconComponents = shallowRef<Record<IconName, any>>({
     'Brand Management': IconBuildings,
     'Activity logs': IconLogs,
     'Permission': IconLicense,
+    'Role': IconUserCircle,
     'non_icon': IconExclamationCircle,
 });
 
@@ -32,6 +34,7 @@ const handleToggle = () => {
   isExpanded.value = !isExpanded.value
 }
 const appSetupStore = useAppSetupStore();
+const toggle = useToggleStore();
 
 watch(() => router.currentRoute.value.path, (newPath) => {
   if (props.item.children && props.item.children.length > 0) {
@@ -62,7 +65,7 @@ watch(() => router.currentRoute.value.path, (newPath) => {
         class="size-8"
         />
                 <h1 
-                :class="appSetupStore.isSideBarExpanded ? `px-4` : `opacity-0 max-w-0 group-hover:px-4 group-hover:opacity-100 group-hover:max-w-xs`"
+                :class="appSetupStore.isSideBarExpanded || toggle.isSidebar ? `px-4` : `opacity-0 max-w-0 group-hover:px-4 group-hover:opacity-100 group-hover:max-w-xs`"
                 class="overflow-hidden font-semibold whitespace-nowrap transition-all duration-500 ease-in-out">{{ item.name }}</h1>
 
             </button>
@@ -83,7 +86,7 @@ watch(() => router.currentRoute.value.path, (newPath) => {
                 class="size-8"
             />
                 <h1 
-                :class="appSetupStore.isSideBarExpanded ? `px-4` : `opacity-0 max-w-0 group-hover:px-4 group-hover:opacity-100 group-hover:max-w-xs`"
+                :class="appSetupStore.isSideBarExpanded || toggle.isSidebar ? `px-4` : `opacity-0 max-w-0 group-hover:px-4 group-hover:opacity-100 group-hover:max-w-xs`"
                 class="overflow-hidden font-semibold whitespace-nowrap transition-all duration-500 ease-in-out">{{ item.name }}</h1>
         </RouterLink>
     </li>

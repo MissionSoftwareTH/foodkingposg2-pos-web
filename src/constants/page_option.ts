@@ -68,6 +68,24 @@ export const stockCardPageOption:PageOption = {
     MerchantId: 1, 
 }
 
+export const rolePageOption:PageOption = {
+    TotalRecords: 1,
+    PageSize: 5,
+    CurrentPage: 1,
+    SortOrder: 'desc',
+    SortColumn: 'RoleName',
+    MerchantId: 1, 
+}
+
+export const adminListPageOption:PageOption = {
+    TotalRecords: 1,
+    PageSize: 5,
+    CurrentPage: 1,
+    SortOrder: 'desc',
+    SortColumn: '',
+    MerchantId: 1,
+}
+
 //sort column
 export const productSortColumnOption:Sort[] = [
   { title: 'Product Name', value: 'PRODUCTNAME' },
@@ -123,4 +141,8 @@ export const stockSortColumnOption: Sort[] = [
 
 export const stockCardSortColumnOption: Sort[] = [
  
+];
+
+export const adminListSortColumnOption: Sort[] = [
+
 ];

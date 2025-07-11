@@ -1,107 +1,99 @@
 <script setup lang="ts">
 import { useAbility } from '@casl/vue';
-import { onMounted, ref, watch } from 'vue';
-import { useProgressBarStore } from '../store/progressBarStore';
-import { useToastStore } from '../store/toastStore';
-import { debounce } from '../services/utils/debounce';
+import BarChart from '../components/charts/BarChart.vue';
+import TitleBarCard from '../components/TitleBarCard.vue';
+import LineChart from '../components/charts/LineChart.vue';
+import PieChart from '../components/charts/PieChart.vue';
 
 // You can add your logic here
 const {can: $can} = useAbility();
-const progressBarStore = useProgressBarStore();
-const toastStore = useToastStore();
-const progress = ref(0);
-const disabled1 = ref(false);
-const progress2 = ref(0);
 
-const loadingMethod = () => {
-    progressBarStore.loadingStart();
-    setTimeout(() => {
-       progressBarStore.loadingStop(); 
-    }, 3000);
+const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false
 }
 
-const checkingValue = (value:number) => {
-    if(value == 100) {
-        toastStore.showToast('Progress 1 is down' , 'error');
-        disabled1.value = true;
-        progressBarStore.loadingStart();
-        setTimeout(() => {
-            progressBarStore.loadingStop(); 
-            disabled1.value = false;
-            progress.value = 0;
-        }, 10000);
-        return;
-    }
-    if(value > 80) return toastStore.showToast('Progress 1 is critical reduce the progress !' , 'warning');
-    if(value > 50) return toastStore.showToast('Progress 1 is more than 50 !', 'warning');
+const chartData = {
+    labels: ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน' , 'พฤษภาคม' , 'มิถุนายน' , 'กรกฎาคม' , 'สิงหาคม' , 'กันยายน' , 'ตุลาคม' , 'พฤศจิกายน' , 'ธันวาคม'],
+    datasets: [
+        {
+            label: 'ยอดขาย',
+            backgroundColor: 'rgb(0, 204, 0)',
+            data: [40, 20, 12, 39 , 59 , 42 , 87 , 12 ,98 , 44 , 24 , 60]
+        }
+    ]
 }
 
-const debounceCheckingValue = debounce(checkingValue , 500);
+const lineChartData = {
+    labels: ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน' , 'พฤษภาคม' , 'มิถุนายน' , 'กรกฎาคม' , 'สิงหาคม' , 'กันยายน' , 'ตุลาคม' , 'พฤศจิกายน' , 'ธันวาคม'],
+    datasets: [
+        {
+            label: 'ยอดขาย',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: '#ff6384',
+            pointBackgroundColor: '#ff6384',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#ff6384',
+            fill: true,
+            data: [40, 20, 12, 39 , 59 , 42 , 87 , 12 ,98 , 44 , 24 , 60]
+        }
+    ]
+}
 
-watch(() => progress.value , (value) => {
-    debounceCheckingValue(value);
-})
+const PieChartData = {
+    labels: ['product 1', 'product 2', 'product 3'],
+    datasets: [
+        {
+            label: 'ยอดขาย',
+            backgroundColor: [
+                'rgb(255, 99, 132)',
+                'rgb(54, 162, 235)',
+                'rgb(255, 205, 86)'
+            ],
+            data: [40, 20, 12],
+            hoverOffset: 4,
+        }
+    ]
+}
 
-onMounted(() => {
-    setTimeout(() => {
-        progress.value = 70;
-        progress2.value = 80;
-    },200)
-})
 </script>
 <template>
-    <div class="flex flex-col p-2">
-        <h1 class="text-3xl font-semibold mb-4">Dashboard</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- Example Card -->
-            <div v-if="$can('read','Post')" class="card bg-base-100 shadow-xl">
-                <div class="card-body">
-                    <h2 class="card-title">Sending Message</h2>
-                    <p>sending message to RabbitMQ</p>
-                    <div class="card-actions justify-end">
-                        <button class="btn btn-success">Send Message</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Example Card -->
-            <div v-if="$can('edit','all')" class="card bg-base-100 shadow-xl">
-                <div class="card-body">
-                    <h2 class="card-title">Notification Toast</h2>
-                    <p>Show a notification toast on your screen.</p>
-                    <div class="card-actions justify-end">
-                        <button class="btn btn-warning" @click="toastStore.showToast('show the toast','info')">Action</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Example Card -->
-            <div v-if="$can('manage','all')" class="card bg-base-100 shadow-xl">
-                <div class="card-body">
-                    <h2 class="card-title">Progress Bar</h2>
-                    <p>Activate progress bar</p>
-                    <div class="card-actions justify-end">
-                        <button class="btn btn-error" @click="loadingMethod">Action</button>
-                    </div>
-                </div>
+    <div class="flex flex-col p-2 gap-4 mb-4">
+        <h1 class="text-3xl font-semibold ">Dashboard</h1>
+        <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
+            <div class="w-full h-full flex gap-4 p-4 items-center bg-gradient-to-tr overflow-x-auto">
+                <TitleBarCard title="Gross sales" :text="65" :is-pending="false"/>
+                <TitleBarCard title="Refunds" :text="85" :is-pending="false"/>
+                <TitleBarCard title="Discounts" :text="77" :is-pending="false"/>
+                <TitleBarCard title="Net sales" :text="43" :is-pending="false"/>
+                <TitleBarCard title="Gross profit" :text="12" :is-pending="false"/>
             </div>
         </div>
-        <div class="card bg-base-100 shadow-xl max-w-sm my-4"> 
-            <div class=" card-body">
-                <div class=" size-[200px] w-full flex items-center">
-                    <div class="space-y-2 flex-1">
-                        <div class="flex gap-2 items-center"><span class="size-4 bg-primary rounded-full"></span> progress 1</div>
-                        <div class="flex gap-2 items-center"><span class="size-4 bg-secondary rounded-full"></span> progress 2</div>
-                    </div>
-                    <div class="flex-1 relative w-full h-full">
-                        <div class="absolute top-0 right-10 radial-progress progress-secondary self-center my-4 duration-700 after:invisible" :aria-valuenow="progress2" :style="`--value: ${progress2}; --size: 160px`" role="progressbar"></div>
-                        <div class="absolute top-0 right-10 radial-progress progress-primary self-center my-4 duration-700 after:invisible" :aria-valuenow="progress" :style="`--value: ${progress}; --size: 160px`" role="progressbar">{{progress}}%</div>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <input type="range" min={0} max="100" v-model="progress" :disabled="disabled1" className="range range-sm w-full range-primary" />
-                    <input type="range" min={0} max="100" v-model="progress2" className="range range-sm w-full range-secondary" />
-                </div>
+        <div class="w-full p-6 shadow-lg bg-base-100 rounded-box h-[400px]">
+            <BarChart
+                 :chart-data="chartData"
+                 :chart-options="chartOptions"
+                 :height="300"
+                 class="h-[400px]"
+            /> 
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div v-if="$can('read','Post')" class="bg-base-100 shadow-xl p-6 rounded-box">
+                <PieChart
+                     :chart-data="PieChartData"
+                     :chart-options="chartOptions"
+                     :height="300"
+                     class="h-[400px]"
+                /> 
+            </div>
+            <div v-if="$can('edit','all')" class="bg-base-100 shadow-xl p-6 rounded-box">
+                <LineChart
+                    :chart-data="lineChartData"
+                    :chart-options="chartOptions"
+                    :height="300"
+                    class="h-[400px]"
+                /> 
             </div>
         </div>
     </div>

@@ -13,6 +13,7 @@ interface DialogProps {
 
 export const useDialogStore = defineStore('dialog', () => {
     const isOpen = ref(false);
+    const form = ref(false);
     const componentName = ref<string | null>(null);
     const props = ref<DialogProps | null>(null);
 
@@ -28,5 +29,5 @@ export const useDialogStore = defineStore('dialog', () => {
         isOpen.value = false;
     };
 
-    return { isOpen, componentName, props, openDialog, closeDialog };
+    return { isOpen, form, componentName, props, openDialog, closeDialog };
 });

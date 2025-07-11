@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import PermissionTable from '../components/permission/PermissionTable.vue';
-import type { RoleListResponse } from '../types/permission';
+import type { PermissionListResponse } from '../types/permission';
 import type { baseResponse } from '../types';
 import apiClient from '../services/api/apiService';
 import type { AxiosResponse } from 'axios';
@@ -10,15 +10,15 @@ import { IconPlugConnectedX } from '@tabler/icons-vue';
 
 const activeTab = ref(1);
 
-const fetchRoleList = async ():Promise<RoleListResponse[]> => {
-    const apiUrl = 'role/list';
-    const res:AxiosResponse<baseResponse<RoleListResponse[]>> = await apiClient.get(apiUrl);
+const fetchPermission = async ():Promise<PermissionListResponse[]> => {
+    const apiUrl = 'role/permission/list';
+    const res:AxiosResponse<baseResponse<PermissionListResponse[]>> = await apiClient.get(apiUrl);
     return res.data.res_data
 }
 
-const { data: roleList , isPending , isError } = useQuery({
-    queryKey: ['roleList'],
-    queryFn: fetchRoleList,
+const { data: permissionList , isPending , isError } = useQuery({
+    queryKey: ['permissionList'],
+    queryFn: fetchPermission,
 })
 
 </script>
@@ -43,19 +43,19 @@ const { data: roleList , isPending , isError } = useQuery({
                 </div>
             </div>
             <div v-else role="tablist" class="w-full tabs tabs-lift" >
-                <template v-for="(role, index) in roleList" :key="index">
+                <template v-for="(permission, index) in permissionList" :key="index">
                     <input
                         type="radio" 
                         name="my_tabs"
                         class="tab" 
-                        :aria-label="`Role ${role.RoleName}`"
+                        :aria-label="`Role ${permission.RoleName}`"
                         :id="`tab-${index+1}`"
                         :checked="activeTab === index+1"
                         @change="activeTab = index+1"
                         defaultChecked
                     />
                     <div class="tab-content border-base-300 bg-base-100 p-10" >
-                        <PermissionTable :data="role.Abilities"/>
+                        <PermissionTable :data="permission.Abilities"/>
                     </div>
                 </template>
             </div>

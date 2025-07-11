@@ -118,68 +118,68 @@ const setupLoginSuccess = async (res:extendTime) => {
 
 </script>
 <template>
-         <div class="flex flex-col lg:flex-row-reverse min-h-screen container mx-auto">
-            <div class="flex-1 text-center flex flex-col justify-end lg:justify-center lg:text-left">
-                <h1 class="text-5xl font-semibold">Login now!</h1>
-                <p class="py-6">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
-            </div>
-            <div class="flex-1 flex flex-col justify-center items-center">
-                <div class="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
-                    <!-- login Form -->
-                    <form v-if="!authCompleted" class="card-body" @submit.prevent="handleSubmit">
-                        <div class="form-control">
-                            <label class="label text-base-content">
-                                <span class="label-text">Email</span>
-                            </label>
-                            <input type="text" placeholder="Email" class="input input-bordered w-full" required v-model="form.Email"/>
-                        </div>
-                        <div class="form-control">
-                            <label class="label text-base-content">
-                                <span class="label-text">Password</span>
-                            </label>
-                            <input type="Password" placeholder="Password" class="input input-bordered w-full" required v-model="form.Password"/>
-                            <label class="label text-base-content">
-                                <a href="#" class="label-text-alt link link-hover">Forgot Password?</a>
-                            </label>
-                        </div>
-                        <div class="form-control mt-6">
-                            <button type="submit" class="btn btn-primary w-full" :disabled="PostIdentityLoginMutation.isPending.value || sendEmailOTPMutation.isPending.value">Login<span v-if="PostIdentityLoginMutation.isPending.value || sendEmailOTPMutation.isPending.value" className="loading loading-spinner loading-xs ml-2"></span></button>
-                        </div>
-                    </form>
-                    <!-- OTP Form -->
-                    <div v-else class="card-body gap-6">
-                        <h1 class="text-center text-xl font-semibold uppercase">Enter OTP </h1>
-                        <OTPinput :length="6" @otp-completed="handleOtpCompleted"/>
-                        <div class="flex">
-                            <div class="flex-1 flex gap-1">
-                                OTP timeleft: <p class="text-error" v-if="isOTPTimerFinish">OTP expired</p><CountdownTimer v-else
-                                                :startTimeMillis="OTPdata.OtpExpireIn"
-                                                @countdown-finished="isOTPTimerFinish = $event"
-                                                class="text-primary"
-                                                />
-                            </div>
-                            <div class="flex-1">
-                                Ref Code: <span class="text-primary">{{OTPdata.RefCode}}</span>
-                            </div>
-                        </div>
-                        <div class="card-actions">
-                            <button @click="handleLogin" class="btn w-full disabled:btn-error" :disabled="PostLoginMutation.isPending.value || sendEmailOTPMutation.isPending.value">Submit<span v-if="PostLoginMutation.isPending.value || sendEmailOTPMutation.isPending.value" className="loading loading-spinner loading-xs ml-2"></span></button>
-                            <span v-if="isdelayOTPTimerFinish" class="flex items-center gap-2">
-                                <p>ยังไม่ได้ OTP ?</p>
-                                <button class="text-primary cursor-pointer hover:underline" @click="sendEmailOTPMutation.mutate()">Click here</button>
-                            </span>
-                            <span v-else class="flex gap-2 self-center">
-                                <p>กรุณารอ</p>
-                                <CountdownTimer :startTimeMillis="OTPdata.RemainingTime"
-                                @countdown-finished="isdelayOTPTimerFinish = $event"
-                                class="text-primary"
-                                />
-                                <p>ก่อนขอรหัส OTP อีกครั้ง</p>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="flex flex-col lg:flex-row-reverse min-h-screen container mx-auto">
+       <div class="flex-1 text-center flex flex-col justify-end lg:justify-center lg:text-left">
+           <h1 class="text-5xl font-semibold">Login now!</h1>
+           <p class="py-6">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
+       </div>
+       <div class="flex-1 flex flex-col justify-center items-center">
+           <div class="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+               <!-- login Form -->
+               <form v-if="!authCompleted" class="card-body" @submit.prevent="handleSubmit">
+                   <div class="form-control">
+                       <label class="label text-base-content">
+                           <span class="label-text">Email</span>
+                       </label>
+                       <input type="text" placeholder="Email" class="input input-bordered w-full" required v-model="form.Email"/>
+                   </div>
+                   <div class="form-control">
+                       <label class="label text-base-content">
+                           <span class="label-text">Password</span>
+                       </label>
+                       <input type="Password" placeholder="Password" class="input input-bordered w-full" required v-model="form.Password"/>
+                       <label class="label text-base-content">
+                           <a href="#" class="label-text-alt link link-hover">Forgot Password?</a>
+                       </label>
+                   </div>
+                   <div class="form-control mt-6">
+                       <button type="submit" class="btn btn-primary w-full" :disabled="PostIdentityLoginMutation.isPending.value || sendEmailOTPMutation.isPending.value">Login<span v-if="PostIdentityLoginMutation.isPending.value || sendEmailOTPMutation.isPending.value" className="loading loading-spinner loading-xs ml-2"></span></button>
+                   </div>
+               </form>
+               <!-- OTP Form -->
+               <div v-else class="card-body gap-6">
+                   <h1 class="text-center text-xl font-semibold uppercase">Enter OTP </h1>
+                   <OTPinput :length="6" @otp-completed="handleOtpCompleted"/>
+                   <div class="flex">
+                       <div class="flex-1 flex gap-1">
+                           OTP timeleft: <p class="text-error" v-if="isOTPTimerFinish">OTP expired</p><CountdownTimer v-else
+                                           :startTimeMillis="OTPdata.OtpExpireIn"
+                                           @countdown-finished="isOTPTimerFinish = $event"
+                                           class="text-primary"
+                                           />
+                       </div>
+                       <div class="flex-1">
+                           Ref Code: <span class="text-primary">{{OTPdata.RefCode}}</span>
+                       </div>
+                   </div>
+                   <div class="card-actions">
+                       <button @click="handleLogin" class="btn w-full disabled:btn-error" :disabled="PostLoginMutation.isPending.value || sendEmailOTPMutation.isPending.value">Submit<span v-if="PostLoginMutation.isPending.value || sendEmailOTPMutation.isPending.value" className="loading loading-spinner loading-xs ml-2"></span></button>
+                       <span v-if="isdelayOTPTimerFinish" class="flex items-center gap-2">
+                           <p>ยังไม่ได้ OTP ?</p>
+                           <button class="text-primary cursor-pointer hover:underline" @click="sendEmailOTPMutation.mutate()">Click here</button>
+                       </span>
+                       <span v-else class="flex gap-2 self-center">
+                           <p>กรุณารอ</p>
+                           <CountdownTimer :startTimeMillis="OTPdata.RemainingTime"
+                           @countdown-finished="isdelayOTPTimerFinish = $event"
+                           class="text-primary"
+                           />
+                           <p>ก่อนขอรหัส OTP อีกครั้ง</p>
+                       </span>
+                   </div>
+               </div>
+           </div>
+       </div>
+    </div>
 </template>
 

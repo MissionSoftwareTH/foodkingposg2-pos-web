@@ -230,3 +230,42 @@ export const stockCardTableHeaders:HeadersTable[] = [
         type: 'actions',
     }
 ]
+
+export const RoleTableHeaders:HeadersTable[] = [
+    {
+        key: 'RoleName',
+        title: 'Role Name',
+    },
+    {
+        key: 'Description',
+        title: 'Description',
+    },
+]
+
+export const AdminListTableHeaders:HeadersTable[] = [
+    {
+        key: 'AdminId',
+        title: 'ID',
+    },
+    {
+        key: 'AdminName',
+        title: 'Name',
+    },
+    {
+        key: 'Email',
+        title: 'Email',
+    },
+    {
+        key: 'Branch',
+        title: 'BranchName',
+    },
+    {
+        key: 'RoleName',
+        title: 'RoleName',
+    },
+    {
+        key: 'actions',
+        title: 'Actions',
+        type: 'actions',
+    }
+]

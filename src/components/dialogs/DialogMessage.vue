@@ -2,7 +2,7 @@
     <Transition name="fade">
         <dialog 
             v-if="dialogStore.isOpen"
-            class="fixed top-0 left-0 w-full h-full bg-black/50 z-50 flex items-center justify-center"
+            class="fixed top-0 left-0 w-full h-full bg-black/50 z-70 flex items-center justify-center"
             @click.self="dialogStore.closeDialog"
         >
             <div class="bg-base-100 rounded-lg shadow-lg p-6 w-full max-w-md relative overflow-hidden flex-semibold">

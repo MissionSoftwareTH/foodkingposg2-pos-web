@@ -21,7 +21,6 @@ const dialogStore = useDialogStore();
 const toastStore = useToastStore();
 const queryClient = useQueryClient();
 const progressBarStore = useProgressBarStore();
-const myModalRef = ref<HTMLDialogElement | null>(null);
 const form = ref<BrandPayload>({...brandPayloadForm});
 const updateForm = ref<BrandPayload>({...brandPayloadForm});
 const headers = brandTableHeaders;
@@ -57,9 +56,7 @@ const createBrandMutation = useMutation<baseResponse<void>,AxiosError<baseRespon
     mutationFn: createBranch,
     onSuccess: (data) => {
         toastStore.showToast(data.res_message , 'success');
-        queryClient.invalidateQueries({ queryKey: ['brandListAxios']});
-        queryClient.invalidateQueries({ queryKey: ['brandList']});
-        closeModal();
+        queryClient.invalidateQueries({ queryKey: ['brandListAxios','brandList']});
     },
     onError: (error) => {
         console.error(error.response?.data.res_message || error.message);
@@ -94,8 +91,7 @@ const updateBrandMutation = useMutation<baseResponse<void> , AxiosError<baseResp
     mutationFn: updateBrand,
     onSuccess: (data) => {
         toastStore.showToast(data.res_message , 'success');
-        queryClient.invalidateQueries({queryKey: ['brandListAxios']});
-        queryClient.invalidateQueries({queryKey: ['productListAxios']});
+        queryClient.invalidateQueries({queryKey: ['brandListAxios','productListAxios']});
         closeModal();
     },
     onError: (error) => {
@@ -113,7 +109,6 @@ const updateBrandMutation = useMutation<baseResponse<void> , AxiosError<baseResp
 })
 
 const closeModal = () => {
-  myModalRef.value?.close();
   resetForm();
 }
 

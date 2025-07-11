@@ -1,5 +1,5 @@
 <template>
-  <div class="toast toast-end z-[9999]">
+  <div class="toast toast-end z-70">
     <transition-group name="toast-list" tag="div">
       <div
         v-for="toast in toastStore.toasts"

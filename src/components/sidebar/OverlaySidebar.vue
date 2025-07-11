@@ -4,15 +4,17 @@ import type { IconName } from '../../router/routePath';
 import { useAppSetupStore } from '../../store/appSetupStore';
 import type { AppRouteRecordRaw, User_Data } from '../../types';
 import SidebarMenu from './components/SidebarMenu.vue';
-import { IconLock, IconLockOpen, IconSettings } from '@tabler/icons-vue';
+import { IconLayoutSidebarLeftCollapse, IconLock, IconLockOpen, IconSettings } from '@tabler/icons-vue';
 import { useQuery } from '@tanstack/vue-query';
 import { fetchUserInfo } from '../../services/utils';
-import { computed, ref, watch } from 'vue'; // เพิ่ม ref และ watch
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'; // เพิ่ม ref และ watch
 import { useToggleStore } from '../../store/toggleStore';
+import { debounce } from '../../services/utils/debounce';
 
 const isLogin = localStorage.getItem('isLoggedIn');
 const router = useRouter();
 const appSetupStore = useAppSetupStore();
+const toggle = useToggleStore();
 
 // ใช้ ref เพื่อเก็บ Map ที่จะถูกอัปเดตเมื่อ userData เปลี่ยนแปลง
 const permissionMap = ref(new Map<string, Array<{ SubPermissionName: string }>>());
@@ -85,9 +87,6 @@ const navLinks = computed(() => {
 });
 
 const settingRoute = router.getRoutes().find((r) => r.name === 'Settings' );
-const handleSidebarToggle = (value: boolean) => {
-    appSetupStore.setSidebarExpand(value);
-};
 
 watch(() => router.currentRoute.value.path, (newPath) => {
     console.log(newPath)
@@ -95,11 +94,36 @@ watch(() => router.currentRoute.value.path, (newPath) => {
     isSettingPage.value = false;
 }, { immediate: true });
 
+
+const autoCloseSidebar = () => {
+    console.log('1')
+    if(window.innerWidth < 1024) return;
+    toggle.isSidebar = false;
+}
+
+const debouceAutoCloseSidebar = debounce(autoCloseSidebar , 500);
+
+ // เมื่อ component ถูก mount ให้เพิ่ม Event Listener
+  onMounted(() => {
+    window.addEventListener('resize', debouceAutoCloseSidebar);
+  });
+
+  // เมื่อ component ถูก unmount ให้ลบ Event Listener เพื่อป้องกัน memory leaks
+  onUnmounted(() => {
+    window.removeEventListener('resize', debouceAutoCloseSidebar);
+  });
+
 </script>
 <template>
+    <div class="inset-0 fixed bg-black/50 z-40" :class="toggle.isSidebar ? 'block' : 'hidden'"></div>
     <aside 
-        class="group h-full bg-base-100 rounded-xl p-4 overflow-hidden text-nowrap shadow-lg relative z-50"
-    >    
+    :class="toggle.isSidebar ? 'block' : 'hidden'"
+    class="group h-full bg-base-100 p-4 text-nowrap shadow-lg absolute top-0 left-0 z-50"
+    >
+        <button @click="toggle.toggleSidebar()" class="btn btn-circle absolute m-2 -right-8"><IconLayoutSidebarLeftCollapse /></button>
+        <div class="font-extrabold italic flex text-2xl text-shadow-md px-4 py-2 mb-5">
+            <h1 class="text-primary">POSKING</h1><h1 class="text-secondary">-</h1><h1 class="text-accent">SERVER</h1>
+        </div>
         <ul class="flex flex-col gap-4">
             <SidebarMenu v-for="link in navLinks" :item="link" :key="link.name || link.path" />
             <!-- setting link -->
@@ -109,18 +133,9 @@ watch(() => router.currentRoute.value.path, (newPath) => {
                     :class="isSettingPage && 'bg-primary text-primary-content stroke-primary-content'"
                     class="flex items-center px-2 py-2 bg-base-100 rounded-xl hover:bg-primary/80 hover:text-primary-content hover:stroke-primary-content transition-all duration-500 ease-in-out">
                     <IconSettings class="size-8"/>
-                        <h1
-                        :class="appSetupStore.isSideBarExpanded ? 'px-4' : 'opacity-0 max-w-0 group-hover:px-4 group-hover:opacity-100 group-hover:max-w-xs'"
-                        class="overflow-hidden font-semibold whitespace-nowrap transition-all duration-500 ease-in-out">{{ settingRoute.name }}</h1>
+                        <h1 class="overflow-hidden font-semibold whitespace-nowrap px-4 transition-all duration-500 ease-in-out">{{ settingRoute.name }}</h1>
                 </RouterLink>
             </li>
         </ul>
-        <button 
-            @click="handleSidebarToggle(!appSetupStore.isSideBarExpanded)"
-            :class="!appSetupStore.isSideBarExpanded && 'invisible opacity-0 group-hover:opacity-100 group-hover:visible'"
-            class="btn btn-ghost btn-sm btn-circle absolute bottom-2 right-2 transition-all duration-500 ">
-            <IconLock v-if="appSetupStore.isSideBarExpanded"/>
-            <IconLockOpen v-else />
-        </button>
     </aside>
 </template>

@@ -1,4 +1,4 @@
-export interface RoleListResponse {
+export interface PermissionListResponse {
     BackendRoleId: number;
     RoleName: string;
     Description: string;
