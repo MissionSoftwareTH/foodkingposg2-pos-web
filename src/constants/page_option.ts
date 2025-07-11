@@ -74,7 +74,7 @@ export const rolePageOption:PageOption = {
     CurrentPage: 1,
     SortOrder: 'desc',
     SortColumn: 'RoleName',
-    MerchantId: 1, 
+    MerchantId: 1,
 }
 
 export const adminListPageOption:PageOption = {
@@ -90,7 +90,7 @@ export const adminListPageOption:PageOption = {
 export const productSortColumnOption:Sort[] = [
   { title: 'Product Name', value: 'PRODUCTNAME' },
   { title: 'Product Category Name', value: 'PRODUCTCATEGORYNAME' },
-  { title: 'Product Brand Name', value: 'PRODUCTBRANDNAME' },
+  { title: 'Product Store Name', value: 'PRODUCTBRANDNAME' },
   { title: 'Product Code', value: 'PRODUCTCODE' },
   { title: 'Product Status Name', value: 'PRODUCTSTATUSNAME' },
   { title: 'Product Price', value: 'PRODUCTPRICE' },
@@ -100,49 +100,49 @@ export const productSortColumnOption:Sort[] = [
   { title: 'Product Discount Amount', value: 'PRODUCTDISCOUNTAMOUNT' },
 ];
 
-export const storeSortColumnOption: Sort[] = [
-  { title: 'Branch ID', value: 'BRANCHID' },
-  { title: 'Branch Name', value: 'BRANCHNAME' },
-  { title: 'Branch Email', value: 'BRANCHEMAIL' },
-  { title: 'Branch Phone', value: 'BRANCHPHONE' },
-  { title: 'Branch Key', value: 'BRANCHKEY' },
-  { title: 'Branch Status', value: 'BRANCHSTATUS' },
-  { title: 'Branch Created At', value: 'BRANCHCREATEDAT' },
-  { title: 'Branch Updated At', value: 'BRANCHUPDATEDAT' },
+export const storeSortColumnOption:Sort[] = [
+  { title: 'Store ID', value: 'BRANCHID' },
+  { title: 'Store Name', value: 'BRANCHNAME' },
+  { title: 'Store Email', value: 'BRANCHEMAIL' },
+  { title: 'Store Phone', value: 'BRANCHPHONE' },
+  { title: 'Store Key', value: 'BRANCHKEY' },
+  { title: 'Store Status', value: 'BRANCHSTATUS' },
+  { title: 'Store Created At', value: 'BRANCHCREATEDAT' },
+  { title: 'Store Updated At', value: 'BRANCHUPDATEDAT' },
   { title: 'Number of POS', value: 'NUMBEROFPOS' },
 ];
 
-export const posSortColumnOption: Sort[] = [
+export const posSortColumnOption:Sort[] = [
   { title: 'POS System ID', value: 'POSSYSTEMID' },
   { title: 'POS System Name', value: 'POSSYSTEMNAME' },
   { title: 'POS System Key', value: 'POSSYSTEMKEY' },
   { title: 'POS Created At', value: 'POSCREATEDAT' },
   { title: 'POS Updated At', value: 'POSUPDATEDAT' },
-  { title: 'Branch Name', value: 'BRANCHNAME' },
-  { title: 'Branch ID', value: 'BRANCHID' },
+  { title: 'Store Name', value: 'BRANCHNAME' },
+  { title: 'Store ID', value: 'BRANCHID' },
 ];
 
-export const categoriesSortColumnOption: Sort[] = [
+export const categoriesSortColumnOption:Sort[] = [
   {title: 'Product Category Id', value: 'ProductCategoryId'},
   {title: 'Product Category Name', value: 'ProductCategoryName'}
 ];
 
-export const brandSortColumnOption: Sort[] = [
+export const brandSortColumnOption:Sort[] = [
   {title: 'Product Brand Id', value: 'ProductBrandId'},
   {title: 'Product Brand Name', value: 'ProductBrandName'}
 ];
 
-export const stockSortColumnOption: Sort[] = [
+export const stockSortColumnOption:Sort[] = [
   { title: 'Product Name', value: 'ProductName' },
-  { title: 'Branch Name', value: 'BranchName' },
+  { title: 'Store Name', value: 'BranchName' },
   { title: 'In Stock', value: 'InStock' },
   { title: 'Status', value: 'Status' },
 ];
 
-export const stockCardSortColumnOption: Sort[] = [
+export const stockCardSortColumnOption:Sort[] = [
  
 ];
 
-export const adminListSortColumnOption: Sort[] = [
+export const adminListSortColumnOption:Sort[] = [
 
 ];

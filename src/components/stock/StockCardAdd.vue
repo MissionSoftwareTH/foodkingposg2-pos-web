@@ -37,9 +37,6 @@ const CloseModal = () => {
 }
 
 const handleSubmit = () => {
-  console.log('submitted');
-  console.log(addList.value);
-  console.log('form',form.value)
   handleCreateStockCard();
 }
 
@@ -118,7 +115,8 @@ const createStockCardMutation = useMutation<baseResponse<void> ,AxiosError<baseR
   mutationFn: createStockCard,
   onSuccess: (data) => {
     dialogStore.openDialog( data?.res_message || 'unknown response' , { status: 'success' });
-    queryClient.invalidateQueries({ queryKey: ['stockListAxios','stockCardListAxios'] });
+    queryClient.invalidateQueries({ queryKey: ['stockListAxios'] });
+    queryClient.invalidateQueries({ queryKey: ['stockCardListAxios'] });
     CloseModal();
   },
   onError: (error) => {
@@ -145,7 +143,7 @@ const createStockCardMutation = useMutation<baseResponse<void> ,AxiosError<baseR
                 <h3 className="font-semibold text-2xl text-nowrap">Add Stock</h3>
                 <div class="w-full"></div>
                 <div class="flex gap-2 items-center">
-                  <span class="label-text">Branch</span>
+                  <span class="label-text">Store</span>
                   <select class="select select-bordered select-sm max-w-xs min-w-[150px] rounded-lg mx-2" v-model="form.BranchId">
                     <option :value="undefined" disabled ><span v-if="isBranchPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
                     <option v-for="(b,index) in branchList" :key="`product-${index}`" :value="b.BranchId">{{ b.BranchName }}</option>
@@ -155,7 +153,7 @@ const createStockCardMutation = useMutation<baseResponse<void> ,AxiosError<baseR
               </div>
               <div class="border-2 p-6 rounded-box mb-4">
                 <div class="flex items-end gap-4 ">
-                  <label class="form-control w-full">
+                  <label class="form-control flex-1">
                     <div class="label">
                       <span class="label-text">Product</span>
                     </div>
@@ -164,21 +162,21 @@ const createStockCardMutation = useMutation<baseResponse<void> ,AxiosError<baseR
                       <option v-for="(p,index) in productList" :key="`product-${index}`" :value="p.ProductInfoId">{{ p.ProductName }}</option>
                     </select>
                   </label>
-                  <label class="form-control w-full">
+                  <label class="form-control flex-1">
                     <div class="label">
                         <span class="label-text">Amount</span>
                         <!-- <span class="label-text text-error">*</span> -->
-                      </div>                  
-                      <input type="number" v-model="productForm.NumberOfProducts" class="input appearance-none">
-                    </label>
-                    <label class="form-control w-full">
+                    </div>
+                    <input type="number" v-model="productForm.NumberOfProducts" class="input appearance-none">
+                  </label>
+                  <label class="form-control flex-1">
                       <div class="label">
                         <span class="label-text">Cost</span>
                         <!-- <span class="label-text text-error">*</span> -->
-                      </div>                  
+                      </div>
                       <input type="number" v-model="productForm.ProductCost" class="input appearance-none">
-                    </label>
-                    <button type="button" class="btn btn-success" @click="handleAddItem"><IconPlus/></button>
+                  </label>
+                  <button type="button" class="btn btn-success" @click="handleAddItem"><IconPlus/></button>
                   </div>
                   <!-- <div class="form-control w-full mb-6 flex flex-col">
                     <div class="label">

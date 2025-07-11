@@ -206,7 +206,7 @@ const mostPOS = computed(() => {
             </div>
            <TableSort :sort-item="sortColumnOption" @page-sort="handleSortColumnEmit">
                 <template #icon>
-                    {{ pageOptionStore.store.SortColumn }}  
+                    {{ sortColumnOption.find((s) => s.value === pageOptionStore.store.SortColumn)?.title }}  
                     <IconFilter2/>
                 </template>
             </TableSort>

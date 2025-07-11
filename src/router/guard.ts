@@ -1,5 +1,4 @@
 
-
 interface routeGuardType {
     beforeEach: (callback: (to: any, from: any, next: any) => void) => void;
 }
@@ -7,8 +6,12 @@ interface routeGuardType {
 export const routeGuard = (router: routeGuardType) => {
     router.beforeEach((to , _from , next) => {
         const isLoggedIn = localStorage.getItem('isLoggedIn');
+
+        if (to.name === 'not-found') {
+            return next();
+        }
+
         if(isLoggedIn) {
-            if(to.name === 'not found') return next();
             if(to.meta.requiresAuth) {
                 return next();
             }

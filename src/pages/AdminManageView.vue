@@ -100,7 +100,7 @@ const handleEmit = () => {
                 </div>
                 <TableSort :sort-item="sortColumnOption" @page-sort="handleSortColumnEmit">
                     <template #icon>
-                        {{ pageOptionStore.adminlist.SortColumn }}  
+                        {{ sortColumnOption.find((s) => s.value === pageOptionStore.adminlist.SortColumn)?.title }}  
                         <IconFilter2/>
                     </template>
                 </TableSort>

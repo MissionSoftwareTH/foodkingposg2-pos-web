@@ -179,7 +179,7 @@ watch(() => pageOptionStore.brand.PageSize ,() => {
             </div>
            <TableSort :sort-item="sortColumnOption" @page-sort="handleSortColumnEmit">
                 <template #icon>
-                    {{ pageOptionStore.brand.SortColumn }}  
+                    {{sortColumnOption.find((s) => s.value === pageOptionStore.brand.SortColumn)?.title }}  
                     <IconFilter2/>
                 </template>
             </TableSort>

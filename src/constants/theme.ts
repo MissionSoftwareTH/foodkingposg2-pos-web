@@ -7,10 +7,6 @@ export const themes = {
         label: "Dark",
         code: "dark",
     },
-    abyss: {
-        label: "Abyss",
-        code: "abyss",
-    },
 } as const
 
 export type ThemeCode = keyof typeof themes

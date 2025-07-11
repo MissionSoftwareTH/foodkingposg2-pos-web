@@ -102,7 +102,7 @@ export const posTableHeaders:HeadersTable[] = [
     },
     {
       key: 'BranchName',
-      title: 'Branch Name',
+      title: 'Store Name',
     },
     {
       key: 'PosCreatedAt',
@@ -161,7 +161,7 @@ export const stockTableHeaders:HeadersTable[] = [
     },
     {
         key: 'BranchName',
-        title: 'Branch Name',
+        title: 'Store Name',
         type: 'custom',
     },
     {
@@ -190,7 +190,7 @@ export const stockCardTableHeaders:HeadersTable[] = [
     },
     {
         key: 'BranchName',
-        title: 'Branch Name',
+        title: 'Store Name',
     },
     {
         key: 'Status',
@@ -257,7 +257,7 @@ export const AdminListTableHeaders:HeadersTable[] = [
     },
     {
         key: 'Branch',
-        title: 'BranchName',
+        title: 'Store Name',
     },
     {
         key: 'RoleName',

@@ -2,6 +2,7 @@ import axios from 'axios';
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { handleCookie, handleReq, handleReqError } from './interceptors/requestInterceptor';
 import { handleRes, handleResError } from './interceptors/responseInterceptor';
+
 const username = import.meta.env.VITE_API_AUTH_USERNAME;
 const password = import.meta.env.VITE_API_AUTH_PASSWORD;
 const basicAuth = "Basic " + btoa(`${username}:${password}`);
@@ -13,7 +14,6 @@ const apiClient: AxiosInstance = axios.create({
     "Content-Type": "application/json",
     "Authorization": basicAuth,
     "x-platform": 'WEB',
-    "accept-language": 'TH',
     }
     // timeout: 10000,
 });
@@ -21,6 +21,9 @@ const apiClient: AxiosInstance = axios.create({
 // Request Interceptor
 apiClient.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
+        const currentLocale = localStorage.getItem('locale')?.toUpperCase() || 'EN';
+        console.log(currentLocale);
+        config.headers["accept-language"] = currentLocale;
         handleCookie();
         return handleReq(config);
     },

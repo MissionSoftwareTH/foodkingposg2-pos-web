@@ -23,7 +23,6 @@ export type IconName = 'Dashboard' | 'Management' | 'Store Management' | 'Admin 
 
 export const routes: AppRouteRecordRaw[] = [
     { name: 'Login', path: '/', component: LoginView, meta: { requiresAuth: false, layout: 'BlankLayout' ,icon: 'non_icon'} },
-    { name: 'Not found', path: '/not-found', component: Error404, meta: { requiresAuth: false, layout: 'BlankLayout' ,icon: 'non_icon' } },
     { name: 'Settings', path: '/setting', redirect: '/setting/account/info', component: SettingView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'non_icon' } , children: [
         {name: 'Account' ,path: 'account' , children: [
             {name: 'Personal info', path: 'info' , component: Personal_Info},
@@ -43,5 +42,5 @@ export const routes: AppRouteRecordRaw[] = [
     { name: 'Permission', path: '/permission', component: PermissionView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Permission' } },
     { name: 'Role', path: '/role', component: RoleView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Role' } },
     { name: 'Activity Logs', path: '/activitylogs', component: ActivityLogView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Activity logs' } },
-
+    { name: 'not-found', path: '/:pathMatch(.*)*', component: Error404, meta: { requiresAuth: false, layout: 'BlankLayout' ,icon: 'non_icon' } },
 ]
