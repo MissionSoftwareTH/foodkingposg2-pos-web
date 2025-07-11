@@ -1,4 +1,3 @@
-```markdown
 # Vue 3 + TypeScript + Vite
 
 This template helps you start developing with Vue 3 and TypeScript in Vite. It uses Vue 3 `<script setup>` SFCs; see the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) for details.
@@ -29,4 +28,4 @@ These are the project dependencies:
 ## Node version 22.11.0
 
 [def]: https://vuejs.org/guide/typescript/overview.html#project-setup
-```
+
