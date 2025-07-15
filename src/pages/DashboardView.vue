@@ -4,42 +4,96 @@ import BarChart from '../components/charts/BarChart.vue';
 import TitleBarCard from '../components/TitleBarCard.vue';
 import LineChart from '../components/charts/LineChart.vue';
 import PieChart from '../components/charts/PieChart.vue';
+import apiClient from '../services/api/apiService';
+import type { ChartResponse, ChartTable } from '../types/charts';
+import type { baseResponse, Data } from '../types';
+import type { ChartData } from 'chart.js';
+import { useQuery } from '@tanstack/vue-query';
+import type { AxiosError, AxiosResponse } from 'axios';
+import 'chartjs-adapter-date-fns';
+import { formatDateTime } from '../services/utils';
 
-// You can add your logic here
 const {can: $can} = useAbility();
 
-const chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false
-}
+const fetchChartsData = async ():Promise<ChartTable> => {
+    const apiUrl = '/dashboard/charts/data';
+    const res:AxiosResponse<baseResponse<Data<ChartResponse>>> = await apiClient.get(apiUrl);
+    const dateTime = res.data.res_data.data.ChartsData.map((data) => formatDateTime(new Date(data.CreatedAt) ,'th-TH', {
+        year: 'numeric',
+        day: 'numeric',
+        month: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: undefined
+    }));
+    console.log(dateTime)
+    const allProductCost = res.data.res_data.data.ChartsData.map((cost) => ({
+        x: cost.CreatedAt,
+        y: cost.ProductCost
+    }));
+    console.log(allProductCost)
+    const allAmountIncome = res.data.res_data.data.ChartsData.map((amount) => ({
+        x: amount.CreatedAt,
+        y: amount.NumberOfIncoming
+    }));
 
-const chartData = {
-    labels: ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน' , 'พฤษภาคม' , 'มิถุนายน' , 'กรกฎาคม' , 'สิงหาคม' , 'กันยายน' , 'ตุลาคม' , 'พฤศจิกายน' , 'ธันวาคม'],
-    datasets: [
-        {
-            label: 'ยอดขาย',
-            backgroundColor: 'rgb(0, 204, 0)',
-            data: [40, 20, 12, 39 , 59 , 42 , 87 , 12 ,98 , 44 , 24 , 60]
-        }
-    ]
-}
+    // BarChart: ใช้ข้อมูลแบบ {x, y} สำหรับ TimeScale
+    const barChartTable:ChartData<'bar'> = {
+        labels: dateTime,
+        datasets: [
+            {
+                label: res.data.res_data.data.ChartLabel + ' (ต้นทุน)',
+                backgroundColor: 'rgb(0, 204, 0)',
+                data: allProductCost.map((data) => data.y ),
+            },
+            {
+                label: res.data.res_data.data.ChartLabel + ' (จำนวน)',
+                backgroundColor: 'rgb(0, 204, 200)',
+                data: allAmountIncome.map((data) => data.y ),
+            }
+        ]
+    };
 
-const lineChartData = {
-    labels: ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน' , 'พฤษภาคม' , 'มิถุนายน' , 'กรกฎาคม' , 'สิงหาคม' , 'กันยายน' , 'ตุลาคม' , 'พฤศจิกายน' , 'ธันวาคม'],
-    datasets: [
-        {
-            label: 'ยอดขาย',
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: '#ff6384',
-            pointBackgroundColor: '#ff6384',
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: '#ff6384',
-            fill: true,
-            data: [40, 20, 12, 39 , 59 , 42 , 87 , 12 ,98 , 44 , 24 , 60]
-        }
-    ]
-}
+    // LineChart: ใช้ข้อมูลแบบ {x, y} สำหรับ TimeScale และลบ labels ออก
+    const lineChartTable:ChartData<'line'> = {
+        // ลบบรรทัด labels: dateTime ออก
+        datasets: [
+            {
+                label: res.data.res_data.data.ChartLabel + ' (ต้นทุน)',
+                backgroundColor: 'rgb(0, 204, 0)',
+                borderColor: 'rgb(0, 204, 0)',
+                pointBackgroundColor: 'rgb(0, 204, 0)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgb(0, 204, 0)',
+                fill: true,
+                data: allProductCost,
+            },
+            {
+                label: res.data.res_data.data.ChartLabel + ' (จำนวน)',
+                backgroundColor: 'rgb(0, 204, 200)',
+                borderColor: 'rgb(0, 204, 200)',
+                pointBackgroundColor: 'rgb(0, 204, 200)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgb(0, 204, 200)',
+                fill: true,
+                data: allAmountIncome,
+            }
+        ]
+    };
+
+    const chartTable:ChartTable = {
+        ChartBar: barChartTable,
+        ChartLine: lineChartTable,
+    };
+    return chartTable;
+};
+
+const {data: chartTable , isPending: chartPending , isError: chartError} = useQuery<ChartTable , AxiosError>({
+    queryKey: ['ChartAxios'],
+    queryFn: fetchChartsData,
+});
 
 const PieChartData = {
     labels: ['product 1', 'product 2', 'product 3'],
@@ -55,11 +109,11 @@ const PieChartData = {
             hoverOffset: 4,
         }
     ]
-}
-
+};
 </script>
+
 <template>
-    <div class="flex flex-col p-2 gap-4 mb-4">
+    <div class="p-2 space-y-4 mb-4">
         <h1 class="text-3xl font-semibold ">Dashboard</h1>
         <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
             <div class="w-full h-full flex gap-4 p-4 items-center bg-gradient-to-tr overflow-x-auto">
@@ -70,30 +124,48 @@ const PieChartData = {
                 <TitleBarCard title="Gross profit" :text="12" :is-pending="false"/>
             </div>
         </div>
-        <div class="w-full p-6 shadow-lg bg-base-100 rounded-box h-[400px]">
-            <BarChart
-                 :chart-data="chartData"
-                 :chart-options="chartOptions"
-                 :height="300"
-                 class="h-[400px]"
-            /> 
+        <div class="w-full p-6 shadow-lg bg-base-100 rounded-box">
+            <template v-if="!chartPending && !chartError && chartTable?.ChartLine">
+                <LineChart
+                    :chart-data="chartTable.ChartLine"
+                    :height="300"
+                />
+            </template>
+            <template v-else-if="chartPending">
+                <div class="flex justify-center items-center h-[400px]">
+                    <p>กำลังโหลดข้อมูลกราฟ...</p>
+                </div>
+            </template>
+            <template v-else-if="chartError">
+                <div class="flex justify-center items-center h-[400px] text-red-500">
+                    <p>เกิดข้อผิดพลาดในการโหลดข้อมูลกราฟ</p>
+                </div>
+            </template>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div v-if="$can('read','Post')" class="bg-base-100 shadow-xl p-6 rounded-box">
                 <PieChart
-                     :chart-data="PieChartData"
-                     :chart-options="chartOptions"
-                     :height="300"
-                     class="h-[400px]"
-                /> 
+                    :chart-data="PieChartData"
+                    :height="300"
+                />
             </div>
             <div v-if="$can('edit','all')" class="bg-base-100 shadow-xl p-6 rounded-box">
-                <LineChart
-                    :chart-data="lineChartData"
-                    :chart-options="chartOptions"
+                <template v-if="!chartPending && !chartError && chartTable?.ChartBar">
+                    <BarChart
+                    :chart-data="chartTable.ChartBar"
                     :height="300"
-                    class="h-[400px]"
-                /> 
+                />
+                </template>
+                <template v-else-if="chartPending">
+                    <div class="flex justify-center items-center h-[400px]">
+                        <p>กำลังโหลดข้อมูลกราฟ...</p>
+                    </div>
+                </template>
+                <template v-else-if="chartError">
+                    <div class="flex justify-center items-center h-[400px] text-red-500">
+                        <p>เกิดข้อผิดพลาดในการโหลดข้อมูลกราฟ</p>
+                    </div>
+                </template>
             </div>
         </div>
     </div>

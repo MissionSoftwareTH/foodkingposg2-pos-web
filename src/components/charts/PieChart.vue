@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Chart as ChartJS , CategoryScale, Legend, LinearScale, Title, Tooltip, type ChartData, type ChartOptions, PieController, ArcElement } from 'chart.js';
+import { Chart as ChartJS , CategoryScale, Legend, LinearScale, Title, Tooltip, type ChartData , PieController, ArcElement } from 'chart.js';
 import { Pie } from 'vue-chartjs'
 
 interface ChartPieProps {
@@ -11,7 +11,6 @@ interface ChartPieProps {
     styles?: any;
     plugins?: any;
     chartData: ChartData<'pie'>;
-    chartOptions?: ChartOptions<'pie'>;
 }
 const props = withDefaults(defineProps<ChartPieProps>(),{
     chartId: 'pie-chart',
@@ -25,10 +24,15 @@ const props = withDefaults(defineProps<ChartPieProps>(),{
 
 ChartJS.register(Title , Tooltip , Legend , PieController , ArcElement , CategoryScale , LinearScale);
 
+const pieChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false
+};
+
 </script>
 <template>
 <Pie 
-    :options="props.chartOptions"
+    :options="pieChartOptions"
     :data="props.chartData"
     :chart-id="props.chartId"
     :dataset-id-key="props.datasetIdKey"

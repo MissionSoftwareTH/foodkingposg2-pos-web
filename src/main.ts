@@ -8,6 +8,9 @@ import App from './App.vue'
 import caslPlugin from './services/plugin/casl'
 import { resetAbility, updateAbility } from './services/plugin/permissions'
 import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query'
+import { Chart, registerables } from 'chart.js';
+import 'chartjs-adapter-date-fns';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -15,6 +18,9 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Register all necessary components and scales
+Chart.register(...registerables);
 
 const pinia = createPinia()
 const app = createApp(App)
