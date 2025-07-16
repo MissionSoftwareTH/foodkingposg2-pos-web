@@ -26,6 +26,7 @@ const handleSelectedEmit = (value:StockTable) => {
   stockCardData.value.BranchId = value.BranchInfo.BranchId;
   stockCardData.value.ProductInfoId = value.ProductInfo.ProductInfoId;
   queryClient.invalidateQueries({ queryKey: ['stockCardListAxios'] });
+  queryClient.invalidateQueries({queryKey: ['ChartAxios']});
 }
 
 </script>

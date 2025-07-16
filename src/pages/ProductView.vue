@@ -32,7 +32,7 @@ const mode = ref(1);
 const form = ref({...productPayloadForm});
 const sortColumnOption = productSortColumnOption;
 const queryClient = useQueryClient();
-  
+
 //fetch product
 const fetchProduct = async ():Promise<ProductTable[]> => {
         const apiUrl = '/product/list';
@@ -326,7 +326,6 @@ watch(() => pageOptionStore.product.PageSize ,() => {
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <div class="w-full h-full flex gap-4 p-4 items-center">
           <TitleBarCard title="Total Product" :text="pageOptionStore.product.TotalRecords" :is-pending="isTablePending"/>
-          
         </div>
     </div>
     <div class="flex gap-4 flex-col">

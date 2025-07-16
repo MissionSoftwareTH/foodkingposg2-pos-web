@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Chart as ChartJS , CategoryScale, Legend, LinearScale, Title, Tooltip, type ChartData, type ChartOptions, LineElement, PointElement, TimeScale } from 'chart.js';
+import { Chart as ChartJS , type ChartData, type ChartOptions, registerables, Colors } from 'chart.js';
 import { Line } from 'vue-chartjs'
 import 'chartjs-adapter-date-fns';
 
@@ -10,6 +10,8 @@ interface ChartLineProps {
     styles?: any;
     plugins?: any;
     chartData: ChartData<'line'>;
+    isPending: boolean;
+    isError: boolean;
 }
 const props = withDefaults(defineProps<ChartLineProps>(),{
     chartId: 'line-chart',
@@ -19,7 +21,7 @@ const props = withDefaults(defineProps<ChartLineProps>(),{
     plugins: () => {},
 })
 
-ChartJS.register(Title , Tooltip , Legend , LineElement , PointElement , CategoryScale , LinearScale , TimeScale);
+ChartJS.register(...registerables , Colors);
 
 const lineChartOptions:ChartOptions<'line'> = {
     responsive: true,
@@ -28,9 +30,12 @@ const lineChartOptions:ChartOptions<'line'> = {
     x: {
       type: 'time',
       time: {
-        unit: 'hour',
+        unit: 'day',
         displayFormats: {
-          hour: 'yyyy-MM-dd HH:mm'
+          hour: 'yyyy-MM-dd HH:mm',
+          day: 'yyyy-MM-dd',
+          month: 'MMM yyyy',
+          year: 'yyyy'
         },
         timezone: 'Asia/Bangkok'
       }
@@ -43,13 +48,20 @@ const lineChartOptions:ChartOptions<'line'> = {
 
 </script>
 <template>
-<Line 
-    :options="lineChartOptions"
-    :data="props.chartData"
-    :chart-id="props.chartId"
-    :dataset-id-key="props.datasetIdKey"
-    :plugins="props.plugins"
-    :css-classes="props.cssClasses"
-    :styles="props.styles"
-/>
+    <div v-if="isPending" class="flex justify-center items-center h-[400px]">
+        <p>กำลังโหลดข้อมูลกราฟ...</p>
+    </div>
+    <div v-else-if="isError" class="flex justify-center items-center h-[400px] text-red-500">
+        <p>เกิดข้อผิดพลาดในการโหลดข้อมูลกราฟ</p>
+    </div>
+    <Line
+        v-else
+        :options="lineChartOptions"
+        :data="props.chartData"
+        :chart-id="props.chartId"
+        :dataset-id-key="props.datasetIdKey"
+        :plugins="props.plugins"
+        :css-classes="props.cssClasses"
+        :styles="props.styles"
+    />
 </template>

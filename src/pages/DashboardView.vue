@@ -7,7 +7,7 @@ import PieChart from '../components/charts/PieChart.vue';
 import apiClient from '../services/api/apiService';
 import type { ChartResponse, ChartTable } from '../types/charts';
 import type { baseResponse, Data } from '../types';
-import type { ChartData } from 'chart.js';
+import { type ChartData } from 'chart.js';
 import { useQuery } from '@tanstack/vue-query';
 import type { AxiosError, AxiosResponse } from 'axios';
 import 'chartjs-adapter-date-fns';
@@ -43,12 +43,10 @@ const fetchChartsData = async ():Promise<ChartTable> => {
         datasets: [
             {
                 label: res.data.res_data.data.ChartLabel + ' (ต้นทุน)',
-                backgroundColor: 'rgb(0, 204, 0)',
-                data: allProductCost.map((data) => data.y ),
+                 data: allProductCost.map((data) => data.y ),
             },
             {
                 label: res.data.res_data.data.ChartLabel + ' (จำนวน)',
-                backgroundColor: 'rgb(0, 204, 200)',
                 data: allAmountIncome.map((data) => data.y ),
             }
         ]
@@ -60,23 +58,11 @@ const fetchChartsData = async ():Promise<ChartTable> => {
         datasets: [
             {
                 label: res.data.res_data.data.ChartLabel + ' (ต้นทุน)',
-                backgroundColor: 'rgb(0, 204, 0)',
-                borderColor: 'rgb(0, 204, 0)',
-                pointBackgroundColor: 'rgb(0, 204, 0)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgb(0, 204, 0)',
                 fill: true,
                 data: allProductCost,
             },
             {
                 label: res.data.res_data.data.ChartLabel + ' (จำนวน)',
-                backgroundColor: 'rgb(0, 204, 200)',
-                borderColor: 'rgb(0, 204, 200)',
-                pointBackgroundColor: 'rgb(0, 204, 200)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgb(0, 204, 200)',
                 fill: true,
                 data: allAmountIncome,
             }
@@ -110,6 +96,7 @@ const PieChartData = {
         }
     ]
 };
+
 </script>
 
 <template>
@@ -124,48 +111,32 @@ const PieChartData = {
                 <TitleBarCard title="Gross profit" :text="12" :is-pending="false"/>
             </div>
         </div>
-        <div class="w-full p-6 shadow-lg bg-base-100 rounded-box">
-            <template v-if="!chartPending && !chartError && chartTable?.ChartLine">
-                <LineChart
-                    :chart-data="chartTable.ChartLine"
-                    :height="300"
-                />
-            </template>
-            <template v-else-if="chartPending">
-                <div class="flex justify-center items-center h-[400px]">
-                    <p>กำลังโหลดข้อมูลกราฟ...</p>
-                </div>
-            </template>
-            <template v-else-if="chartError">
-                <div class="flex justify-center items-center h-[400px] text-red-500">
-                    <p>เกิดข้อผิดพลาดในการโหลดข้อมูลกราฟ</p>
-                </div>
-            </template>
+        <div class="w-full">
+            <LineChart
+                v-if="chartTable?.ChartLine"
+                :chart-data="chartTable.ChartLine"
+                :height="300"
+                :is-pending="chartPending"
+                :is-error="chartError"
+            />
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div v-if="$can('read','Post')" class="bg-base-100 shadow-xl p-6 rounded-box">
+            <div v-if="$can('read','Post')" class="p-6">
                 <PieChart
                     :chart-data="PieChartData"
                     :height="300"
+                    :is-pending="chartPending"
+                    :is-error="chartError"
                 />
             </div>
-            <div v-if="$can('edit','all')" class="bg-base-100 shadow-xl p-6 rounded-box">
-                <template v-if="!chartPending && !chartError && chartTable?.ChartBar">
-                    <BarChart
+            <div v-if="$can('edit','all')" class="p-6">
+                <BarChart
+                    v-if="chartTable?.ChartBar"
                     :chart-data="chartTable.ChartBar"
                     :height="300"
+                    :is-pending="chartPending"
+                    :is-error="chartError"
                 />
-                </template>
-                <template v-else-if="chartPending">
-                    <div class="flex justify-center items-center h-[400px]">
-                        <p>กำลังโหลดข้อมูลกราฟ...</p>
-                    </div>
-                </template>
-                <template v-else-if="chartError">
-                    <div class="flex justify-center items-center h-[400px] text-red-500">
-                        <p>เกิดข้อผิดพลาดในการโหลดข้อมูลกราฟ</p>
-                    </div>
-                </template>
             </div>
         </div>
     </div>

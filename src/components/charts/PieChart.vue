@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Chart as ChartJS , CategoryScale, Legend, LinearScale, Title, Tooltip, type ChartData , PieController, ArcElement } from 'chart.js';
+import { Chart as ChartJS , type ChartData , registerables } from 'chart.js';
 import { Pie } from 'vue-chartjs'
 
 interface ChartPieProps {
@@ -11,6 +11,8 @@ interface ChartPieProps {
     styles?: any;
     plugins?: any;
     chartData: ChartData<'pie'>;
+    isPending: boolean;
+    isError: boolean;
 }
 const props = withDefaults(defineProps<ChartPieProps>(),{
     chartId: 'pie-chart',
@@ -22,7 +24,7 @@ const props = withDefaults(defineProps<ChartPieProps>(),{
     plugins: () => {},
 })
 
-ChartJS.register(Title , Tooltip , Legend , PieController , ArcElement , CategoryScale , LinearScale);
+ChartJS.register(...registerables);
 
 const pieChartOptions = {
     responsive: true,
@@ -31,15 +33,22 @@ const pieChartOptions = {
 
 </script>
 <template>
-<Pie 
-    :options="pieChartOptions"
-    :data="props.chartData"
-    :chart-id="props.chartId"
-    :dataset-id-key="props.datasetIdKey"
-    :plugins="props.plugins"
-    :css-classes="props.cssClasses"
-    :styles="props.styles"
-    :width="props.width"
-    :height="props.height"
-/>
+    <div v-if="isPending" class="flex justify-center items-center h-[400px]">
+        <p>กำลังโหลดข้อมูลกราฟ...</p>
+    </div>
+    <div v-else-if="isError" class="flex justify-center items-center h-[400px] text-red-500">
+        <p>เกิดข้อผิดพลาดในการโหลดข้อมูลกราฟ</p>
+    </div>
+    <Pie 
+        v-else
+        :options="pieChartOptions"
+        :data="props.chartData"
+        :chart-id="props.chartId"
+        :dataset-id-key="props.datasetIdKey"
+        :plugins="props.plugins"
+        :css-classes="props.cssClasses"
+        :styles="props.styles"
+        :width="props.width"
+        :height="props.height"
+    />
 </template>
