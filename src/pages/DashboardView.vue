@@ -26,12 +26,10 @@ const fetchChartsData = async ():Promise<ChartTable> => {
         minute: '2-digit',
         second: undefined
     }));
-    console.log(dateTime)
     const allProductCost = res.data.res_data.data.ChartsData.map((cost) => ({
         x: cost.CreatedAt,
         y: cost.ProductCost
     }));
-    console.log(allProductCost)
     const allAmountIncome = res.data.res_data.data.ChartsData.map((amount) => ({
         x: amount.CreatedAt,
         y: amount.NumberOfIncoming
@@ -96,7 +94,6 @@ const PieChartData = {
         }
     ]
 };
-
 </script>
 
 <template>

@@ -56,7 +56,9 @@ const createBrandMutation = useMutation<baseResponse<void>,AxiosError<baseRespon
     mutationFn: createBranch,
     onSuccess: (data) => {
         toastStore.showToast(data.res_message , 'success');
-        queryClient.invalidateQueries({ queryKey: ['brandListAxios','brandList']});
+        queryClient.invalidateQueries({ queryKey: ['brandListAxios']});
+        queryClient.invalidateQueries({queryKey: ['brandList']});
+
     },
     onError: (error) => {
         console.error(error.response?.data.res_message || error.message);
