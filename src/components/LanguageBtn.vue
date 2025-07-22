@@ -29,12 +29,13 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 
 import { languages, type LanguageCode } from "../constants/language.ts";
 import { useAppSetupStore } from "../store/appSetupStore.ts";
-import appController from "../services/utils/appController.ts";
+import { useAppLocale } from "../services/utils/useAppLocale.ts";
 
+const {changeLocale} = useAppLocale();
 const UIStore = useAppSetupStore();
 const getLanguageDetail = (code:LanguageCode) => {
     if(code === "th") return languages.th;
@@ -46,13 +47,8 @@ const selectedLanguage = ref<string>(getLanguageDetail(UIStore.locale as Languag
 
 const changeLanguage = (lang: { label: string, value: string }) => {
     selectedLanguage.value = lang.label
-    // TODO: Implement i18n logic here, e.g., using vue-i18n
     console.log(`Language changed to ${lang.value}`);
-    appController.setLocale(lang.value)
+    changeLocale(lang.value);
 };
-
-onMounted(() => {
-    appController.setLocale(UIStore.locale)
-})
 
 </script>

@@ -1,67 +1,91 @@
 <script lang="ts" setup>
-import { Chart as ChartJS , type ChartData, type ChartOptions, registerables, Colors } from 'chart.js';
-import { Line } from 'vue-chartjs'
-import 'chartjs-adapter-date-fns';
+// import type { ChartTable } from '../../types/charts';
+
 
 interface ChartLineProps {
-    chartId?: string;
-    datasetIdKey?: string;
-    cssClasses?: string;
-    styles?: any;
-    plugins?: any;
-    chartData: ChartData<'line'>;
+    // data: ChartTable;
+    title: string;
     isPending: boolean;
     isError: boolean;
 }
-const props = withDefaults(defineProps<ChartLineProps>(),{
-    chartId: 'line-chart',
-    datasetIdKey: 'label',
-    cssClasses: '',
-    styles: () => {},
-    plugins: () => {},
-})
 
-ChartJS.register(...registerables , Colors);
+const props = defineProps<ChartLineProps>();
 
-const lineChartOptions:ChartOptions<'line'> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-    x: {
-      type: 'time',
-      time: {
-        unit: 'day',
-        displayFormats: {
-          hour: 'yyyy-MM-dd HH:mm',
-          day: 'yyyy-MM-dd',
-          month: 'MMM yyyy',
-          year: 'yyyy'
-        },
-        timezone: 'Asia/Bangkok'
-      }
-    },
-    y: {
-      beginAtZero: true
-    }
+const cat = () => {
+  let array = []
+  for (let index = 0; index < 31; index++) {
+    array.push(index+1);
   }
-} as any;
+  return array;
+}
+
+ const options = {
+    chart: {
+      id: 'bar-chart-ex',
+      toolbar: false,
+      zoom: {
+        enabled: false // ปิดการซูมด้วยเมาส์ (ถ้าไม่ต้องการ)
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    xaxis: {
+        categories: cat(),
+        label: {
+          style: {
+            color: '#0000'
+          }
+        }
+    },
+    stroke: {
+      curve: 'smooth'
+    }
+}
+
+
+const randomData = () => {
+  let data = []
+  for (let index = 0; index < 31; index++) {
+    data.push(Math.floor(Math.random()*100));
+  }
+  return data;
+}
+
+const randomSeries = () => {
+  let series = [];
+  let num = Math.floor(Math.random()*3);
+  if(num === 0) num = 1;
+  console.log(num);
+  for (let i = 0; i < num; i++) {
+    series.push(
+      {
+        name: `series-${i+1}`,
+        data: randomData(),
+      }
+    )
+  }
+  console.log(series)
+  return series;
+}
+
+const series = randomSeries();
 
 </script>
 <template>
+    <h1 class="text-lg">{{ props.title }}</h1>
     <div v-if="isPending" class="flex justify-center items-center h-[400px]">
         <p>กำลังโหลดข้อมูลกราฟ...</p>
     </div>
     <div v-else-if="isError" class="flex justify-center items-center h-[400px] text-red-500">
         <p>เกิดข้อผิดพลาดในการโหลดข้อมูลกราฟ</p>
     </div>
-    <Line
-        v-else
-        :options="lineChartOptions"
-        :data="props.chartData"
-        :chart-id="props.chartId"
-        :dataset-id-key="props.datasetIdKey"
-        :plugins="props.plugins"
-        :css-classes="props.cssClasses"
-        :styles="props.styles"
-    />
+    <apexchart
+      v-else
+      type="area"
+      height="400px"
+      :options="options"
+      :series="series"
+    >
+    </apexchart>
 </template>

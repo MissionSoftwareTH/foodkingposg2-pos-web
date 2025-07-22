@@ -7,12 +7,14 @@ export interface StockResponse {
     Status?: string;
     CreatedAt: string;
     UpdatedAt: string;
+    ProductCost: number;
 }
 
 export interface StockTable {
     ProductInfo: ProductInfo;
     BranchInfo: BranchInfo;
     CurrentStock: number;
+    ProductCost: number;
     Status?: string;
 }
 

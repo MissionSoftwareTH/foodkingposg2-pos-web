@@ -6,14 +6,10 @@ import apiClient from '../api/apiService';
 import { updateAbility } from '../plugin/permissions';
 
 export * from './CookieExtend';
-export * from './appController';
-
 const removelist = ['info','extendTime','isLoggedIn'];
 
 const removelistItem = () => {
-    const appSetupStore = useAppSetupStore();
-    appSetupStore.user_data = undefined;
-    Cookies.remove('x-access-token');
+     Cookies.remove('x-access-token');
     
     removelist.forEach(item => {
         localStorage.removeItem(item);
@@ -68,4 +64,11 @@ export const logoutAPI = async () => {
   const res = await apiClient.get(apiUrl);
   console.log('Logout...');
   return res;
+}
+
+export const translator = (array: any[] , t: (key: string) => string) => {
+  return array.map(header => ({
+    ...header,
+    title: t(header.title as string)
+  }));
 }

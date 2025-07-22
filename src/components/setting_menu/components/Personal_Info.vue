@@ -2,10 +2,10 @@
     <form class="flex flex-col p-4 font-semibold" @submit.prevent="handleSubmit()">
         <div class="flex justify-between">
             <div class="">
-                <h1 class="text-xl">Personal Info</h1>
-                <p class="text-base font-medium text-base-content/50">Update your personal details</p>
+                <h1 class="text-xl">{{ $t('personal_info_title') }}</h1>
+                <p class="text-base font-medium text-base-content/50">{{ $t('personal_info_subtitle') }}</p>
             </div>
-            <button type="submit" class="btn btn-primary btn-sm">Submit<span v-if="isLoading" className="loading loading-spinner loading-xs ml-2"></span></button>
+            <button type="submit" class="btn btn-primary btn-sm">{{ $t('submit') }}<span v-if="isLoading" className="loading loading-spinner loading-xs ml-2"></span></button>
         </div>
         <span class="divider"></span>
         <div class="space-y-5 p-2 w-full overflow-y-auto">
@@ -13,24 +13,24 @@
                 <img src="/assets/images/profile-mock.png" alt="mock image" class="size-20 rounded-full">
                 <div class="flex flex-col justify-between">
                     <div class="flex gap-4">
-                        <button type="button" class="btn btn-sm btn-info">change your image</button>
-                        <button type="button" class="btn btn-sm btn-base-100">remove image</button>
+                        <button type="button" class="btn btn-sm btn-info">{{ $t('change_user_img') }}</button>
+                        <button type="button" class="btn btn-sm btn-base-100">{{ $t('remove_img') }}</button>
                     </div>
-                    <p class="text-base-content/50 text-sm">We supports PNGs , JPGs and GIFs under 2MB</p>
+                    <p class="text-base-content/50 text-sm">{{ $t('change_img_subtitle') }}</p>
                 </div>
             </div>
             <div class="flex gap-6">
                 <div class="flex-1 flex flex-col gap-2">
                     <label class="label text-base-content">
-                        <span class="label-text text-base text-base-content/50">First Name</span>
+                        <span class="label-text text-base text-base-content/50">{{ $t('first_name') }}</span>
                     </label>
-                    <input type="text" placeholder="first name" class="input input-bordered w-full" required v-model="form.FirstName"/>
+                    <input type="text" :placeholder="$t('first_name_placeholder')" class="input input-bordered w-full" required v-model="form.FirstName"/>
                 </div>
                 <div class="flex-1 flex flex-col gap-2">
                     <label class="label text-base-content">
-                        <span class="label-text text-base text-base-content/50">Last Name</span>
+                        <span class="label-text text-base text-base-content/50">{{ $t('last_name') }}</span>
                     </label>
-                    <input type="text" placeholder="last name" class="input input-bordered w-full" required v-model="form.LastName"/>
+                    <input type="text" :placeholder="$t('last_name_placeholder')" class="input input-bordered w-full" required v-model="form.LastName"/>
                 </div>
             </div>
         </div>

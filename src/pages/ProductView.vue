@@ -21,8 +21,9 @@ import { extractPageOption } from '../services/utils/dataExtract';
 import { usePageOptionStore } from '../store/sortingStore';
 import TitleBarCard from '../components/TitleBarCard.vue';
 import FormDialog from '../components/dialogs/FormDialog.vue';
+import { useI18n } from 'vue-i18n';
+import { translator } from '../services/utils';
 
-const headers = productTableHeaders;
 const dialogStore = useDialogStore();
 const store = useConfirmDialogStore();
 const progressBarStore = useProgressBarStore();
@@ -30,8 +31,12 @@ const pageOptionStore = usePageOptionStore();
 const toastStore = useToastStore();
 const mode = ref(1);
 const form = ref({...productPayloadForm});
-const sortColumnOption = productSortColumnOption;
 const queryClient = useQueryClient();
+const { t } = useI18n();
+const headers = computed(() => {return translator(productTableHeaders,t)});
+const sortColumnOption = computed(() => {return translator(productSortColumnOption,t)});
+const sortOrder = computed(() => {return translator(SortOrderOption,t)});
+
 
 //fetch product
 const fetchProduct = async ():Promise<ProductTable[]> => {
@@ -322,7 +327,7 @@ watch(() => pageOptionStore.product.PageSize ,() => {
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
-    <h1 class="text-3xl font-semibold">Product Management</h1>
+    <h1 class="text-3xl font-semibold">{{ $t('product_management')}}</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <div class="w-full h-full flex gap-4 p-4 items-center">
           <TitleBarCard title="Total Product" :text="pageOptionStore.product.TotalRecords" :is-pending="isTablePending"/>
@@ -331,7 +336,7 @@ watch(() => pageOptionStore.product.PageSize ,() => {
     <div class="flex gap-4 flex-col">
         <div class="flex gap-2 items-center">
             <div class="flex items-center gap-2">
-                <h1>show</h1>
+                <h1>{{ $t('show') }}</h1>
                 <select v-model="pageOptionStore.product.PageSize" className="select select-sm w-fit rounded-lg">
                     <option v-for="item in [5,10,25,50]" :value="item" :key="`item-${item}`">{{item}}</option>
                 </select>
@@ -342,14 +347,14 @@ watch(() => pageOptionStore.product.PageSize ,() => {
                     <IconFilter2/>
                 </template>
             </TableSort>
-            <TableSort :sort-item="SortOrderOption" @page-sort="handleSortOrderEmit">
+            <TableSort :sort-item="sortOrder" @page-sort="handleSortOrderEmit">
                 <template #icon>    
-                    {{ SortOrderOption.find((s) => s.value === pageOptionStore.product.SortOrder)?.title  }}
+                    {{ sortOrder.find((s) => s.value === pageOptionStore.product.SortOrder)?.title  }}
                     <IconSortAscendingLetters/>
                 </template>
             </TableSort>
             <span class="w-full"></span>
-            <button class="btn btn-primary btn-sm rounded-lg" @click="openModal()"><IconPlus class="size-5"/>Add Product</button>
+            <button class="btn btn-primary btn-sm rounded-lg" @click="openModal()"><IconPlus class="size-5"/>{{$t('add_product')}}</button>
         </div>
         <Table 
           :headers="headers" 
@@ -409,14 +414,14 @@ watch(() => pageOptionStore.product.PageSize ,() => {
       <template #form>
         <div className="bg-base-100 text-base-content rounded-box px-6 py-8 relative min-w-1/2">
           <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal"><IconX class="text-error-content"/></button>
-          <h3 v-if="mode === 1" className="font-semibold text-xl">Add New Product</h3>
-          <h3 v-else-if="mode === 2" className="font-semibold text-xl">Update Product</h3>
+          <h3 v-if="mode === 1" className="font-semibold text-xl">{{ $t('add_new_product') }}</h3>
+          <h3 v-else-if="mode === 2" className="font-semibold text-xl">{{ $t('update_product') }}</h3>
           <div className="">
             <form @submit.prevent="handleSubmit()" class="text-base mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <label class="form-control w-full">
                 <div class="label">
-                  <span class="label-text">Product Code</span>
+                  <span class="label-text">{{ $t('product_code') }}</span>
                   <span class="label-text text-error">*</span>
                 </div>
                 <input
@@ -429,7 +434,7 @@ watch(() => pageOptionStore.product.PageSize ,() => {
               </label>
               <label class="form-control w-full">
                 <div class="label">
-                  <span class="label-text">Product Name</span>
+                  <span class="label-text">{{ $t('product_name') }}</span>
                   <span class="label-text text-error">*</span>
                 </div>
                 <input
@@ -441,7 +446,8 @@ watch(() => pageOptionStore.product.PageSize ,() => {
                 />
               </label>
             </div>
-            <div class="form-control w-full mb-4">
+            <!-- Image File -->
+            <!-- <div class="form-control w-full mb-4">
               <div class="label">
                 <span class="label-text">Product Image</span>
               </div>
@@ -454,48 +460,61 @@ watch(() => pageOptionStore.product.PageSize ,() => {
                 <div v-if="form.ProductImagePath" class="text-base text-gray-500 mt-2">
                   Selected: {{ form.ProductImagePath }}
                 </div>
-              </div>
+            </div> -->
+            <!-- Image Url -->
+              <label class="form-control w-full">
+                <div class="label">
+                  <span class="label-text">{{ $t('img_url') }}</span>
+                </div>
+                <input
+                type="text"
+                required
+                v-model="form.ProductImagePath"
+                placeholder="e.g., Fried Chicken"
+                class="input input-bordered w-full validator rounded-lg"
+                />
+              </label>
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                 <label class="form-control w-full">
                   <div class="label">
-                    <span class="label-text">Brand</span>
+                    <span class="label-text">{{ $t('brand') }}</span>
                   </div>
                   <select v-model="form.ProductBrandId" class="select select-bordered w-full rounded-lg">
-                    <option :value="undefined" disabled ><span v-if="isBrandPending" class=" loading-spinner"></span><span v-else>Select Brand</span></option>
+                    <option :value="undefined" disabled ><span v-if="isBrandPending" class=" loading-spinner"></span><span v-else>{{ $t('brand_placeholder') }}</span></option>
                     <option v-for="(brand,index) in brandList" :key="`brand-${index}`" :value="brand.ProductBrandId">{{ brand.ProductBrandName }}</option>
                   </select>
                 </label>
                 <label class="form-control w-full">
                   <div class="label">
-                    <span class="label-text">Category</span>
+                    <span class="label-text">{{ $t('category') }}</span>
                   </div>
                   <select v-model="form.ProductCategoryId" class="select select-bordered w-full rounded-lg">
-                    <option :value="undefined" disabled ><span v-if="isCatPending" class=" loading-spinner"></span><span v-else>Select Category</span></option>
+                    <option :value="undefined" disabled ><span v-if="isCatPending" class=" loading-spinner"></span><span v-else>{{ $t('category_placeholder') }}</span></option>
                     <option v-for="(cat,index) in categoryList" :key="`cat-${index}`" :value="cat.ProductCategoryId">{{ cat.ProductCategoryName }}</option>
                   </select>
                 </label>
                 <label class="form-control w-full">
                   <div class="label">
-                    <span class="label-text">Status</span>
+                    <span class="label-text">{{ $t('status') }}</span>
                   </div>
                   <select v-model="form.ProductStatusId" class="select select-bordered w-full rounded-lg">
-                    <option :value="undefined" disabled ><span v-if="isProductStatusPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
+                    <option :value="undefined" disabled ><span v-if="isProductStatusPending" class=" loading-spinner"></span><span v-else>{{ $t('status_placeholder') }}</span></option>
                     <option v-for="(status,index) in productStatusList" :key="`status-${index}`" :value="status.ProductStatusId">{{ status.ProductStatusName }}</option>
                   </select>
                 </label>
                 <label class="form-control w-full">
                   <div class="label">
-                    <span class="label-text">VAT Type</span>
+                    <span class="label-text">{{ $t('vat_type') }}</span>
                   </div>
                   <select v-model="form.ProductTaxTypeId" class="select select-bordered w-full rounded-lg">
-                    <option :value="undefined" disabled ><span v-if="isTaxTypePending" class=" loading-spinner"></span><span v-else>Select VAT Type</span></option>
+                    <option :value="undefined" disabled ><span v-if="isTaxTypePending" class=" loading-spinner"></span><span v-else>{{ $t('vat_type_placeholder') }}</span></option>
                     <option v-for="(vat,index) in productTaxTypeList" :key="`vat-${index}`" :value="vat.ProductTaxTypeId">{{ vat.ProductTaxTypeName }}</option>
                   </select>
                 </label>
               </div>
               <div class="form-control w-full mb-4">
                 <div class="label">
-                  <span class="label-text">Barcode</span>
+                  <span class="label-text">{{ $t('barcode') }}</span>
               </div>
               <input
               type="text"
@@ -504,10 +523,11 @@ watch(() => pageOptionStore.product.PageSize ,() => {
               class="input input-bordered w-full rounded-lg"
               />
             </div>
+            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <label class="form-control w-full">
                 <div class="label">
-                  <span class="label-text">Product Price</span>
+                  <span class="label-text">{{ $t('price') }}</span>
                 </div>
                 <CurrencyInput v-model="form.ProductPrice"/>
               </label>
@@ -520,7 +540,7 @@ watch(() => pageOptionStore.product.PageSize ,() => {
                   v-model="enableDiscountPercentComputed"
                   class="checkbox checkbox-primary mr-2"
                   />
-                  <span class="label-text">Percent Discount</span>
+                  <span class="label-text">{{ $t('percent_discount') }}</span>
                 </div>
               </label>
               <div class="flex-3">
@@ -535,7 +555,7 @@ watch(() => pageOptionStore.product.PageSize ,() => {
                   v-model="enableDiscountAmountComputed"
                   class="checkbox checkbox-primary mr-2 "
                   />
-                  <span class="label-text">Amount Discount</span>
+                  <span class="label-text">{{ $t('amount_discount') }}</span>
                 </div>
               </label>
               <div class="flex-3">
@@ -544,16 +564,16 @@ watch(() => pageOptionStore.product.PageSize ,() => {
             </div>
             <div class="form-control w-full mb-6 flex flex-col">
               <div class="label">
-                <span class="label-text">Product Description</span>
+                <span class="label-text">{{ $t('description') }}</span>
               </div>
               <textarea
                 v-model="form.ProductDescription"
                 class="textarea textarea-bordered h-24 w-full rounded-lg"
-                placeholder="Enter product ProductDescription here..."
+                :placeholder="$t('description_placeholder')"
                 ></textarea>
               </div>
               <div class="flex justify-center">
-                <button type="submit" class="btn btn-primary px-8" :disabled="createProductMutation.isPending.value || updateProductMutation.isPending.value">Submit<span v-if="createProductMutation.isPending.value || updateProductMutation.isPending.value" className="loading loading-spinner loading-xs ml-2"></span></button>
+                <button type="submit" class="btn btn-primary px-8" :disabled="createProductMutation.isPending.value || updateProductMutation.isPending.value">{{ $t('submit') }}<span v-if="createProductMutation.isPending.value || updateProductMutation.isPending.value" className="loading loading-spinner loading-xs ml-2"></span></button>
               </div>
             </form>
           </div>

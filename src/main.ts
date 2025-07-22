@@ -8,7 +8,11 @@ import App from './App.vue'
 import caslPlugin from './services/plugin/casl'
 import { resetAbility, updateAbility } from './services/plugin/permissions'
 import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query'
-import 'chartjs-adapter-date-fns';
+import VueApexCharts from 'vue3-apexcharts';
+import setupI18n from './services/i18n/index'
+
+const pinia = createPinia()
+const app = createApp(App)
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,9 +21,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-const pinia = createPinia()
-const app = createApp(App)
 
 const rawUserinfo = localStorage.getItem('info');
 if(rawUserinfo) {
@@ -35,8 +36,11 @@ if(rawUserinfo) {
     resetAbility();
 }
 
+setupI18n(app);
+
+app.component('apexchart', VueApexCharts);
 app.use(VueQueryPlugin,{
-    queryClient,
+  queryClient,
 });
 app.use(caslPlugin);
 app.use(pinia);

@@ -1,8 +1,8 @@
 import type { PageOption, Sort } from "../types";
 
 export const SortOrderOption:Sort[] = [
-  {title: 'Ascending', value: 'asc'},
-  {title: 'Descending', value: 'desc'}
+  {title: 'asc', value: 'asc'},
+  {title: 'desc', value: 'desc'}
 ]
 
 //page option
@@ -88,59 +88,66 @@ export const adminListPageOption:PageOption = {
 
 //sort column
 export const productSortColumnOption:Sort[] = [
-  { title: 'Product Name', value: 'PRODUCTNAME' },
-  { title: 'Product Category Name', value: 'PRODUCTCATEGORYNAME' },
-  { title: 'Product Store Name', value: 'PRODUCTBRANDNAME' },
-  { title: 'Product Code', value: 'PRODUCTCODE' },
-  { title: 'Product Status Name', value: 'PRODUCTSTATUSNAME' },
-  { title: 'Product Price', value: 'PRODUCTPRICE' },
-  { title: 'Product Cost', value: 'PRODUCTCOST' },
-  { title: 'Product Tax Type Name', value: 'PRODUCTTAXTYPENAME' },
-  { title: 'Product Discount Percent', value: 'PRODUCTDISCOUNTPERCENT' },
-  { title: 'Product Discount Amount', value: 'PRODUCTDISCOUNTAMOUNT' },
+  { title: 'product_name', value: 'PRODUCTNAME' },
+  { title: 'category', value: 'PRODUCTCATEGORYNAME' },
+  { title: 'store_name', value: 'PRODUCTBRANDNAME' },
+  { title: 'product_code', value: 'PRODUCTCODE' },
+  { title: 'status', value: 'PRODUCTSTATUSNAME' },
+  { title: 'price', value: 'PRODUCTPRICE' },
+  { title: 'vat_type', value: 'PRODUCTTAXTYPENAME' },
+  { title: 'percent_discount', value: 'PRODUCTDISCOUNTPERCENT' },
+  { title: 'amount_discount', value: 'PRODUCTDISCOUNTAMOUNT' },
 ];
 
 export const storeSortColumnOption:Sort[] = [
-  { title: 'Store ID', value: 'BRANCHID' },
-  { title: 'Store Name', value: 'BRANCHNAME' },
-  { title: 'Store Email', value: 'BRANCHEMAIL' },
-  { title: 'Store Phone', value: 'BRANCHPHONE' },
-  { title: 'Store Key', value: 'BRANCHKEY' },
-  { title: 'Store Status', value: 'BRANCHSTATUS' },
-  { title: 'Store Created At', value: 'BRANCHCREATEDAT' },
-  { title: 'Store Updated At', value: 'BRANCHUPDATEDAT' },
-  { title: 'Number of POS', value: 'NUMBEROFPOS' },
+  { title: 'store_id', value: 'BRANCHID' },
+  { title: 'store_name', value: 'BRANCHNAME' },
+  { title: 'store_email', value: 'BRANCHEMAIL' },
+  { title: 'store_phone', value: 'BRANCHPHONE' },
+  { title: 'status', value: 'BRANCHSTATUS' },
+  { title: 'created_at', value: 'BRANCHCREATEDAT' },
+  { title: 'updated_at', value: 'BRANCHUPDATEDAT' },
+  { title: 'number_of_pos', value: 'NUMBEROFPOS' },
 ];
 
 export const posSortColumnOption:Sort[] = [
-  { title: 'POS System ID', value: 'POSSYSTEMID' },
-  { title: 'POS System Name', value: 'POSSYSTEMNAME' },
-  { title: 'POS System Key', value: 'POSSYSTEMKEY' },
-  { title: 'POS Created At', value: 'POSCREATEDAT' },
-  { title: 'POS Updated At', value: 'POSUPDATEDAT' },
-  { title: 'Store Name', value: 'BRANCHNAME' },
-  { title: 'Store ID', value: 'BRANCHID' },
+  { title: 'pos_id', value: 'POSSYSTEMID' },
+  { title: 'pos_name', value: 'POSSYSTEMNAME' },
+  { title: 'pos_key', value: 'POSSYSTEMKEY' },
+  { title: 'created_at', value: 'POSCREATEDAT' },
+  { title: 'updated_at', value: 'POSUPDATEDAT' },
+  { title: 'store_name', value: 'BRANCHNAME' },
 ];
 
 export const categoriesSortColumnOption:Sort[] = [
-  {title: 'Product Category Id', value: 'ProductCategoryId'},
-  {title: 'Product Category Name', value: 'ProductCategoryName'}
+  {title: 'category_id', value: 'ProductCategoryId'},
+  {title: 'category_name', value: 'ProductCategoryName'}
 ];
 
 export const brandSortColumnOption:Sort[] = [
-  {title: 'Product Brand Id', value: 'ProductBrandId'},
-  {title: 'Product Brand Name', value: 'ProductBrandName'}
+  {title: 'brand_id', value: 'ProductBrandId'},
+  {title: 'brand_name', value: 'ProductBrandName'}
 ];
 
 export const stockSortColumnOption:Sort[] = [
-  { title: 'Product Name', value: 'ProductName' },
-  { title: 'Store Name', value: 'BranchName' },
-  { title: 'In Stock', value: 'InStock' },
-  { title: 'Status', value: 'Status' },
+  { title: 'product_name', value: 'ProductName' },
+  { title: 'store_name', value: 'BranchName' },
+  { title: 'in_stock', value: 'InStock' },
+  { title: 'cost', value: 'ProductCost'},
+  { title: 'status', value: 'Status' },
 ];
 
 export const stockCardSortColumnOption:Sort[] = [
- 
+  { title: 'stockcard_id' , value: 'StockId'},
+  { title: 'previous_result' , value: 'PreviosResult'},
+  { title: 'amount' , value: 'Amount'},
+  { title: 'in_stock' , value: 'CurrentResult'},
+  { title: 'store_name' , value: 'BranchName'},
+  { title: 'created_at' , value: 'CreatedAt'},
+  { title: 'cost' , value: 'Cost'},
+  { title: 'price' , value: 'Price'},
+  { title: 'product_name' , value: 'ProductName'},
+  { title: 'vat_type' , value: 'VatType'},
 ];
 
 export const adminListSortColumnOption:Sort[] = [

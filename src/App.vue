@@ -6,10 +6,10 @@ import AuthLayout from './layouts/AuthLayout.vue';
 import BlankLayout from './layouts/BlankLayout.vue';
 import type { Layouts } from './types';
 import DialogMessage from './components/dialogs/DialogMessage.vue';
-import appController from './services/utils/appController';
 import ConfirmDialog from './components/dialogs/ConfirmDialog.vue';
 import ProgressBar from './components/ProgressBar.vue';
 import NotificationToast from './components/NotificationToast.vue';
+import { useAppSetupStore } from './store/appSetupStore';
 // import { VueQueryDevtools } from '@tanstack/vue-query-devtools';
 
 // setup layout router
@@ -24,7 +24,8 @@ const currentLayout = computed(() => {
 });
 
 // setup theme locale
-appController.setup();
+const setupStore = useAppSetupStore();
+setupStore.initialize();
 
 </script>
 

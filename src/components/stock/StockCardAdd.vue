@@ -140,22 +140,22 @@ const createStockCardMutation = useMutation<baseResponse<void> ,AxiosError<baseR
           <div className="">
             <form @submit.prevent="handleSubmit" class="text-base mx-auto w-full p-4">
               <div class="flex items-start mb-4 ">
-                <h3 className="font-semibold text-2xl text-nowrap">Add Stock</h3>
+                <h3 className="font-semibold text-2xl text-nowrap">{{ $t('add_new_stock') }}</h3>
                 <div class="w-full"></div>
                 <div class="flex gap-2 items-center">
-                  <span class="label-text">Store</span>
+                  <span class="label-text">{{ $t('store') }}</span>
                   <select class="select select-bordered select-sm max-w-xs min-w-[150px] rounded-lg mx-2" v-model="form.BranchId">
-                    <option :value="undefined" disabled ><span v-if="isBranchPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
+                    <option :value="undefined" disabled ><span v-if="isBranchPending" class=" loading-spinner"></span><span v-else>{{$t('store_placeholder')}}</span></option>
                     <option v-for="(b,index) in branchList" :key="`product-${index}`" :value="b.BranchId">{{ b.BranchName }}</option>
                   </select>
                 </div>
-                <button class="btn btn-info btn-sm">Submit</button>
+                <button class="btn btn-info btn-sm">{{ $t('submit') }}</button>
               </div>
               <div class="border-2 p-6 rounded-box mb-4">
                 <div class="flex items-end gap-4 ">
                   <label class="form-control flex-1">
                     <div class="label">
-                      <span class="label-text">Product</span>
+                      <span class="label-text">{{ $t('product_name') }}</span>
                     </div>
                     <select class="select select-bordered w-full rounded-lg" v-model="productForm.ProductInfoId">
                       <option :value="undefined" disabled ><span v-if="isBranchPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
@@ -164,14 +164,14 @@ const createStockCardMutation = useMutation<baseResponse<void> ,AxiosError<baseR
                   </label>
                   <label class="form-control flex-1">
                     <div class="label">
-                        <span class="label-text">Amount</span>
+                        <span class="label-text">{{$t('amount')}}</span>
                         <!-- <span class="label-text text-error">*</span> -->
                     </div>
                     <input type="number" v-model="productForm.NumberOfProducts" class="input appearance-none">
                   </label>
                   <label class="form-control flex-1">
                       <div class="label">
-                        <span class="label-text">Cost</span>
+                        <span class="label-text">{{ $t('cost') }}</span>
                         <!-- <span class="label-text text-error">*</span> -->
                       </div>
                       <input type="number" v-model="productForm.ProductCost" class="input appearance-none">
@@ -194,7 +194,7 @@ const createStockCardMutation = useMutation<baseResponse<void> ,AxiosError<baseR
                     <div class="flex items-end gap-4 w-full">
                       <label class="form-control w-full">
                         <div class="label">
-                          <span class="label-text">Product</span>
+                          <span class="label-text">{{ $t('product_name') }}</span>
                         </div>
                         <select class="select select-bordered w-full rounded-lg " v-model="list.data.ProductInfoId">
                           <option :value="undefined" disabled ><span v-if="isBranchPending" class=" loading-spinner"></span><span v-else>Select Status</span></option>
@@ -203,13 +203,13 @@ const createStockCardMutation = useMutation<baseResponse<void> ,AxiosError<baseR
                       </label>
                       <label class="form-control w-full">
                         <div class="label">
-                          <span class="label-text">Amount</span>
+                          <span class="label-text">{{ $t('amount') }}</span>
                         </div>
                         <input type="number" v-model="list.data.NumberOfProducts" class="input appearance-none ">
                       </label>
                       <label class="form-control w-full">
                         <div class="label">
-                          <span class="label-text">Cost</span>
+                          <span class="label-text">{{ $t('cost') }}</span>
                         </div>
                         <input type="number" v-model="list.data.ProductCost" class="input appearance-none ">
                       </label>
@@ -222,5 +222,5 @@ const createStockCardMutation = useMutation<baseResponse<void> ,AxiosError<baseR
           </div>
         </template>
         </FormDialog>
-        <button class="modal-button btn btn-soft btn-primary" @click="() => dialogStore.form = true"><IconPlus/>Add Stock</button>
+        <button class="modal-button btn btn-soft btn-primary" @click="() => dialogStore.form = true"><IconPlus/>{{ $t('add_stock') }}</button>
       </template>

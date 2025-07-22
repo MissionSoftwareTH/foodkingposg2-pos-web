@@ -1,35 +1,39 @@
 <script lang="ts" setup>
-import { Chart as ChartJS , type ChartData , registerables } from 'chart.js';
-import { Pie } from 'vue-chartjs'
 
 interface ChartPieProps {
-    chartId?: string;
-    datasetIdKey?: string;
-    width?: number;
-    height?: number;
-    cssClasses?: string;
-    styles?: any;
-    plugins?: any;
-    chartData: ChartData<'pie'>;
     isPending: boolean;
     isError: boolean;
 }
 const props = withDefaults(defineProps<ChartPieProps>(),{
-    chartId: 'pie-chart',
-    datasetIdKey: 'label',
-    width: 400,
-    height: 400,
-    cssClasses: '',
-    styles: () => {},
-    plugins: () => {},
 })
 
-ChartJS.register(...registerables);
+const randomData = () => {
+  let data = []
+  for (let index = 0; index < 6; index++) {
+    data.push(Math.floor(Math.random()*100));
+  }
+  return data;
+}
 
-const pieChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false
-};
+const options = {
+    chart: {
+        animations: {
+        enabled: true,
+        easing: 'easeinout',
+        speed: 800,
+        animateGradually: {
+            enabled: true,
+            delay: 150
+        },
+        dynamicAnimation: {
+            enabled: true,
+            speed: 350
+        }
+    }
+    },
+    labels: ['product-1','product-2','product-3','product-4','product-5','product-6']
+}
+const series = randomData()
 
 </script>
 <template>
@@ -39,16 +43,12 @@ const pieChartOptions = {
     <div v-else-if="isError" class="flex justify-center items-center h-[400px] text-red-500">
         <p>เกิดข้อผิดพลาดในการโหลดข้อมูลกราฟ</p>
     </div>
-    <Pie 
+    <apexchart
         v-else
-        :options="pieChartOptions"
-        :data="props.chartData"
-        :chart-id="props.chartId"
-        :dataset-id-key="props.datasetIdKey"
-        :plugins="props.plugins"
-        :css-classes="props.cssClasses"
-        :styles="props.styles"
-        :width="props.width"
-        :height="props.height"
-    />
+        type="pie"
+        height="400px"
+        :options="options"
+        :series="series"
+    >
+    </apexchart>
 </template>

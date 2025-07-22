@@ -18,7 +18,7 @@
                 scope="col"
                 class=" text-left text-sm font-semibold text-primary-content uppercase tracking-wider sticky right-0 bg-primary z-10 px-6 py-4 before:w-0.5 before:h-full before:absolute before:bg-base-300 before:left-0 before:top-0"
               >
-                ACTIONS
+                {{ $t('action') }} 
               </th>
             </tr>
           </thead>
