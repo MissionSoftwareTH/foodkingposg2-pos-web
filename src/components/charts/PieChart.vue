@@ -1,45 +1,54 @@
 <script lang="ts" setup>
-import { Chart as ChartJS , CategoryScale, Legend, LinearScale, Title, Tooltip, type ChartData , PieController, ArcElement } from 'chart.js';
-import { Pie } from 'vue-chartjs'
 
 interface ChartPieProps {
-    chartId?: string;
-    datasetIdKey?: string;
-    width?: number;
-    height?: number;
-    cssClasses?: string;
-    styles?: any;
-    plugins?: any;
-    chartData: ChartData<'pie'>;
+    isPending: boolean;
+    isError: boolean;
 }
 const props = withDefaults(defineProps<ChartPieProps>(),{
-    chartId: 'pie-chart',
-    datasetIdKey: 'label',
-    width: 400,
-    height: 400,
-    cssClasses: '',
-    styles: () => {},
-    plugins: () => {},
 })
 
-ChartJS.register(Title , Tooltip , Legend , PieController , ArcElement , CategoryScale , LinearScale);
+const randomData = () => {
+  let data = []
+  for (let index = 0; index < 6; index++) {
+    data.push(Math.floor(Math.random()*100));
+  }
+  return data;
+}
 
-const pieChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false
-};
+const options = {
+    chart: {
+        animations: {
+        enabled: true,
+        easing: 'easeinout',
+        speed: 800,
+        animateGradually: {
+            enabled: true,
+            delay: 150
+        },
+        dynamicAnimation: {
+            enabled: true,
+            speed: 350
+        }
+    }
+    },
+    labels: ['product-1','product-2','product-3','product-4','product-5','product-6']
+}
+const series = randomData()
 
 </script>
 <template>
-<Pie 
-    :options="pieChartOptions"
-    :data="props.chartData"
-    :chart-id="props.chartId"
-    :dataset-id-key="props.datasetIdKey"
-    :plugins="props.plugins"
-    :css-classes="props.cssClasses"
-    :styles="props.styles"
-    :width="props.width"
-    :height="props.height"
-/>
+    <div v-if="isPending" class="flex justify-center items-center h-[400px]">
+        <p>กำลังโหลดข้อมูลกราฟ...</p>
+    </div>
+    <div v-else-if="isError" class="flex justify-center items-center h-[400px] text-red-500">
+        <p>เกิดข้อผิดพลาดในการโหลดข้อมูลกราฟ</p>
+    </div>
+    <apexchart
+        v-else
+        type="pie"
+        height="400px"
+        :options="options"
+        :series="series"
+    >
+    </apexchart>
 </template>

@@ -3,39 +3,39 @@ import type { HeadersTable } from "../types";
 export const storeTableHeaders:HeadersTable[] = [
     {
         key: 'BranchId',
-        title: 'Store Id',
+        title: 'store_id',
     },
     {
         key: 'BranchName',
-        title: 'Store Name',
+        title: 'store_name',
     },
     {
         key: 'ContactPhone',
-        title: 'Contact Phone',
+        title: 'store_phone',
     },
     {
         key: 'ContactEmail',
-        title: 'Contact Email',
+        title: 'store_email',
     },
     {
         key: 'NumberOfPos',
-        title: 'number of POS',
+        title: 'number_of_pos',
     },
     {
         key: 'CreatedAt',
-        title: 'Created At',
+        title: 'created_at',
     },
     {
         key: 'UpdatedAt',
-        title: 'Updated At',
+        title: 'updated_at',
     },
     {
         key: 'Status',
-        title: 'Status',
+        title: 'status',
     },
     {
         key: 'actions',
-        title: 'Actions',
+        title: 'action',
         type: 'actions',
     }
 ];
@@ -43,46 +43,46 @@ export const storeTableHeaders:HeadersTable[] = [
 export const productTableHeaders:HeadersTable[] = [
     {
         key: 'ProductInfo',
-        title: 'Product',
+        title: 'product',
         type: 'custom',
     },
     {
         key: 'ProductCode',
-        title: 'Product Code',
+        title: 'product_code',
     },
     {
       key: 'ProductBrand',
-      title: 'Product Brand',
+      title: 'brand',
       type: 'custom'
     },
     {
         key: 'ProductStatus',
-        title: 'Status',
+        title: 'status',
         type: 'custom',
     },
     {
         key: 'ProductPrice',
-        title: 'Price',
+        title: 'price',
         type: 'custom',
     },
     {
         key: 'ProductTaxType',
-        title: 'Vat Type',
+        title: 'vat_type',
         type: 'custom',
     },
     {
         key: 'ProductDiscountPercent',
-        title: 'Percent Discount',
+        title: 'percent_discount',
         type: 'custom',
     },
     {
         key: 'ProductDiscountAmount',
-        title: 'Amount Discount',
+        title: 'amount_discount',
         type: 'custom',
     },
     {
         key: 'actions',
-        title: 'Actions',
+        title: 'action',
         type: 'actions',
     }
 ];
@@ -90,27 +90,27 @@ export const productTableHeaders:HeadersTable[] = [
 export const posTableHeaders:HeadersTable[] = [
     {
       key: 'PosSystemId',
-      title: 'Id',
+      title: 'pos_id',
     },
     {
         key: 'PosSystemName',
-        title: 'Pos System Name',
+        title: 'pos_name',
       },
     {
       key: 'PosSystemKey',
-        title: 'Pos System Key',
+        title: 'pos_key',
     },
     {
       key: 'BranchName',
-      title: 'Store Name',
+      title: 'store_name',
     },
     {
       key: 'PosCreatedAt',
-      title: 'Created At',
+      title: 'created_at',
     },
     {
         key: 'PosUpdatedAt',
-        title: 'Updated At',
+        title: 'updated_at',
     },
     {
         key: 'actions',
@@ -122,11 +122,11 @@ export const posTableHeaders:HeadersTable[] = [
 export const brandTableHeaders:HeadersTable[] = [
     {
       key: 'ProductBrandId',
-      title: 'Id',
+      title: 'brand_id',
     },
     {
       key: 'ProductBrandName',
-      title: 'Brand Name',
+      title: 'brand_name',
       type: 'custom',
     },
     {
@@ -139,11 +139,11 @@ export const brandTableHeaders:HeadersTable[] = [
 export const categoriesTableHeaders:HeadersTable[] = [
     {
       key: 'ProductCategoryId',
-      title: 'Id',
+      title: 'category_id',
     },
     {
       key: 'ProductCategoryName',
-      title: 'Category Name',
+      title: 'category_name',
       type: 'custom',
     },
     {
@@ -156,21 +156,25 @@ export const categoriesTableHeaders:HeadersTable[] = [
 export const stockTableHeaders:HeadersTable[] = [
     {
         key: 'ProductName',
-        title: 'Product Name',
+        title: 'product_name',
         type: 'custom',
     },
     {
         key: 'BranchName',
-        title: 'Store Name',
+        title: 'store_name',
         type: 'custom',
     },
     {
         key: 'CurrentStock',
-        title: 'In Stock',
+        title: 'in_stock',
+    },
+    {
+        key: 'ProductCost',
+        title: 'cost',
     },
     {
         key: 'Status',
-        title: 'Status',
+        title: 'status',
     },
     {
         key: 'actions',
@@ -182,23 +186,23 @@ export const stockTableHeaders:HeadersTable[] = [
 export const stockCardTableHeaders:HeadersTable[] = [
     {
         key: 'StockId',
-        title: 'Stock Card Id',
+        title: 'stockcard_id',
     },
     {
         key: 'ProductName',
-        title: 'Product Name',
+        title: 'product_name',
     },
     {
         key: 'BranchName',
-        title: 'Store Name',
+        title: 'store_name',
     },
     {
-        key: 'Status',
-        title: 'Status',
+        key: 'PreviosResult',
+        title: 'previous_result',
     },
     {
-        key: 'CurrentStock',
-        title: 'In Stock',
+        key: 'CurrentResult',
+        title: 'in_stock',
     },
     {
         key: 'Type',
@@ -206,29 +210,24 @@ export const stockCardTableHeaders:HeadersTable[] = [
     },
     {
         key: 'Amount',
-        title: 'Amount',
+        title: 'amount',
     },
     {
         key: 'CreatedAt',
-        title: 'Date Recorded',
+        title: 'created_at',
     },
     {
         key: 'Cost',
-        title: 'Cost',
+        title: 'cost',
     },
     {
         key: 'Price',
-        title: 'Price',
+        title: 'price',
     },
     {
         key: 'VatType',
-        title: 'Vat Type',
+        title: 'vat_type',
     },
-    {
-        key: 'actions',
-        title: 'Actions',
-        type: 'actions',
-    }
 ]
 
 export const RoleTableHeaders:HeadersTable[] = [

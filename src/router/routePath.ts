@@ -23,24 +23,24 @@ export type IconName = 'Dashboard' | 'Management' | 'Store Management' | 'Admin 
 
 export const routes: AppRouteRecordRaw[] = [
     { name: 'Login', path: '/', component: LoginView, meta: { requiresAuth: false, layout: 'BlankLayout' ,icon: 'non_icon'} },
-    { name: 'Settings', path: '/setting', redirect: '/setting/account/info', component: SettingView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'non_icon' } , children: [
+    { name: 'Settings', path: '/setting', redirect: '/setting/account/info', component: SettingView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'non_icon' , title: 'setting' } , children: [
         {name: 'Account' ,path: 'account' , children: [
             {name: 'Personal info', path: 'info' , component: Personal_Info},
             {name: 'Change password', path: 'Change-password' , component: ChangePassword},
         ]},
     ]},
-    { name: 'Dashboard', path: '/dashboard', component: DashboardView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Dashboard' } },
-    { name: 'Management', path: '/management', redirect: '/management/store', meta: {icon: 'Management'}, children: [
-        {name: 'Store Management' ,path: '/management/store' , component: StoreView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Store Management' } },
-        {name: 'Product Management' ,path: '/management/product' , component: ProductView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Product Management' } },
-        {name: 'Stock Management' ,path: '/management/stock' , component: StockItemView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Stock Management' } },
-        {name: 'POS Management' ,path: '/management/pos' , component: POSView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'POS Management' } },
-        {name: 'Category Management' ,path: '/management/categories' , component: CategoriesView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Categories Management' } },
-        {name: 'Brand Management' ,path: '/management/brand' , component: BrandView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Brand Management' } },
+    { name: 'Dashboard', path: '/dashboard', component: DashboardView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Dashboard', title: 'dashboard' } },
+    { name: 'Management', path: '/management', redirect: '/management/store', meta: {icon: 'Management' , title: 'management'}, children: [
+        {name: 'Store Management' ,path: '/management/store' , component: StoreView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Store Management', title: 'store_management' } },
+        {name: 'Product Management' ,path: '/management/product' , component: ProductView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Product Management', title: 'product_management' } },
+        {name: 'Stock Management' ,path: '/management/stock' , component: StockItemView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Stock Management', title: 'stock_management' } },
+        {name: 'POS Management' ,path: '/management/pos' , component: POSView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'POS Management', title: 'pos_management' } },
+        {name: 'Category Management' ,path: '/management/categories' , component: CategoriesView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Categories Management', title: 'category_management' } },
+        {name: 'Brand Management' ,path: '/management/brand' , component: BrandView , meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Brand Management', title: 'brand_management' } },
     ] },
-    { name: 'Admin Management', path: '/admins', component: AdminManageView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Admin Management' } },
-    { name: 'Permission', path: '/permission', component: PermissionView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Permission' } },
+    { name: 'Admin Management', path: '/admins', component: AdminManageView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Admin Management', title: 'admin_management' } },
+    { name: 'Permission', path: '/permission', component: PermissionView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Permission', title: 'permission' } },
     { name: 'Role', path: '/role', component: RoleView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Role' } },
-    { name: 'Activity Logs', path: '/activitylogs', component: ActivityLogView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Activity logs' } },
+    { name: 'Activity Logs', path: '/activitylogs', component: ActivityLogView, meta: { requiresAuth: true, layout: 'AuthLayout' ,icon: 'Activity logs', title: 'activiy_log' } },
     { name: 'not-found', path: '/:pathMatch(.*)*', component: Error404, meta: { requiresAuth: false, layout: 'BlankLayout' ,icon: 'non_icon' } },
 ]

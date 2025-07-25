@@ -10,9 +10,10 @@ import { usePageOptionStore } from '../../store/sortingStore';
 import { SortOrderOption, stockCardSortColumnOption } from '../../constants/page_option';
 import TableSort from '../TableSort.vue';
 import { IconFilter2, IconSortAscendingLetters } from '@tabler/icons-vue';
-import { watch } from 'vue';
+import { computed, watch } from 'vue';
 import { extractPageOption } from '../../services/utils/dataExtract';
-import { formatDateTime } from '../../services/utils';
+import { formatDateTime, translator } from '../../services/utils';
+import { useI18n } from 'vue-i18n';
 
 
 interface Props {
@@ -25,10 +26,13 @@ defineEmits<{
   (e: 'openInsertDialog', open: boolean): void;
 }>();
 
-const headers = stockCardTableHeaders;
-const sortColumnOption = stockCardSortColumnOption;
 const pageOptionStore = usePageOptionStore();
 const queryClient = useQueryClient();
+const { t } = useI18n();
+const headers = computed(() => {return translator(stockCardTableHeaders,t)});
+const sortColumnOption = computed(() => {return translator(stockCardSortColumnOption,t)});
+const sortOrder = computed(() => {return translator(SortOrderOption,t)});
+
 
 const fetchStockCard = async () => {
     const apiUrl = '/product/stock/record';
@@ -81,7 +85,7 @@ watch(() => pageOptionStore.stockCard.PageSize ,() => {
        <div class="flex gap-4 flex-col">
         <div class="flex gap-2 items-center">
             <div class="flex items-center gap-2">
-                <h1>show</h1>
+                <h1>{{ $t('show') }}</h1>
                 <select v-model="pageOptionStore.stockCard.PageSize" className="select select-sm w-fit rounded-lg">
                     <option v-for="item in [5,10,25,50]" :value="item" :key="`item-${item}`">{{item}}</option>
                 </select>
@@ -92,9 +96,9 @@ watch(() => pageOptionStore.stockCard.PageSize ,() => {
                     <IconFilter2/>
                 </template>
             </TableSort>
-            <TableSort :sort-item="SortOrderOption" @page-sort="handleSortOrderEmit">
+            <TableSort :sort-item="sortOrder" @page-sort="handleSortOrderEmit">
                 <template #icon>    
-                    {{ SortOrderOption.find((s) => s.value === pageOptionStore.stockCard.SortOrder)?.title }}
+                    {{ sortOrder.find((s) => s.value === pageOptionStore.stockCard.SortOrder)?.title }}
                     <IconSortAscendingLetters/>
                 </template>
             </TableSort>

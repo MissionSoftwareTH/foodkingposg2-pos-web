@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import Table from '../components/Table.vue';
 import type { baseResponse, CategoriesResponse , CategoriesTable, CategoriesPayload, Data } from '../types';
 import { IconFilter2, IconPlus, IconSortAscendingLetters, IconTrash ,IconEdit } from '@tabler/icons-vue';
@@ -15,6 +15,8 @@ import { categoriesPayloadForm } from '../constants/form';
 import { categoriesTableHeaders } from '../constants/table';
 import { categoriesSortColumnOption, SortOrderOption } from '../constants/page_option';
 import { usePageOptionStore } from '../store/sortingStore';
+import { useI18n } from 'vue-i18n';
+import { translator } from '../services/utils';
 
 const confirmStore = useConfirmDialogStore();
 const dialogStore = useDialogStore();
@@ -23,10 +25,13 @@ const queryClient = useQueryClient();
 const progressBarStore = useProgressBarStore();
 const form = ref({...categoriesPayloadForm});
 const updateForm = ref({...categoriesPayloadForm});
-const headers = categoriesTableHeaders;
-const sortColumnOption = categoriesSortColumnOption;
 const pageOptionStore = usePageOptionStore();
 const isInputUpdated = ref<number | undefined>(undefined);
+const { t } = useI18n();
+const headers = computed(() => {return translator(categoriesTableHeaders,t)});
+const sortColumnOption = computed(() => {return translator(categoriesSortColumnOption,t)});
+const sortOrder = computed(() => {return translator(SortOrderOption,t)});
+
 
 // fetch data
 const fetchCategoriesList = async (): Promise<CategoriesTable[]> => {
@@ -161,19 +166,19 @@ watch(() => pageOptionStore.categories.PageSize ,() => {
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
-    <h1 class="text-3xl font-semibold">Categories Management</h1>
+    <h1 class="text-3xl font-semibold">{{ $t('category_management') }}</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <form @submit.prevent="handleSubmit" class="w-full h-full flex gap-4 p-4 items-center">
             <div class="form-control flex">
-                <input type="text" placeholder="Categories name" class="input input-bordered flex-2 min-w-sm" v-model="form.ProductCategoryName"/>
+                <input type="text" :placeholder="$t('category_name_placeholder')" class="input input-bordered flex-2 min-w-sm" v-model="form.ProductCategoryName"/>
             </div>
-            <button type="submit" class="btn btn-primary" :disabled="isFetching"><IconPlus class="size-5"/>Add new categories<span v-if="isFetching" className="loading loading-spinner loading-xs ml-2"></span></button>
+            <button type="submit" class="btn btn-primary" :disabled="isFetching"><IconPlus class="size-5"/>{{ $t('add_new_category') }}<span v-if="isFetching" className="loading loading-spinner loading-xs ml-2"></span></button>
         </form>
     </div>
     <div class="flex gap-4 flex-col">
         <div class="flex gap-2 items-center">
             <div class="flex items-center gap-2">
-                <h1>show</h1>
+                <h1>{{ $t('show') }}</h1>
                 <select v-model="pageOptionStore.categories.PageSize" className="select select-sm w-fit rounded-lg">
                     <option v-for="item in [5,10,25,50]" :value="item" :key="`item-${item}`">{{item}}</option>
                 </select>
@@ -184,9 +189,9 @@ watch(() => pageOptionStore.categories.PageSize ,() => {
                     <IconFilter2/>
                 </template>
             </TableSort>
-            <TableSort :sort-item="SortOrderOption" @page-sort="handleSortOrderEmit">
+            <TableSort :sort-item="sortOrder" @page-sort="handleSortOrderEmit">
                 <template #icon>    
-                    {{ SortOrderOption.find((s) => s.value === pageOptionStore.categories.SortOrder)?.title  }}
+                    {{ sortOrder.find((s) => s.value === pageOptionStore.categories.SortOrder)?.title  }}
                     <IconSortAscendingLetters/>
                 </template>
             </TableSort>
@@ -206,8 +211,8 @@ watch(() => pageOptionStore.categories.PageSize ,() => {
                 <div class="flex items-center gap-2 w-fit">
                     <input type="text" class="input input-ghost max-w-[150px] disabled:text-base-content disabled:bg-transparent disabled:border-none disabled:cursor-default" :disabled="isInputUpdated !== categories.item.ProductCategoryId" :value="categories.item.ProductCategoryName" @input="e => handleTextInputUpdate(String((e.target as HTMLSelectElement).value),categories.item.ProductCategoryId)">
                     <span v-if="isInputUpdated === categories.item.ProductCategoryId" class="flex items-center gap-2">
-                        <button @click="handleUpdateSubmit()" class="btn btn-primary btn-sm">Update</button>
-                        <button @click="() => isInputUpdated = undefined" class="btn btn-error btn-sm">Close</button>
+                        <button @click="handleUpdateSubmit()" class="btn btn-primary btn-sm">{{ $t('update') }}</button>
+                        <button @click="() => isInputUpdated = undefined" class="btn btn-error btn-sm">{{ $t('close') }}</button>
                     </span>
                     <button v-else class="btn btn-xs" @click="() => isInputUpdated = categories.item.ProductCategoryId"><IconEdit class="size-4"/></button>
                 </div>

@@ -65,11 +65,11 @@ const handleOutsideClick = (event: MouseEvent) => {
             @click="logout"
             >
             <span
-            class="max-w-0 opacity-0 transition-all duration-500 ease-in-out flex items-center justify-center gap-1"
+            class="max-w-0 whitespace-nowrap opacity-0 transition-all duration-500 ease-in-out flex items-center justify-center gap-1"
             :class="isOpen && 'group-hover/logout:max-w-xs group-hover/logout:opacity-100'"
             >
                 <IconLogout class="transition-all duration-200 ease-in-out"/>
-                Logout
+                {{ $t('logout') }} 
             </span>
             </button>
         </button>

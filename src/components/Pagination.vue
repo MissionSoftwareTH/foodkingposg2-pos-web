@@ -34,7 +34,7 @@
       </li>
     </ul>
     <div class="text-base-content/50 flex items-center">
-      Page <input type="number" v-model="inputPage" @change="handleInputPage" class="min-w-4 max-w-8 text-center appearance-none"> of {{ totalPages }}
+      {{ $t('page') }} <input type="number" v-model="inputPage" @change="handleInputPage" class="min-w-4 max-w-8 text-center appearance-none"> {{ $t('of') }} {{ totalPages }}
     </div>
   </nav>
 </template>

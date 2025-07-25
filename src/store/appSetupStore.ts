@@ -3,9 +3,9 @@ import { ref } from 'vue';
 import type { User_Data } from '../types';
 
 export const useAppSetupStore = defineStore('appSetup', () => {
-    const locale = ref('en');
-    const theme = ref('light');
-    const user_data = ref<User_Data>();
+    const locale = ref(localStorage.getItem('locale') || 'en');
+    const theme = ref(localStorage.getItem('theme') || 'light');
+    const user_data = ref<User_Data>(JSON.parse(localStorage.getItem('info') || '{}'));
     const permission = ref<string[]>([]);
     const isSideBarExpanded = ref(false);
 
@@ -36,26 +36,7 @@ export const useAppSetupStore = defineStore('appSetup', () => {
     };
 
     const initialize = () => {
-        const storedLocale = localStorage.getItem('locale');
-        if (storedLocale) {
-            locale.value = storedLocale;
-        }
-
-        const storedTheme = localStorage.getItem('theme');
-        if (storedTheme) {
-            theme.value = storedTheme;
-        }
-
-        const get_user_data = localStorage.getItem('info');
-        if(get_user_data) {
-            user_data.value = JSON.parse(get_user_data);
-            setPermissionStore(user_data.value || {});
-        }
-
-        const get_sidebar_status = localStorage.getItem('sidebar-expanded');
-        if(get_sidebar_status) {
-            setSidebarExpand(JSON.parse(get_sidebar_status) || false);
-        }
+        setPermissionStore(user_data.value);
     };
 
     return {

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { watch } from 'vue';
+import { computed, watch } from 'vue';
 import { usePageOptionStore } from '../../store/sortingStore';
 import Table from '../Table.vue';
 import TableSort from '../TableSort.vue';
@@ -12,6 +12,8 @@ import type { baseResponse, DataBaseResponse } from '../../types';
 import apiClient from '../../services/api/apiService';
 import { extractPageOption } from '../../services/utils/dataExtract';
 import { IconEye, IconFilter2, IconSortAscendingLetters } from '@tabler/icons-vue';
+import { useI18n } from 'vue-i18n';
+import { translator } from '../../services/utils';
 
 const emit = defineEmits<{
   (e: 'selectStock', selected: StockTable): void;
@@ -24,8 +26,11 @@ const handleEmit = (emitValue:StockTable) => {
 
 const queryClient = useQueryClient();
 const pageOptionStore = usePageOptionStore();
-const headers = stockTableHeaders;
-const sortColumnOption = stockSortColumnOption;
+const { t } = useI18n();
+const headers = computed(() => {return translator(stockTableHeaders,t)});
+const sortColumnOption = computed(() => {return translator(stockSortColumnOption,t)});
+const sortOrder = computed(() => {return translator(SortOrderOption,t)});
+
 
 //fetch stock
 const fetchStock = async ():Promise<StockTable[]> => {
@@ -44,10 +49,11 @@ const fetchStock = async ():Promise<StockTable[]> => {
                 BranchId: item.BranchId,
                 BranchName: item.BranchName
             },
+            ProductCost: item.ProductCost,
             CurrentStock: item.CurrentStock,
+            Status: item.Status,
         })) || [];
         pageOptionStore.stock = extractPageOption(res.data.res_data , pageOptionStore.stock);
-        console.log(res.data.res_data.ConstructData)
         return stockList;
 }
 
@@ -81,7 +87,7 @@ watch(() => pageOptionStore.stock.PageSize ,() => {
    <div class="flex gap-4 flex-col">
         <div class="flex gap-2 items-center">
             <div class="flex items-center gap-2">
-                <h1>show</h1>
+                <h1>{{ $t('show') }}</h1>
                 <select v-model="pageOptionStore.stock.PageSize" className="select select-sm w-fit rounded-lg">
                     <option v-for="item in [5,10,25,50]" :value="item" :key="`item-${item}`">{{item}}</option>
                 </select>
@@ -92,17 +98,17 @@ watch(() => pageOptionStore.stock.PageSize ,() => {
                     <IconFilter2/>
                 </template>
             </TableSort>
-            <TableSort :sort-item="SortOrderOption" @page-sort="handleSortOrderEmit">
+            <TableSort :sort-item="sortOrder" @page-sort="handleSortOrderEmit">
                 <template #icon>    
-                    {{ SortOrderOption.find((s) => s.value === pageOptionStore.stock.SortOrder)?.title }}
+                    {{ sortOrder.find((s) => s.value === pageOptionStore.stock.SortOrder)?.title }}
                     <IconSortAscendingLetters/>
                 </template>
             </TableSort>
             <span class="w-full"></span>
         </div>
-        <Table 
-          :headers="headers" 
-          :items="stock" 
+        <Table
+          :headers="headers"
+          :items="stock"
           :isLoading="isTablePending"
           :isError="isTableError"
           :item-per-page="pageOptionStore.stock.PageSize"
@@ -121,5 +127,4 @@ watch(() => pageOptionStore.stock.PageSize ,() => {
             </template>
         </Table>
     </div>
-
 </template>

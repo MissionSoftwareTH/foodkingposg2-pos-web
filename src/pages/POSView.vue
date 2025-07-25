@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import Table from '../components/Table.vue';
 import type { baseResponse, Data , DataBaseResponse, POSPayload , POSResponse , POSTable } from '../types';
 import { IconFilter2, IconPencil, IconPlus, IconSortAscendingLetters, IconTrash, IconX } from '@tabler/icons-vue';
@@ -7,7 +7,7 @@ import apiClient from '../services/api/apiService';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useDialogStore } from '../store/dialogStore';
 import type { BranchList } from '../types/dropdown';
-import { formatDateTime } from '../services/utils';
+import { formatDateTime, translator } from '../services/utils';
 import { useProgressBarStore } from '../store/progressBarStore';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { useToastStore } from '../store/toastStore';
@@ -19,8 +19,8 @@ import { extractPageOption } from '../services/utils/dataExtract';
 import { usePageOptionStore } from '../store/sortingStore';
 import TitleBarCard from '../components/TitleBarCard.vue';
 import FormDialog from '../components/dialogs/FormDialog.vue';
+import { useI18n } from 'vue-i18n';
 
-const headers = posTableHeaders;
 const dialogStore = useDialogStore();
 const mode = ref<number>(1);
 const progressBarStore = useProgressBarStore();
@@ -28,7 +28,11 @@ const queryClient = useQueryClient();
 const toastStore = useToastStore();
 const form = ref({...posPayloadForm});
 const pageOptionStore = usePageOptionStore();
-const sortColumnOption = posSortColumnOption;
+const { t } = useI18n();
+const headers = computed(() => {return translator(posTableHeaders,t)});
+const sortColumnOption = computed(() => {return translator(posSortColumnOption,t)});
+const sortOrder = computed(() => {return translator(SortOrderOption,t)});
+
 
 const resetForm = () => {
   form.value = {...posPayloadForm};
@@ -68,8 +72,8 @@ const fetchPOSList = async (): Promise<POSTable[]> => {
             BranchId: data.BranchId,
             BranchName: data.BranchName,
             PosSystemId: pos?.PosSystemId,
-            PosSystemName: pos?.PosSystemName || 'not availiable',
-            PosSystemKey: pos?.PosSystemKey || 'not availiable',
+            PosSystemName: pos?.PosSystemName || t('not_available'),
+            PosSystemKey: pos?.PosSystemKey || t('not_available'),
             PosCreatedAt: formatDateTime(pos?.PosCreatedAt) || '',
             PosUpdatedAt: formatDateTime(pos?.PosUpdatedAt) || '',
           })) || []
@@ -202,16 +206,16 @@ watch(() => pageOptionStore.pos.PageSize ,() => {
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
-    <h1 class="text-3xl font-semibold">POS Management</h1>
+    <h1 class="text-3xl font-semibold">{{ $t('pos_management') }}</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <div class="w-full h-full flex gap-4 p-4 items-center">
-          <TitleBarCard title="Total POS" :text="pageOptionStore.pos.TotalRecords" :is-pending="isPending"/>
+          <TitleBarCard :title="$t('total_pos')" :text="pageOptionStore.pos.TotalRecords" :is-pending="isPending"/>
         </div>
     </div>
     <div class="flex gap-4 flex-col">
         <div class="flex gap-2 items-center">
             <div class="flex items-center gap-2">
-                <h1>show</h1>
+                <h1>{{ $t('show') }}</h1>
                 <select v-model="pageOptionStore.pos.PageSize" className="select select-sm w-fit rounded-lg">
                     <option v-for="item in [5,10,25,50]" :value="item" :key="`item-${item}`">{{item}}</option>
                 </select>
@@ -222,14 +226,14 @@ watch(() => pageOptionStore.pos.PageSize ,() => {
                     <IconFilter2/>
                 </template>
             </TableSort>
-            <TableSort :sort-item="SortOrderOption" @page-sort="handleSortOrderEmit">
+            <TableSort :sort-item="sortOrder" @page-sort="handleSortOrderEmit">
                 <template #icon>    
-                    {{ SortOrderOption.find((s) => s.value === pageOptionStore.pos.SortOrder)?.title  }}
+                    {{ sortOrder.find((s) => s.value === pageOptionStore.pos.SortOrder)?.title  }}
                     <IconSortAscendingLetters/>
                 </template>
             </TableSort>
             <span class="w-full"></span>
-            <button class="btn btn-primary btn-sm rounded-lg" @click="openModal()"><IconPlus class="size-5"/>Add POS</button>
+            <button class="btn btn-primary btn-sm rounded-lg" @click="openModal()"><IconPlus class="size-5"/>{{ $t('add_pos') }}</button>
         </div>
         <Table 
         :headers="headers" 
@@ -252,23 +256,23 @@ watch(() => pageOptionStore.pos.PageSize ,() => {
       <template #form>
         <div className="bg-base-100 text-base-content rounded-box relative px-6 py-8 min-w-1/2">
           <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal()"><IconX class="text-error-content"/></button>
-          <h3 v-if="mode === 1" className="font-semibold text-xl">Add New POS</h3>
-          <h3 v-else-if="mode === 2" className="font-semibold text-xl">Update POS</h3>
+          <h3 v-if="mode === 1" className="font-semibold text-xl">{{ $t('add_new_pos') }}</h3>
+          <h3 v-else-if="mode === 2" className="font-semibold text-xl">{{ $t('update_pos') }}</h3>
             <div className="">
               <form @submit.prevent="handleSubmit" class="text-base mx-auto">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <label class="form-control w-full" v-if="mode === 1">
                     <div class="label">
-                      <span class="label-text">Brand</span>
+                      <span class="label-text">{{ $t('brand') }}</span>
                     </div>
                     <select v-model="form.BranchId" class="select select-bordered w-full rounded-lg">
-                      <option :value="undefined" disabled>Select Brand</option>
+                      <option :value="undefined" disabled>{{ $t('brand_placeholder') }}</option>
                       <option v-for="(branch,index) in branchList" :key="`branch-${index}`" :value="branch.BranchId">{{ branch.BranchName }}</option>
                     </select>
                   </label>
                   <label class="form-control w-full">
                     <div class="label">
-                      <span class="label-text">POS Name</span>
+                      <span class="label-text">{{$t('pos_name')}}</span>
                     </div>
                     <input
                     type="text"
@@ -280,7 +284,7 @@ watch(() => pageOptionStore.pos.PageSize ,() => {
                   </label>
                   <label class="form-control w-full">
                     <div class="label">
-                      <span class="label-text">POS Key</span>
+                      <span class="label-text">{{ $t('pos_key') }}</span>
                     </div>
                     <input
                     type="text"
@@ -292,7 +296,7 @@ watch(() => pageOptionStore.pos.PageSize ,() => {
                   </label>
                 </div>
                 <div class="flex justify-center">
-                  <button type="submit" class="btn btn-primary px-8" :disabled="postPOSMutation.isPending.value || updatePOSMutation.isPending.value">Submit<span v-if="postPOSMutation.isPending.value || updatePOSMutation.isPending.value" className="loading loading-spinner loading-xs ml-2"></span></button>
+                  <button type="submit" class="btn btn-primary px-8" :disabled="postPOSMutation.isPending.value || updatePOSMutation.isPending.value">{{ $t('submit') }}</button>
                 </div>
               </form>
             </div>

@@ -10,7 +10,7 @@ import { useConfirmDialogStore } from '../store/confirmDialogStore';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { useToastStore } from '../store/toastStore';
 import { useProgressBarStore } from '../store/progressBarStore';
-import { formatDateTime } from '../services/utils';
+import { formatDateTime, translator } from '../services/utils';
 import TableSort from '../components/TableSort.vue';
 import { storeForm } from '../constants/form';
 import { storeTableHeaders } from '../constants/table';
@@ -19,6 +19,7 @@ import { extractPageOption } from '../services/utils/dataExtract';
 import { usePageOptionStore } from '../store/sortingStore';
 import TitleBarCard from '../components/TitleBarCard.vue';
 import FormDialog from '../components/dialogs/FormDialog.vue';
+import { useI18n } from 'vue-i18n';
 
 const confirmStore = useConfirmDialogStore();
 const dialogStore = useDialogStore();
@@ -27,9 +28,11 @@ const queryClient = useQueryClient();
 const progressBarStore = useProgressBarStore();
 const mode = ref<number>(1);
 const form = ref({...storeForm});
-const headers = storeTableHeaders;
-const sortColumnOption = storeSortColumnOption;
 const pageOptionStore = usePageOptionStore();
+const { t } = useI18n();
+const headers = computed(() => {return translator(storeTableHeaders,t)});
+const sortColumnOption = computed(() => {return translator(storeSortColumnOption,t)});
+const sortOrder = computed(() => {return translator(SortOrderOption,t)});
 
 const openModal = (data?:BranchTable) => {
     if(data) {
@@ -189,17 +192,17 @@ const mostPOS = computed(() => {
 </script>
 <template>
 <div class="flex flex-col p-2 gap-4">
-    <h1 class="text-3xl font-semibold">Store Management</h1>
+    <h1 class="text-3xl font-semibold">{{ $t('store_management') }}</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <div class="w-full h-full flex gap-4 p-4 items-center">
-            <TitleBarCard title="Total Store" :text="pageOptionStore.store.TotalRecords" :is-pending="isPending"/>
-            <TitleBarCard title="Most Amount of POS" :text="mostPOS" :is-pending="isPending" />
+            <TitleBarCard :title="$t('total_store')" :text="pageOptionStore.store.TotalRecords" :is-pending="isPending"/>
+            <TitleBarCard :title="$t('most_amount_pos')" :text="mostPOS" :is-pending="isPending" />
         </div>
     </div>
     <div class="flex gap-4 flex-col">
         <div class="flex gap-2 items-center">
             <div class="flex items-center gap-2">
-                <h1>show</h1>
+                <h1>{{ $t('show') }}</h1>
                 <select v-model="pageOptionStore.store.PageSize" className="select select-sm w-fit rounded-lg">
                     <option v-for="item in [5,10,25,50]" :value="item" :key="`item-${item}`">{{item}}</option>
                 </select>
@@ -210,14 +213,14 @@ const mostPOS = computed(() => {
                     <IconFilter2/>
                 </template>
             </TableSort>
-            <TableSort :sort-item="SortOrderOption" @page-sort="handleSortOrderEmit">
+            <TableSort :sort-item="sortOrder" @page-sort="handleSortOrderEmit">
                 <template #icon>    
-                    {{ SortOrderOption.find((s) => s.value === pageOptionStore.store.SortOrder)?.title  }}
+                    {{ sortOrder.find((s) => s.value === pageOptionStore.store.SortOrder)?.title  }}
                     <IconSortAscendingLetters/>
                 </template>
             </TableSort>
             <span class="w-full"></span>
-            <button class="btn btn-primary btn-sm rounded-lg" @click="openModal()"><IconPlus class="size-5"/>Add Store</button>
+            <button class="btn btn-primary btn-sm rounded-lg" @click="openModal()"><IconPlus class="size-5"/>{{$t('add_store')}}</button>
         </div>
         <Table 
             :isLoading="isPending"
@@ -242,30 +245,30 @@ const mostPOS = computed(() => {
         <template #form>
             <div className="bg-base-100 text-base-content rounded-box px-6 py-8 relative">
                 <button class="absolute top-2 right-2 btn btn-soft btn-circle btn-error size-8" @click="closeModal"><IconX class="text-error-content"/></button>
-                <h3 v-if="mode === 1" className="font-semibold text-xl">Add New Store</h3>
-                <h3 v-else-if="mode === 2" className="font-semibold text-xl">Update Store</h3>
+                <h3 v-if="mode === 1" className="font-semibold text-xl">{{$t('add_store_title')}}</h3>
+                <h3 v-else-if="mode === 2" className="font-semibold text-xl">{{$t('update_store_title')}}</h3>
             <div className="">
                 <form class="card-body" @submit.prevent="handleSubmit">
                     <div class="form-control flex">
                         <label class="label text-base-content flex-1">
-                            <span class="label-text">Store Name</span>
+                            <span class="label-text">{{$t('store_name')}}</span>
                         </label>
-                        <input type="text" placeholder="Store Name" class="input input-bordered flex-2 validator" v-model="form.BranchName"/>
+                        <input type="text" :placeholder="$t('store_name_placeholder')" class="input input-bordered flex-2 validator" v-model="form.BranchName"/>
                     </div>
                     <div class="form-control flex">
                         <label class="label text-base-content flex-1">
-                            <span class="label-text">Store Phone</span>
+                            <span class="label-text">{{$t('store_phone')}}</span>
                         </label>
-                        <input type="text" placeholder="Store Email" class="input input-bordered flex-2" v-model="form.BranchPhone"/>
+                        <input type="text" :placeholder="$t('store_phone_placeholder')" class="input input-bordered flex-2" v-model="form.BranchPhone"/>
                     </div>
                     <div class="form-control flex">
                         <label class="label text-base-content flex-1">
-                            <span class="label-text">Store Email</span>
+                            <span class="label-text">{{$t('store_email')}}</span>
                         </label>
-                        <input type="text" placeholder="Store Email" class="input input-bordered flex-2" v-model="form.BranchEmail"/>
+                        <input type="text" :placeholder="$t('store_email_placeholder')" class="input input-bordered flex-2" v-model="form.BranchEmail"/>
                     </div>
                     <div class="form-control mt-6">
-                        <button type="submit" class="btn btn-primary" :disabled="isFetching">Submit<span v-if="isFetching" className="loading loading-spinner loading-xs ml-2"></span></button>
+                        <button type="submit" class="btn btn-primary" :disabled="isFetching">{{$t('submit')}}<span v-if="isFetching" className="loading loading-spinner loading-xs ml-2"></span></button>
                     </div>
                 </form>
             </div>
