@@ -55,24 +55,24 @@ const fetchProduct = async ():Promise<ProductTable[]> => {
               ProductImagePath: product.ProductImagePath || null,
               ProductCategory: {
                 ProductCategoryId: product.ProductCategory?.ProductCategoryId || null,
-                ProductCategoryName: product.ProductCategory?.ProductCategoryName || 'no category'
+                ProductCategoryName: product.ProductCategory?.ProductCategoryName || t('no_category')
               },
           } ,
           ProductCode: product.ProductCode || null,
           ProductStatus: {
             ProductStatusId: product.ProductStatus?.ProductStatusId || null,
-            ProductStatusName: product.ProductStatus?.ProductStatusName || 'not availiable',
-            ProductStatusDescription: product.ProductStatus?.ProductStatusDescription || 'not availiable',
+            ProductStatusName: product.ProductStatus?.ProductStatusName || t('not_available'),
+            ProductStatusDescription: product.ProductStatus?.ProductStatusDescription || t('not_available'),
           },
           ProductBrand: {
             ProductBrandId: product.ProductBrand?.ProductBrandId || null,
-            ProductBrandName: product.ProductBrand?.ProductBrandName || 'not availiable'
+            ProductBrandName: product.ProductBrand?.ProductBrandName || t('not_available')
           },
           ProductPrice: product.ProductPrice || 0,
           ProductTaxType:{
             ProductTaxTypeId: product.ProductTaxType?.ProductTaxTypeId || null,
-            ProductTaxTypeName: product.ProductTaxType?.ProductTaxTypeName || 'not availiable',
-            ProductTaxTypeDescription: product.ProductTaxType?.ProductTaxTypeDescription || 'not availiable'
+            ProductTaxTypeName: product.ProductTaxType?.ProductTaxTypeName || t('not_available'),
+            ProductTaxTypeDescription: product.ProductTaxType?.ProductTaxTypeDescription || t('not_available')
           }, 
           ProductDiscountPercent: {
             ProductEnableDiscount: !!product.ProductEnableDiscountPercent,
@@ -330,7 +330,7 @@ watch(() => pageOptionStore.product.PageSize ,() => {
     <h1 class="text-3xl font-semibold">{{ $t('product_management')}}</h1>
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <div class="w-full h-full flex gap-4 p-4 items-center">
-          <TitleBarCard title="Total Product" :text="pageOptionStore.product.TotalRecords" :is-pending="isTablePending"/>
+          <TitleBarCard :title="$t('total_product')" :text="pageOptionStore.product.TotalRecords" :is-pending="isTablePending"/>
         </div>
     </div>
     <div class="flex gap-4 flex-col">
@@ -396,11 +396,11 @@ watch(() => pageOptionStore.product.PageSize ,() => {
             </template>
             <template #ProductDiscountPercent="product">
                 <h1 v-if="product.item.ProductDiscountPercent.ProductEnableDiscount">{{ product.item.ProductDiscountPercent.ProductDiscountValue }}%</h1>
-                <h1 v-else class="text-error">disabled</h1>
+                <h1 v-else class="text-error">{{ $t('disabled') }}</h1>
             </template>
             <template #ProductDiscountAmount="product">
                 <h1 v-if="product.item.ProductDiscountAmount.ProductEnableDiscount">{{ product.item.ProductDiscountAmount.ProductDiscountValue }}฿</h1>
-                <h1 v-else class="text-error">disabled</h1>
+                <h1 v-else class="text-error">{{ $t('disabled') }}</h1>
             </template>
             <template #actions="product">
                 <button class="btn btn-circle btn-soft btn-xs bg-info text-info-content mr-2" @click="openModal(product.item)"><IconPencil class="size-4"/></button>

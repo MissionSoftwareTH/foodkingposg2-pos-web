@@ -122,14 +122,16 @@ const debouceAutoCloseSidebar = debounce(autoCloseSidebar , 500);
         <div class="font-extrabold italic flex text-2xl text-shadow-md px-4 py-2 mb-5">
             <h1 class="text-primary">POSKING</h1><h1 class="text-secondary">-</h1><h1 class="text-accent">SERVER</h1>
         </div>
-        <ul class="flex flex-col gap-4">
+        <ul class="flex flex-col gap-4 h-8/10 overflow-y-auto">
             <SidebarMenu v-for="link in navLinks" :item="link" :key="link.name || link.path" />
             <!-- setting link -->
             <li v-if="settingRoute">
                 <RouterLink
                     to="/setting/account/info"
                     :class="isSettingPage && 'bg-primary text-primary-content stroke-primary-content'"
-                    class="flex items-center px-2 py-2 bg-base-100 rounded-xl hover:bg-primary/80 hover:text-primary-content hover:stroke-primary-content transition-all duration-500 ease-in-out">
+                    class="flex items-center px-2 py-2 bg-base-100 rounded-xl hover:bg-primary/80 hover:text-primary-content hover:stroke-primary-content transition-all duration-500 ease-in-out"
+                    @click="() => toggle.isSidebar = false"
+                    >
                     <IconSettings class="size-8"/>
                         <h1 class="overflow-hidden font-semibold whitespace-nowrap px-4 transition-all duration-500 ease-in-out">{{ settingRoute.name }}</h1>
                 </RouterLink>

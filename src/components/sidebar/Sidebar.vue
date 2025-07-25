@@ -49,6 +49,8 @@ const navLinks = computed(() => {
             const permissionChildren = permissionMap.value.get(route.name);
             const newRoute: AppRouteRecordRaw = { ...route } as AppRouteRecordRaw; // คัดลอก route เพื่อไม่แก้ไข original
 
+            
+
             if (route.children && route.children.length > 0 && permissionChildren && permissionChildren.length > 0) {
                 const sourceChildrenValues = new Set(permissionChildren.map(child => child.SubPermissionName));
                 const filteredChildren: AppRouteRecordRaw[] = [];
@@ -96,9 +98,7 @@ watch(() => router.currentRoute.value.path, (newPath) => {
 
 </script>
 <template>
-    <aside 
-        class="group h-full bg-base-100 rounded-xl p-4 overflow-hidden text-nowrap shadow-lg relative z-50"
-    >    
+    <aside class="group h-full bg-base-100 rounded-xl p-4 overflow-hidden text-nowrap shadow-lg relative z-50">    
         <ul class="flex flex-col gap-4">
             <SidebarMenu v-for="link in navLinks" :item="link" :key="link.name || link.path" />
             <!-- setting link -->
@@ -110,14 +110,15 @@ watch(() => router.currentRoute.value.path, (newPath) => {
                     <IconSettings class="size-8"/>
                         <h1
                         :class="appSetupStore.isSideBarExpanded ? 'px-4' : 'opacity-0 max-w-0 group-hover:px-4 group-hover:opacity-100 group-hover:max-w-xs'"
-                        class="overflow-hidden font-semibold whitespace-nowrap transition-all duration-500 ease-in-out">{{ settingRoute.name }}</h1>
+                        class="overflow-hidden font-semibold whitespace-nowrap transition-all duration-500 ease-in-out">{{ $t(settingRoute.meta?.title || 'unknown') }}</h1>
                 </RouterLink>
             </li>
         </ul>
-        <button 
+        <button
             @click="handleSidebarToggle(!appSetupStore.isSideBarExpanded)"
             :class="!appSetupStore.isSideBarExpanded && 'invisible opacity-0 group-hover:opacity-100 group-hover:visible'"
-            class="btn btn-ghost btn-sm btn-circle absolute bottom-2 right-2 transition-all duration-500 ">
+            class="btn btn-ghost btn-sm btn-circle absolute bottom-2 right-2 transition-all duration-500 "
+        >
             <IconLock v-if="appSetupStore.isSideBarExpanded"/>
             <IconLockOpen v-else />
         </button>

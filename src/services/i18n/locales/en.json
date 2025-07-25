@@ -122,5 +122,9 @@
     "current_password_placeholder": "current password",
     "new_password_placeholder": "new password",
     "confirm_password_placeholder": "confirm password",
-    "account": "Account"
+    "account": "Account",
+    "no_category": "no category",
+    "not_available": "not available",
+    "disabled": "Disabled",
+    "logout": "Logout"
 }

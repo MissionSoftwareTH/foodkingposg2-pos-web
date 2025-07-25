@@ -170,7 +170,7 @@ watch(() => pageOptionStore.categories.PageSize ,() => {
     <div class="card bg-gradient-to-br from-secondary to-accent shadow-lg font-semibold">
         <form @submit.prevent="handleSubmit" class="w-full h-full flex gap-4 p-4 items-center">
             <div class="form-control flex">
-                <input type="text" placeholder="Categories name" class="input input-bordered flex-2 min-w-sm" v-model="form.ProductCategoryName"/>
+                <input type="text" :placeholder="$t('category_name_placeholder')" class="input input-bordered flex-2 min-w-sm" v-model="form.ProductCategoryName"/>
             </div>
             <button type="submit" class="btn btn-primary" :disabled="isFetching"><IconPlus class="size-5"/>{{ $t('add_new_category') }}<span v-if="isFetching" className="loading loading-spinner loading-xs ml-2"></span></button>
         </form>

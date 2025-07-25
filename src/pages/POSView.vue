@@ -72,8 +72,8 @@ const fetchPOSList = async (): Promise<POSTable[]> => {
             BranchId: data.BranchId,
             BranchName: data.BranchName,
             PosSystemId: pos?.PosSystemId,
-            PosSystemName: pos?.PosSystemName || 'not availiable',
-            PosSystemKey: pos?.PosSystemKey || 'not availiable',
+            PosSystemName: pos?.PosSystemName || t('not_available'),
+            PosSystemKey: pos?.PosSystemKey || t('not_available'),
             PosCreatedAt: formatDateTime(pos?.PosCreatedAt) || '',
             PosUpdatedAt: formatDateTime(pos?.PosUpdatedAt) || '',
           })) || []

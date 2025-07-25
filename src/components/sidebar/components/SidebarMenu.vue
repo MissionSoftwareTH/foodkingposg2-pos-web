@@ -6,6 +6,7 @@ import type { IconName } from '../../../router/routePath';
 import type { AppRouteRecordRaw } from '../../../types';
 import { useAppSetupStore } from '../../../store/appSetupStore';
 import { useToggleStore } from '../../../store/toggleStore';
+import { useI18n } from 'vue-i18n';
 
 const iconComponents = shallowRef<Record<IconName, any>>({
     'Dashboard': IconHome,
@@ -66,7 +67,7 @@ watch(() => router.currentRoute.value.path, (newPath) => {
         />
                 <h1 
                 :class="appSetupStore.isSideBarExpanded || toggle.isSidebar ? `px-4` : `opacity-0 max-w-0 group-hover:px-4 group-hover:opacity-100 group-hover:max-w-xs`"
-                class="overflow-hidden font-semibold whitespace-nowrap transition-all duration-500 ease-in-out">{{ item.name }}</h1>
+                class="overflow-hidden font-semibold whitespace-nowrap transition-all duration-500 ease-in-out">{{ $t(item.meta?.title || 'unknown') }}</h1>
 
             </button>
             <div class="collapse-content flex flex-col p-0 gap-2 peer-checked:pt-2">
@@ -79,7 +80,9 @@ watch(() => router.currentRoute.value.path, (newPath) => {
             v-else
             :to="item.path" 
             exactActiveClass="bg-primary text-primary-content stroke-primary-content"
-            class="flex items-center px-2 py-2 bg-base-100 rounded-xl hover:bg-primary/80 hover:text-primary-content hover:stroke-primary-content transition-all duration-500 ease-in-out">
+            class="flex items-center px-2 py-2 bg-base-100 rounded-xl hover:bg-primary/80 hover:text-primary-content hover:stroke-primary-content transition-all duration-500 ease-in-out"
+            @click="() => toggle.isSidebar = false"
+            >
             <component 
                 v-if="item?.meta?.icon && iconComponents[item.meta.icon]" 
                 :is="iconComponents[item.meta.icon]"
@@ -87,7 +90,7 @@ watch(() => router.currentRoute.value.path, (newPath) => {
             />
                 <h1 
                 :class="appSetupStore.isSideBarExpanded || toggle.isSidebar ? `px-4` : `opacity-0 max-w-0 group-hover:px-4 group-hover:opacity-100 group-hover:max-w-xs`"
-                class="overflow-hidden font-semibold whitespace-nowrap transition-all duration-500 ease-in-out">{{ item.name }}</h1>
+                class="overflow-hidden font-semibold whitespace-nowrap transition-all duration-500 ease-in-out">{{ $t(item.meta?.title || 'unknown') }}</h1>
         </RouterLink>
     </li>
 </template>
